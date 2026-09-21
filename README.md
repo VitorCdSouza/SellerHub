@@ -58,6 +58,8 @@ node --version
 
 ## 1. Preparar o banco
 
+**Alternativa para os integrantes com PostgreSQL 18:** restaure o [dump pronto da PoC](SellerBack/dump/README.md), que já inclui tabela e usuário de teste. Escolha a restauração do dump ou os scripts abaixo; não aplique ambos sobre as mesmas tabelas. O guia do dump explica como definir as credenciais locais de cada integrante.
+
 Com o serviço PostgreSQL iniciado, conecte como administrador:
 
 ```powershell

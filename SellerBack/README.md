@@ -4,6 +4,8 @@ API REST em Go para a PoC SellerHub. Recebe `POST /login` com `email` e `passwor
 
 O [README principal](../README.md) contém o passo a passo completo de instalação do PostgreSQL, criação da role e banco, execução dos scripts SQL e demonstração com Angular.
 
+Para reproduzir o banco em outra máquina com PostgreSQL 18, use o [dump e as instruções de restauração](dump/README.md). O arquivo inclui a tabela e o usuário de demonstração; cada integrante configura sua própria senha de conexão no `.env` local.
+
 ## Responsabilidades
 
 | Parte | Responsabilidade |
