@@ -1,0 +1,115 @@
+:host {
+  display: block;
+}
+.pagina {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+}
+.cartao {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.25rem;
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px #142b4910;
+}
+.marca {
+  margin: 0 0 2rem;
+  color: #244bc1;
+  font-size: 1.15rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  letter-spacing: -0.035em;
+}
+.introducao {
+  color: #526075;
+  line-height: 1.6;
+  margin: 0.65rem 0 1.75rem;
+}
+.campo {
+  margin-bottom: 1.2rem;
+}
+label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 650;
+  margin-bottom: 0.5rem;
+}
+input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #8290a4;
+  border-radius: 7px;
+  padding: 0.7rem 0.8rem;
+  background: #fff;
+  color: #182335;
+  font: inherit;
+}
+input[aria-invalid='true'] {
+  border-color: #ae2434;
+}
+input:disabled {
+  background: #f1f4f8;
+}
+button {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 7px;
+  background: #244bc1;
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: #1d3b96;
+}
+button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid #244bc1;
+  outline-offset: 3px;
+}
+.erro-campo {
+  color: #a01e2d;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+}
+.mensagem {
+  margin: 1.25rem 0 0;
+  border-radius: 7px;
+  padding: 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.erro {
+  background: #fff0f1;
+  color: #8d1b29;
+}
+.sucesso {
+  background: #eaf8ef;
+  color: #176238;
+}
+.nota {
+  margin: 1.75rem 0 0;
+  text-align: center;
+  color: #637084;
+  font-size: 0.8rem;
+}
+@media (max-width: 400px) {
+  .cartao {
+    padding: 1.5rem;
+  }
+}

@@ -1,0 +1,73 @@
+<main class="pagina">
+  <section class="cartao" aria-labelledby="titulo-login">
+    <p class="marca">SellerHub</p>
+    <h1 id="titulo-login">Entre na sua conta</h1>
+    <p class="introducao">Informe suas credenciais para continuar.</p>
+
+    <form [formGroup]="formulario" (ngSubmit)="entrar()" [attr.aria-busy]="enviando()" novalidate>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input
+          id="email"
+          #campoEmail
+          type="email"
+          formControlName="email"
+          autocomplete="username"
+          inputmode="email"
+          maxlength="254"
+          required
+          [attr.aria-invalid]="
+            formulario.controls.email.touched && formulario.controls.email.invalid
+          "
+          [attr.aria-describedby]="
+            formulario.controls.email.touched && formulario.controls.email.invalid
+              ? 'erro-email'
+              : null
+          "
+        />
+        @if (formulario.controls.email.touched && formulario.controls.email.invalid) {
+          <p id="erro-email" class="erro-campo">Informe um e-mail válido.</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input
+          id="senha"
+          #campoSenha
+          type="password"
+          formControlName="senha"
+          autocomplete="current-password"
+          required
+          [attr.aria-invalid]="
+            formulario.controls.senha.touched && formulario.controls.senha.invalid
+          "
+          [attr.aria-describedby]="
+            formulario.controls.senha.touched && formulario.controls.senha.invalid
+              ? 'erro-senha'
+              : null
+          "
+        />
+        @if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
+          <p id="erro-senha" class="erro-campo">Informe sua senha.</p>
+        }
+      </div>
+
+      <button type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <div role="alert" aria-atomic="true">
+      @if (erro()) {
+        <p class="mensagem erro">{{ erro() }}</p>
+      }
+    </div>
+    <div role="status" aria-atomic="true">
+      @if (sucesso()) {
+        <p class="mensagem sucesso">{{ sucesso() }}</p>
+      }
+    </div>
+    <p class="nota">Demonstração acadêmica de login.</p>
+  </section>
+</main>
