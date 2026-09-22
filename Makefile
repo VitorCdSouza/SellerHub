@@ -5,8 +5,8 @@ run:
 	$(MAKE) -j2 api web
 
 api:
-ifeq ($(wildcard api/.env),)
-	$(error api/.env não encontrado: copie api/.env.example para api/.env e defina DB_PASSWORD)
+ifeq ($(wildcard .env),)
+	$(error .env não encontrado: copie .env.example para .env e defina DB_PASSWORD)
 endif
 	cd api && go run ./cmd
 
@@ -19,18 +19,18 @@ web/node_modules: web/package-lock.json
 install: web/node_modules
 	cd api && go mod download
 
-# postgresql via docker com as credenciais do api/.env
+# postgresql via docker com as credenciais do .env
 db:
-ifeq ($(wildcard api/.env),)
-	$(error api/.env não encontrado: copie api/.env.example para api/.env e defina DB_PASSWORD)
+ifeq ($(wildcard .env),)
+	$(error .env não encontrado: copie .env.example para .env e defina DB_PASSWORD)
 endif
-	docker compose --env-file api/.env up -d --wait
+	docker compose -f db/docker-compose.yaml --env-file .env up -d --wait
 
 # mantem os dados; recriar do zero
 stop-db:
-	docker compose --env-file api/.env down
+	docker compose -f db/docker-compose.yaml --env-file .env down
 
-# apaga o volume e recria o banco rodando de novo os scripts de api/sql
+# apaga o volume e recria o banco rodando de novo os scripts de db/
 reset-db:
-	docker compose --env-file api/.env down -v
+	docker compose -f db/docker-compose.yaml --env-file .env down -v
 	$(MAKE) db

@@ -1,15 +1,18 @@
+name: saleshub
+
 services:
   db:
     image: postgres:17
     environment:
-      POSTGRES_USER: ${DB_USER:?defina DB_USER em api/.env}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD em api/.env}
-      POSTGRES_DB: ${DB_NAME:?defina DB_NAME em api/.env}
+      POSTGRES_USER: ${DB_USER:?defina DB_USER em .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD em .env}
+      POSTGRES_DB: ${DB_NAME:?defina DB_NAME em .env}
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./api/sql:/docker-entrypoint-initdb.d:ro
+      - ./estrutura.sql:/docker-entrypoint-initdb.d/01_estrutura.sql:ro
+      - ./dados.sql:/docker-entrypoint-initdb.d/02_dados.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s

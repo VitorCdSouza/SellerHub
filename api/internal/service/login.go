@@ -4,44 +4,39 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/mail"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
-	"sellerhub/sellerback/internal/repository"
+
+	"saleshub/api/internal/db"
 )
 
 var (
-	ErrDadosInvalidos       = errors.New("informe um e-mail válido e uma senha de até 72 bytes")
-	ErrCredenciaisInvalidas = errors.New("credenciais inválidas")
+	ErrInvalidInput       = errors.New("dados invalidos")
+	ErrInvalidCredentials = errors.New("credenciais invalidas")
 )
 
-type ConsultaUsuario interface {
-	BuscarHash(context.Context, string) (string, error)
+type LoginService struct {
+	Queries *db.Queries
 }
 
-type Login struct {
-	Usuarios ConsultaUsuario
-}
-
-func (s *Login) Entrar(ctx context.Context, email, senha string) error {
+func (s *LoginService) Login(ctx context.Context, email, password string) error {
 	email = strings.ToLower(strings.TrimSpace(email))
-	endereco, err := mail.ParseAddress(email)
-	if err != nil || endereco.Address != email || len(email) > 254 || len(senha) == 0 || len(senha) > 72 {
-		return ErrDadosInvalidos
+	// bcrypt ignora bytes alem do 72
+	if email == "" || password == "" || len(password) > 72 {
+		return ErrInvalidInput
 	}
-	hash, err := s.Usuarios.BuscarHash(ctx, email)
-	if errors.Is(err, repository.ErrUsuarioNaoEncontrado) {
-		return ErrCredenciaisInvalidas
+
+	hash, err := s.Queries.GetPasswordHash(ctx, email)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return ErrInvalidCredentials
 	}
 	if err != nil {
-		return fmt.Errorf("realizar login: %w", err)
+		return fmt.Errorf("buscar usuario: %w", err)
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(senha)); err != nil {
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return ErrCredenciaisInvalidas
-		}
-		return fmt.Errorf("verificar hash armazenado: %w", err)
+	if bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) != nil {
+		return ErrInvalidCredentials
 	}
 	return nil
 }

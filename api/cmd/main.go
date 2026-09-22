@@ -2,43 +2,48 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
-	"sellerhub/sellerback/internal/database"
-	"sellerhub/sellerback/internal/handler"
-	"sellerhub/sellerback/internal/repository"
-	"sellerhub/sellerback/internal/service"
+
+	"saleshub/api/internal/controller"
+	"saleshub/api/internal/db"
+	"saleshub/api/internal/service"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil && !errors.Is(err, os.ErrNotExist) {
-		log.Fatal("Não foi possível ler .env; confira o formato e as permissões")
-	}
-	banco, err := database.Conectar(context.Background())
+	// caminho relativo a api/, de onde a api roda
+	_ = godotenv.Load("../.env")
+
+	pool, err := db.Connect(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer banco.Close()
-	origem := os.Getenv("FRONTEND_ORIGIN")
-	if origem == "" {
-		origem = "http://localhost:4200"
-	}
-	servico := &service.Login{Usuarios: &repository.Usuarios{Banco: banco}}
-	servidor := &http.Server{
-		Addr:              "localhost:8080",
-		Handler:           handler.Novo(servico, origem),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      10 * time.Second,
-		IdleTimeout:       60 * time.Second,
-	}
-	log.Print("API disponível em http://localhost:8080")
-	if err := servidor.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Printf("Executar servidor: %v", err)
-	}
+	defer pool.Close()
+
+	queries := db.New(pool)
+	loginController := &controller.LoginController{Service: &service.LoginService{Queries: queries}}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /login", loginController.Login)
+
+	log.Print("API em http://localhost:8080")
+	log.Fatal(http.ListenAndServe("localhost:8080", cors(mux, os.Getenv("FRONTEND_ORIGIN"))))
+}
+
+func cors(next http.Handler, origin string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Origin") == origin {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Methods", "POST")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		}
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
