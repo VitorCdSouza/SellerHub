@@ -33,7 +33,7 @@ Escolha uma senha local ao executar `\password`. Se a role `sellerhub` já exist
 No PowerShell, restaure como o proprietário do banco:
 
 ```powershell
-pg_restore -h localhost -p 5432 -U sellerhub -d sellerhub_poc --no-owner --no-privileges --single-transaction --exit-on-error .\SellerBack\dump\sellerhub_poc.dump
+pg_restore -h localhost -p 5432 -U sellerhub -d sellerhub_poc --no-owner --no-privileges --single-transaction --exit-on-error .\api\dump\sellerhub_poc.dump
 ```
 
 A senha solicitada é a senha local da role `sellerhub`, não `123456`. As opções de restauração evitam depender dos proprietários e permissões da máquina de origem. Não execute os scripts de criação da tabela antes do dump: ele já contém a estrutura e os dados.
@@ -48,7 +48,7 @@ A senha solicitada é a senha local da role `sellerhub`, não `123456`. As opç�
 
 ## Configurar a API em cada máquina
 
-Na pasta `SellerBack`, copie `.env.example` para `.env` somente se este ainda não existir. Preencha:
+Na pasta `api`, copie `.env.example` para `.env` somente se este ainda não existir. Preencha:
 
 ```dotenv
 DB_HOST=localhost
@@ -70,7 +70,7 @@ Na raiz do repositório:
 psql -h localhost -p 5432 -U sellerhub -d sellerhub_poc -c "SELECT id, email FROM users;"
 ```
 
-Deve aparecer o usuário `teste@email.com`. Depois, na pasta `SellerBack`:
+Deve aparecer o usuário `teste@email.com`. Depois, na pasta `api`:
 
 ```powershell
 $env:TEST_POSTGRES = '1'
@@ -86,7 +86,7 @@ Em outro terminal, na pasta do front-end `SellerHub`, execute `npm ci` e `npm st
 Com o banco contendo somente os dados fictícios que devem ser compartilhados, execute na raiz do repositório:
 
 ```powershell
-pg_dump -h localhost -p 5432 -U sellerhub -d sellerhub_poc --format=custom --no-privileges --file=.\SellerBack\dump\sellerhub_poc.dump
+pg_dump -h localhost -p 5432 -U sellerhub -d sellerhub_poc --format=custom --no-privileges --file=.\api\dump\sellerhub_poc.dump
 ```
 
 Esse comando substitui o arquivo de dump. Revise os dados antes de gerar uma nova versão: backups posteriores podem incluir outras contas. `pg_dump` exporta o banco; roles e senhas de conexão são configuradas separadamente em cada máquina.

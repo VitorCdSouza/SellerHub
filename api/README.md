@@ -1,4 +1,4 @@
-# SellerBack — API de login
+# API de login
 
 API REST em Go para a PoC SellerHub. Recebe `POST /login` com `email` e `password`, consulta PostgreSQL e compara a senha com bcrypt.
 
@@ -21,7 +21,7 @@ Para reproduzir o banco em outra máquina com PostgreSQL 18, use o [dump e as in
 
 ## Execução
 
-Na pasta `SellerBack`, depois de preparar PostgreSQL e os scripts:
+Na pasta `api`, depois de preparar PostgreSQL e os scripts:
 
 ```powershell
 Copy-Item .env.example .env

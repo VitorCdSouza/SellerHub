@@ -8,13 +8,13 @@ O escopo é somente a verificação de credenciais. O sucesso não cria sessão,
 
 ```text
 SellerHub/                         raiz do repositório
-├── SellerHub/                     front-end Angular
+├── web/                           front-end Angular
 │   └── src/app/
 │       ├── login/                 formulário, estado e mensagens
 │       ├── services/auth.service.ts
 │       ├── app.config.ts          configuração HTTP e rotas
 │       └── app.routes.ts          carregamento da tela de login
-├── SellerBack/                    back-end Go
+├── api/                           back-end Go
 │   ├── cmd/main.go                inicialização
 │   ├── cmd/gerar-hash/main.go      utilitário local de bcrypt
 │   ├── internal/
@@ -42,7 +42,7 @@ As camadas são pacotes do mesmo programa Go. `net/http` dispensa um framework w
 ## Pré-requisitos
 
 - Node.js 24 e npm, usados com o Angular 21.2 existente.
-- Go 1.27 ou superior, conforme `SellerBack/go.mod`.
+- Go 1.27 ou superior, conforme `api/go.mod`.
 - PostgreSQL 17 ou superior, com servidor e ferramentas de linha de comando (`psql`).
 
 No Windows, obtenha o instalador pelo [site oficial do PostgreSQL](https://www.postgresql.org/download/windows/). Instale o servidor e as ferramentas de linha de comando; pgAdmin é opcional. Para esta PoC, use a porta local `5432` e defina sua própria senha de administrador `postgres`. Não são necessários complementos do Stack Builder.
@@ -58,7 +58,7 @@ node --version
 
 ## 1. Preparar o banco
 
-**Alternativa para os integrantes com PostgreSQL 18:** restaure o [dump pronto da PoC](SellerBack/dump/README.md), que já inclui tabela e usuário de teste. Escolha a restauração do dump ou os scripts abaixo; não aplique ambos sobre as mesmas tabelas. O guia do dump explica como definir as credenciais locais de cada integrante.
+**Alternativa para os integrantes com PostgreSQL 18:** restaure o [dump pronto da PoC](api/dump/README.md), que já inclui tabela e usuário de teste. Escolha a restauração do dump ou os scripts abaixo; não aplique ambos sobre as mesmas tabelas. O guia do dump explica como definir as credenciais locais de cada integrante.
 
 Com o serviço PostgreSQL iniciado, conecte como administrador:
 
@@ -80,8 +80,8 @@ O comando `\password` solicita uma senha local sem colocá-la no script SQL. Ess
 De volta ao PowerShell, execute os scripts com o proprietário do banco:
 
 ```powershell
-psql -h localhost -p 5432 -U sellerhub -d sellerhub_poc -v ON_ERROR_STOP=1 -f .\SellerBack\sql\01_criar_tabela.sql
-psql -h localhost -p 5432 -U sellerhub -d sellerhub_poc -v ON_ERROR_STOP=1 -f .\SellerBack\sql\02_usuario_teste.sql
+psql -h localhost -p 5432 -U sellerhub -d sellerhub_poc -v ON_ERROR_STOP=1 -f .\api\sql\01_criar_tabela.sql
+psql -h localhost -p 5432 -U sellerhub -d sellerhub_poc -v ON_ERROR_STOP=1 -f .\api\sql\02_usuario_teste.sql
 ```
 
 A tabela `users` contém `id`, `email` único e `password` com hash bcrypt. O segundo script insere o usuário de demonstração. Reexecutá-lo não altera uma conta já existente com o mesmo e-mail.
@@ -91,7 +91,7 @@ A tabela `users` contém `id`, `email` único e `password` com hash bcrypt. O se
 Em um terminal, a partir da raiz:
 
 ```powershell
-cd SellerBack
+cd api
 Copy-Item .env.example .env
 ```
 
@@ -121,7 +121,7 @@ A API verifica a conexão com o banco antes de iniciar e atende em `http://local
 Em outro terminal, a partir da raiz:
 
 ```powershell
-cd SellerHub
+cd web
 npm ci
 npm start
 ```
@@ -178,7 +178,7 @@ Senha incorreta ou e-mail não cadastrado retornam `401` com a mesma mensagem:
 O SQL guarda somente um hash. Ele foi gerado em Go com `bcrypt.GenerateFromPassword` e `bcrypt.DefaultCost` (10). O utilitário abaixo permite gerar novamente o hash da senha pública de teste; salts aleatórios produzem hashes diferentes para a mesma senha:
 
 ```powershell
-cd SellerBack
+cd api
 '123456' | go run ./cmd/gerar-hash
 ```
 
@@ -191,14 +191,14 @@ Esta conta tem credenciais públicas e serve somente para demonstração local. 
 No back-end:
 
 ```powershell
-cd SellerBack
+cd api
 go test ./...
 go vet ./...
 ```
 
 Os testes comuns verificam HTTP, CORS, validação e bcrypt usando um repositório de teste. Eles também conferem se o hash do SQL corresponde a `123456`, mas não comprovam conexão com PostgreSQL.
 
-Após preparar o banco real com os scripts e configurar `.env`, execute na pasta `SellerBack`:
+Após preparar o banco real com os scripts e configurar `.env`, execute na pasta `api`:
 
 ```powershell
 $env:TEST_POSTGRES = '1'
@@ -211,7 +211,7 @@ Esse teste consulta o banco configurado, sem inserir ou apagar dados, e verifica
 No front-end:
 
 ```powershell
-cd SellerHub
+cd web
 npm test -- --watch=false
 npm run build
 ```
