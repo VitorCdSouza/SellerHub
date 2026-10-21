@@ -1,1 +1,16 @@
 .env
+
+# auxiliares do latex
+documentacao/*.aux
+documentacao/*.bbl
+documentacao/*.blg
+documentacao/*.brf
+documentacao/*.fdb_latexmk
+documentacao/*.fls
+documentacao/*.lof
+documentacao/*.log
+documentacao/*.lot
+documentacao/*.out
+documentacao/*.synctex.gz
+documentacao/*.toc
+documentacao/documento.pdf

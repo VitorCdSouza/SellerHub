@@ -15,7 +15,8 @@ SalesHub/
 │   ├── estrutura.sql              tabelas; também é o schema do sqlc
 │   └── dados.sql                  dados de desenvolvimento
 ├── api/                           back-end Go
-└── web/                           front-end Angular
+├── web/                           front-end Angular
+└── documentacao/                  documento técnico em LaTeX (abnTeX2)
 ```
 
 Fluxo do login:
@@ -203,6 +204,66 @@ npm run build
 ```
 
 Os testes usam HTTP simulado para conferir o formulário, o contrato do `AuthService`, o sucesso, as credenciais inválidas e a indisponibilidade da API. O build fica em `web/dist/SellerHub`.
+
+## Documentação (LaTeX)
+
+O documento técnico fica em `documentacao/` e usa a classe [abnTeX2](https://github.com/abntex/abntex2), com os capítulos do roteiro de proposta do Projeto Integrado de Extensão.
+
+```text
+documentacao/
+├── documento.tex          arquivo principal: ordem de capa, listas, capítulos e referências
+├── referencias.bib        base BibTeX das referências
+├── configuracoes/
+│   ├── preambulo.tex      classe, pacotes, fontes e estilo dos títulos
+│   ├── metadados.tex      título, autores, instituição, curso, orientador
+│   ├── capa.tex           layout da capa e da folha de rosto
+│   └── comandos.tex       comandos próprios (\orientacao, \pendente, \diagrama)
+├── pre-textual/           resumo, abstract e lista de siglas
+├── capitulos/             um arquivo por capítulo
+├── pos-textual/           referências, apêndices e anexos
+└── imagens/               figuras e diagramas; logo-ifsp.pdf é a marca oficial do Campus São Paulo
+```
+
+### Compilar
+
+Requer uma distribuição TeX com `latexmk`. No Fedora:
+
+```bash
+sudo dnf install latexmk texlive-scheme-medium texlive-abntex2
+```
+
+```bash
+make doc        # gera documentacao/documento.pdf
+make doc-clean  # remove auxiliares e o PDF
+```
+
+Para recompilar a cada arquivo salvo, rode `latexmk -pvc documento.tex` dentro de `documentacao/`. O `.latexmkrc` da pasta já configura pdfLaTeX e BibTeX, e a extensão LaTeX Workshop do VS Code o usa sem configuração extra. No Overleaf, envie a pasta `documentacao/` em `.zip` (New Project > Upload Project) e defina `documento.tex` como documento principal.
+
+### Comandos do template
+
+- `\sistema{}`: nome do sistema, definido em `configuracoes/metadados.tex`.
+- `\orientacao{texto}`: texto-guia em cinza itálico com o que cada seção deve conter. Apague o comando quando a seção for escrita. Para gerar o PDF sem nenhum deles, troque `\mostrarorientacoestrue` por `\mostrarorientacoesfalse` em `configuracoes/comandos.tex`.
+- `\pendente{texto}`: dado ainda não definido, em vermelho.
+- `\diagrama{legenda}{rotulo}`: moldura reservada para um diagrama ainda não desenhado; já entra na lista de ilustrações e pode ser citado com `\ref{fig:rotulo}`. Quando a imagem existir, substitua por:
+
+```latex
+\begin{figure}[htbp]
+  \centering
+  \caption{Diagrama de casos de uso}
+  \label{fig:casos-de-uso}
+  \includegraphics[width=\textwidth]{imagens/casos-de-uso.pdf}
+  \fonte{Elaborado pelos autores.}
+\end{figure}
+```
+
+### Citações e convenções
+
+Estilo autor-data (`abntex2cite`, opção `alf`). Cadastre a fonte em `referencias.bib` e cite com `\cite{go}`, que gera (THE GO AUTHORS, 2026), ou `\citeonline{go}`, que gera THE GO AUTHORS (2026). Só aparecem nas referências as entradas citadas pelo menos uma vez. Autor institucional vai entre chaves duplas e em caixa alta, como `{{GOOGLE}}`, para sair assim na lista de referências (NBR 6023).
+
+- Um capítulo por arquivo em `capitulos/`, incluído em `documento.tex`.
+- Rótulos com prefixo `cap:`, `fig:` e `tab:`; `\autoref{tab:tecnologias}` já escreve "Tabela 1".
+- Figuras e tabelas com legenda acima (`\caption`) e fonte abaixo (`\fonte`), como pede a ABNT.
+- Imagens em `documentacao/imagens/`, de preferência em PDF, para não perder resolução.
 
 ## Problemas comuns
 

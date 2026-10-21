@@ -1,4 +1,4 @@
-.PHONY: run api web install db stop-db reset-db
+.PHONY: run api web install db stop-db reset-db doc doc-clean
 
 # sobe api e web em paralelo, ctrl+c encerra os dois
 run:
@@ -34,3 +34,11 @@ stop-db:
 reset-db:
 	docker compose -f db/docker-compose.yaml --env-file .env down -v
 	$(MAKE) db
+
+# gera documentacao/documento.pdf
+doc:
+	cd documentacao && latexmk documento.tex
+
+# remove auxiliares e o pdf da documentacao
+doc-clean:
+	cd documentacao && latexmk -C documento.tex

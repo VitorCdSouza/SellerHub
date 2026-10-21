@@ -1,0 +1,20 @@
+% texto de orientacao em cinza; \mostrarorientacoesfalse tira todos do pdf
+\newif\ifmostrarorientacoes
+\mostrarorientacoestrue
+\newcommand{\orientacao}[1]{\ifmostrarorientacoes{\color{gray}\itshape #1\par}\fi}
+
+% dado ainda nao definido, em vermelho para nao passar despercebido
+\newcommand{\pendente}[1]{\textcolor{red}{#1}}
+
+% espaco reservado para diagrama ainda nao desenhado
+% uso: \diagrama{legenda}{rotulo}, referenciado com \ref{fig:rotulo}
+% quando a imagem existir em imagens/, trocar pelo ambiente figure com \includegraphics
+\newcommand{\diagrama}[2]{%
+  \begin{figure}[htbp]
+    \centering
+    \caption{#1}
+    \label{fig:#2}
+    \fbox{\parbox[c][5cm][c]{0.8\textwidth}{\centering\color{gray}\itshape #1 (a elaborar)}}
+    \fonte{Elaborado pelos autores.}
+  \end{figure}%
+}

@@ -1,0 +1,48 @@
+% arquivo principal: compilar este (ver README.md)
+\input{configuracoes/preambulo}
+
+\begin{document}
+\selectlanguage{brazil}
+\frenchspacing
+
+% elementos pre-textuais
+\imprimircapa
+% ambiente direto: \imprimirfolhaderosto engole o comando seguinte como argumento
+\begin{folhaderosto}
+  \folhaderostocontent
+\end{folhaderosto}
+\input{pre-textual/resumo}
+\input{pre-textual/abstract}
+
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+
+\input{pre-textual/siglas}
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+% elementos textuais
+\textual
+% so o numero da pagina no canto superior direito, sem cabecalho
+\pagestyle{simple}
+\input{capitulos/01-introducao}
+\input{capitulos/02-contexto}
+\input{capitulos/03-analise}
+\input{capitulos/04-projeto}
+\input{capitulos/05-implementacao}
+\input{capitulos/06-conclusao}
+
+% elementos pos-textuais
+\postextual
+\input{pos-textual/referencias}
+\input{pos-textual/apendices}
+\input{pos-textual/anexos}
+
+\end{document}

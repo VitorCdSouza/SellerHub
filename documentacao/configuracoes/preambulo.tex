@@ -1,0 +1,63 @@
+\documentclass[
+  12pt,
+  oneside,
+  a4paper,
+  chapter=TITLE,
+  section=TITLE,
+  english,
+  brazil
+]{abntex2}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage[alf]{abntex2cite}
+
+% titulos no tamanho do texto, diferenciados por negrito e caixa alta (nbr 6024)
+\renewcommand{\ABNTEXchapterfont}{\bfseries}
+\renewcommand{\ABNTEXchapterfontsize}{\normalsize}
+\renewcommand{\ABNTEXsectionfont}{\normalfont}
+\renewcommand{\ABNTEXsectionfontsize}{\normalsize}
+\renewcommand{\ABNTEXsubsectionfont}{\bfseries}
+\renewcommand{\ABNTEXsubsectionfontsize}{\normalsize}
+\renewcommand{\ABNTEXsubsubsectionfont}{\normalfont}
+\renewcommand{\ABNTEXsubsubsectionfontsize}{\normalsize}
+
+% sumario repete o destaque de cada nivel do texto (nbr 6027)
+\renewcommand{\cftsectionfont}{\normalfont}
+\renewcommand{\cftsectionpagefont}{\normalfont}
+\renewcommand{\cftsubsectionfont}{\bfseries}
+\renewcommand{\cftsubsectionpagefont}{\bfseries}
+\renewcommand{\cftsubsubsectionfont}{\normalfont}
+\renewcommand{\cftsubsubsectionpagefont}{\normalfont}
+
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0cm}
+
+\input{configuracoes/metadados}
+\input{configuracoes/comandos}
+\input{configuracoes/capa}
+
+% links em preto para nao destoar na impressao
+\makeatletter
+\hypersetup{
+  pdftitle={\@title},
+  pdfauthor={\nomesautores},
+  pdfsubject={\imprimirtipotrabalho},
+  pdfkeywords={marketplaces}{integração de sistemas}{comércio eletrônico}{gestão de anúncios},
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  filecolor=black,
+  urlcolor=black,
+  bookmarksdepth=4
+}
+\makeatother

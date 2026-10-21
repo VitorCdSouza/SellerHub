@@ -1,0 +1,53 @@
+\chapter{Projeto do Sistema}
+\label{cap:projeto}
+
+\orientacao{Este capítulo define como a solução será estruturada para atender aos requisitos identificados na análise. Sua função é transformar o modelo conceitual em uma especificação técnica da solução, estabelecendo sua arquitetura, componentes, dados, interfaces, interações, tecnologias e mecanismos de segurança.}
+
+\section{Arquitetura do Sistema}
+\orientacao{Apresentar a organização geral da solução, definindo seus principais elementos, responsabilidades e relações em nível arquitetural.}
+
+\diagrama{Diagrama de componentes}{componentes}
+
+\section{Projeto dos Componentes}
+\orientacao{Detalhar a estrutura e as responsabilidades dos principais componentes definidos na arquitetura, incluindo suas interfaces e relações.}
+
+\section{Modelo de Dados}
+\orientacao{Descrever a estrutura dos dados necessários ao funcionamento do sistema e suas relações, considerando as decisões de projeto adotadas.}
+
+\diagrama{Diagrama de classes de projeto}{classes-projeto}
+
+\section{Projeto da Interface do Usuário}
+\orientacao{Apresentar a organização e o comportamento das interfaces pelas quais os usuários interagem com o sistema, incluindo protótipos ou representações visuais quando pertinentes.}
+
+\section{Diagramas de Interação}
+\orientacao{Detalhar como os elementos do sistema colaboram para realizar os comportamentos definidos, evidenciando a sequência de mensagens e responsabilidades.}
+
+\diagrama{Diagrama de sequência}{sequencia}
+
+\section{Tecnologias Utilizadas}
+\orientacao{Relacionar as principais linguagens, frameworks, bibliotecas, sistemas gerenciadores, ferramentas e demais tecnologias adotadas, indicando sua função no projeto.}
+
+A \autoref{tab:tecnologias} resume as tecnologias adotadas em cada camada do \sistema{} \cite{go,sqlc,postgresql,angular}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Tecnologias adotadas no \sistema}
+  \label{tab:tecnologias}
+  \begin{tabularx}{\textwidth}{llX}
+    \toprule
+    \textbf{Camada} & \textbf{Tecnologia} & \textbf{Função no projeto} \\
+    \midrule
+    Back-end       & Go 1.27        & API REST e regras de negócio \\
+    Acesso a dados & sqlc           & Geração de código Go tipado a partir de consultas SQL \\
+    Banco de dados & PostgreSQL 17  & Persistência dos dados \\
+    Front-end      & Angular 22     & Interface web \\
+    Ambiente       & Docker Compose & Execução opcional do PostgreSQL em contêiner \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos autores.}
+\end{table}
+
+\section{Segurança e Controle de Acesso}
+\orientacao{Descrever as decisões relacionadas à autenticação, autorização, controle de acesso, proteção de dados e demais mecanismos de segurança aplicáveis ao sistema.}
+
+\diagrama{Diagrama de estados}{estados}

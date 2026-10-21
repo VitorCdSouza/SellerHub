@@ -1,0 +1,41 @@
+% capa: logo, instituicao e curso, autores, titulo, local e ano
+\renewcommand{\imprimircapa}{%
+  \begin{capa}%
+    \centering
+    \includegraphics[height=3cm]{imagens/logo-ifsp.pdf}\par
+    \vspace{0.5cm}
+    {\bfseries\MakeUppercase{\imprimirinstituicao}\par}
+    \vspace{3cm}
+    {\bfseries\MakeUppercase{\imprimirautor}\par}
+    \vfill
+    {\bfseries\MakeUppercase{\imprimirtitulo}\par}
+    \vfill
+    {\bfseries\MakeUppercase{\imprimirlocal}\par}
+    {\bfseries\imprimirdata\par}
+    \vspace*{1cm}
+  \end{capa}%
+}
+
+% folha de rosto: autores, titulo, natureza do trabalho com orientador, local e ano
+\renewcommand{\folhaderostocontent}{%
+  \begin{center}
+    {\MakeUppercase{\imprimirautor}\par}
+    \vfill
+    {\bfseries\MakeUppercase{\imprimirtitulo}\par}
+    \vfill
+  \end{center}
+  \hfill
+  \begin{minipage}{.5\textwidth}
+    \SingleSpacing
+    \imprimirpreambulo
+
+    \vspace{\baselineskip}
+    \textbf{\imprimirorientadorRotulo}~\imprimirorientador
+  \end{minipage}
+  \vfill
+  \begin{center}
+    {\MakeUppercase{\imprimirlocal}\par}
+    {\imprimirdata\par}
+    \vspace*{1cm}
+  \end{center}
+}
