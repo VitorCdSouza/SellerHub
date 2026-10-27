@@ -1,0 +1,60 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  acao/.style={draw, rounded corners=4pt, text width=2.3cm, align=center, minimum height=1cm, inner sep=3pt,
+    execute at begin node={\hyphenpenalty=10000}},
+  ponto/.style={draw, diamond, minimum size=0.55cm, inner sep=0pt},
+  inicio/.style={circle, fill=black, minimum size=0.35cm, inner sep=0pt},
+  final/.style={circle, draw, minimum size=0.4cm, inner sep=0pt},
+  fluxo/.style={-{Stealth[length=2mm]}},
+  guarda/.style={font=\scriptsize},
+]
+  % raias
+  \draw (0,0) rectangle (23.8,9.6);
+  \draw (0,6.0) -- (23.8,6.0);
+  \draw (0,3.2) -- (23.8,3.2);
+  \draw (0.8,0) -- (0.8,9.6);
+  \node[rotate=90] at (0.4,7.8) {Vendedor};
+  \node[rotate=90] at (0.4,4.6) {\sistema};
+  \node[rotate=90] at (0.4,1.6) {Marketplace};
+
+  % cadastro
+  \node[inicio] (ini) at (1.4,8.4) {};
+  \node[acao] (acessar) at (3.2,8.4) {Acessar o \sistema};
+  \node[acao] (produto) at (6.3,8.4) {Cadastrar produto};
+  \node[acao] (anuncio) at (9.4,8.4) {Cadastrar anúncio selecionando o marketplace};
+
+  % verificacao de anuncio existente
+  \node[acao] (verificar) at (9.4,4.7) {Verificar anúncio existente no marketplace};
+  \node[ponto] (d0) at (11.5,4.7) {};
+  \node[guarda, anchor=north, align=center] at (d0.south) {anúncio já\\existe?};
+  \node[acao] (informar) at (13.8,4.7) {Informar anúncio já existente};
+  \node[final] (fim1) at (15.8,4.7) {};
+  \fill (fim1.center) circle (0.12cm);
+
+  % envio, validacao e publicacao
+  \node[ponto] (m1) at (16.8,8.4) {};
+  \node[acao] (enviar) at (19.0,8.4) {Enviar anúncio};
+  \node[acao] (corrigir) at (16.8,6.9) {Corrigir anúncio};
+  \node[acao] (validar) at (19.0,2.3) {Validar anúncio};
+  \node[ponto] (d1) at (16.8,2.3) {};
+  \node[guarda, anchor=east] at (d1.west) {anúncio recusado?};
+  \node[acao] (publicar) at (21.2,0.8) {Publicar anúncio};
+  \node[final] (fim2) at (23.2,0.8) {};
+  \fill (fim2.center) circle (0.12cm);
+
+  \draw[fluxo] (ini) -- (acessar);
+  \draw[fluxo] (acessar) -- (produto);
+  \draw[fluxo] (produto) -- (anuncio);
+  \draw[fluxo] (anuncio) -- (verificar);
+  \draw[fluxo] (verificar) -- (d0);
+  \draw[fluxo] (d0) -- node[guarda, above] {[sim]} (informar);
+  \draw[fluxo] (informar) -- (fim1);
+  \draw[fluxo] (d0) |- node[guarda, pos=0.25, right] {[não]} (m1);
+  \draw[fluxo] (m1) -- (enviar);
+  \draw[fluxo] (enviar) -- (validar);
+  \draw[fluxo] (validar) -- (d1);
+  \draw[fluxo] (d1) -- node[guarda, right] {[sim]} (corrigir);
+  \draw[fluxo] (corrigir) -- (m1);
+  \draw[fluxo] (d1) |- node[guarda, pos=0.25, left] {[não]} (publicar);
+  \draw[fluxo] (publicar) -- (fim2);
+\end{tikzpicture}

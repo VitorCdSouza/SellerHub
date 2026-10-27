@@ -33,13 +33,15 @@ A estruturação lógica dos dados deriva das entidades e regras de negócio est
 
 Entre as principais decisões de projeto adotadas, destaca-se a normalização dos dados para mitigar redundâncias — separando as informações estruturais do produto das informações voláteis de cada anúncio. A escolha do modelo relacional garante, através da aplicação de chaves estrangeiras (\textit{Foreign Keys}) e restrições de integridade (\textit{Constraints}), que a base de dados não admita inconsistências, como o registro de vendas de produtos inexistentes ou o acúmulo de métricas órfãs no sistema.
 
+O modelo entidade-relacionamento resultante é apresentado na Figura \ref{fig:modelo_conceitual_banco_dados}.
+
 \begin{figure}[htbp]
     \centering
-    \vspace{-1cm} % Valor negativo reduz a margem superior
-    \hspace*{-5cm}
-    \includegraphics[width=1.00\textwidth, angle=-90]{imagens/testeBR.pdf}
-    \caption{Modelo Conceitual do Hub de Integrações}
+    \caption{Modelo entidade-relacionamento do Seller Hub}
     \label{fig:modelo_conceitual_banco_dados}
+    % trim remove a margem branca da pagina a4 exportada pelo brmodelo
+    \includegraphics[trim=140 269 104 187, clip, angle=-90, width=\textwidth]{imagens/testeBR.pdf}
+    \fonte{Elaborado pelos autores.}
 \end{figure}
 
 \section{Projeto da Interface do Usuário}
