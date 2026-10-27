@@ -1,13 +1,13 @@
 \chapter{Análise do Sistema}
 \label{cap:analise}
 
-Este capítulo apresenta a análise do Seller Hub, contemplando a visão geral do sistema, os atores envolvidos, os casos de uso, o modelo conceitual, os requisitos funcionais e não funcionais e as restrições identificadas para o desenvolvimento da aplicação.
+Este capítulo apresenta a análise do SellerHub, contemplando a visão geral do sistema, os atores envolvidos, os casos de uso, o modelo conceitual, os requisitos funcionais e não funcionais e as restrições identificadas para o desenvolvimento da aplicação.
 
 A análise tem como objetivo organizar as funcionalidades previstas e estabelecer uma base para as etapas de projeto e implementação. Considerando que o sistema ainda está em fase de planejamento, os requisitos apresentados representam a definição inicial da solução e poderão ser refinados conforme o detalhamento das regras de negócio e a avaliação da viabilidade técnica das integrações com plataformas externas.
 
 \section{Visão Geral do Sistema}
 
-O Seller Hub é uma aplicação web proposta para centralizar informações e facilitar a gestão de negócios que comercializam produtos em diferentes marketplaces. Seu objetivo principal é oferecer ferramentas de gestão em um único ambiente, reduzindo a necessidade de acessar diversas plataformas separadamente para administrar produtos, anúncios, vendas e estoques.
+O SellerHub é uma aplicação web proposta para centralizar informações e facilitar a gestão de negócios que comercializam produtos em diferentes marketplaces. Seu objetivo principal é oferecer ferramentas de gestão em um único ambiente, reduzindo a necessidade de acessar diversas plataformas separadamente para administrar produtos, anúncios, vendas e estoques.
 
 O sistema deverá permitir o cadastro, a consulta e a edição de produtos, além do gerenciamento de anúncios associados aos itens comercializados. Também estão previstas funcionalidades para consultar informações de vendas e estoque e analisar indicadores de desempenho, incluindo acessos aos anúncios e informações relacionadas às vendas, conforme a disponibilidade dos dados.
 
@@ -19,19 +19,19 @@ A integração com marketplaces será considerada de acordo com os recursos téc
 
 \section{Atores Envolvidos}
 
-Os atores representam as entidades externas que interagem com o Seller Hub. Com base no escopo inicial da aplicação, foram identificados dois atores humanos principais e um ator que representa sistemas externos.
+Os atores representam as entidades externas que interagem com o SellerHub. Com base no escopo inicial da aplicação, foram identificados dois atores humanos principais e um ator que representa sistemas externos.
 
 \begin{description}
     \item[Vendedor:] é o principal usuário da aplicação e responsável pelo gerenciamento das informações comerciais. Pode cadastrar, consultar e editar produtos, gerenciar anúncios, utilizar recursos de inteligência artificial para obter sugestões de conteúdo, revisar e aprovar essas sugestões, consultar vendas e estoques e analisar indicadores de desempenho.
     \item[Administrador do sistema:] é responsável pelas atividades administrativas da aplicação. Suas atribuições iniciais incluem o gerenciamento de usuários e das configurações administrativas disponibilizadas pelo sistema. As permissões específicas desse perfil deverão ser detalhadas durante a definição das regras de negócio.
-    \item[Marketplaces e plataformas externas:] representam os sistemas com os quais o Seller Hub poderá se comunicar para obter informações comerciais. Entre as plataformas consideradas inicialmente estão Mercado Livre, Shopee, Facebook Marketplace, OLX e Amazon. Sua participação está relacionada às operações que dependem de dados externos, como consultas de vendas, estoque e métricas de acesso aos anúncios. A efetiva disponibilidade dessas operações dependerá da viabilidade técnica de cada integração.
+    \item[Marketplaces e plataformas externas:] representam os sistemas com os quais o SellerHub poderá se comunicar para obter informações comerciais. Entre as plataformas consideradas inicialmente estão Mercado Livre, Shopee, Facebook Marketplace, OLX e Amazon. Sua participação está relacionada às operações que dependem de dados externos, como consultas de vendas, estoque e métricas de acesso aos anúncios. A efetiva disponibilidade dessas operações dependerá da viabilidade técnica de cada integração.
 \end{description}
 
 Os usuários deverão se autenticar para acessar as funcionalidades restritas da aplicação. A comunicação com plataformas externas, quando implementada, deverá respeitar os mecanismos de autenticação, autorização e acesso aos dados exigidos por cada serviço.
 
 \section{Casos de Uso}
 
-O diagrama de casos de uso representa as principais funcionalidades previstas para o Seller Hub e as interações entre os atores e a aplicação. Sua finalidade é apresentar os serviços oferecidos pelo sistema sem detalhar os procedimentos internos de implementação.
+O diagrama de casos de uso representa as principais funcionalidades previstas para o SellerHub e as interações entre os atores e a aplicação. Sua finalidade é apresentar os serviços oferecidos pelo sistema sem detalhar os procedimentos internos de implementação.
 
 O vendedor concentra as interações relacionadas à gestão comercial, enquanto o administrador possui responsabilidades voltadas à administração da plataforma. Os marketplaces e sistemas externos são representados como atores secundários nas consultas que dependem de informações disponibilizadas por esses serviços.
 
@@ -60,11 +60,11 @@ As consultas que dependem de informações externas estão associadas ao ator qu
 
 A publicação direta de anúncios não é considerada uma funcionalidade confirmada nesta etapa. Sua inclusão dependerá da definição do escopo e da viabilidade de integração com cada plataforma.
 
-O diagrama de casos de uso do Seller Hub é apresentado na Figura \ref{fig:casos_de_uso}.
+O diagrama de casos de uso do SellerHub é apresentado na Figura \ref{fig:casos_de_uso}.
 
 \begin{figure}[htbp]
     \centering
-    \caption{Diagrama de Casos de Uso do Seller Hub}
+    \caption{Diagrama de Casos de Uso do SellerHub}
     \label{fig:casos_de_uso}
     \includegraphics[height=0.8\textheight]{imagens/sellerhub - diagrama de caso de uso revisado.png}
     \fonte{Elaborado pelos autores.}
@@ -72,7 +72,7 @@ O diagrama de casos de uso do Seller Hub é apresentado na Figura \ref{fig:casos
 
 \section{Modelo Conceitual}
 
-O modelo conceitual representa os principais conceitos do domínio do Seller Hub e os relacionamentos existentes entre eles. Seu objetivo é organizar as informações relevantes para o funcionamento do sistema, servindo como base para o detalhamento posterior do modelo de dados.
+O modelo conceitual representa os principais conceitos do domínio do SellerHub e os relacionamentos existentes entre eles. Seu objetivo é organizar as informações relevantes para o funcionamento do sistema, servindo como base para o detalhamento posterior do modelo de dados.
 
 O modelo proposto contempla as seguintes classes conceituais:
 
@@ -102,7 +102,7 @@ Para o estoque, foi adotada inicialmente a hipótese de um registro centralizado
 
 A obtenção de métricas e informações comerciais dependerá da disponibilidade dos dados nas plataformas integradas. Assim, o modelo conceitual representa os dados relevantes para a solução sem pressupor que todos os marketplaces ofereçam os mesmos recursos.
 
-O diagrama de classes conceitual do Seller Hub é apresentado na Figura \ref{fig:modelo_conceitual}.
+O diagrama de classes conceitual do SellerHub é apresentado na Figura \ref{fig:modelo_conceitual}.
 
 \begin{landscape}
 \begin{figure}[htbp]
@@ -116,7 +116,7 @@ O diagrama de classes conceitual do Seller Hub é apresentado na Figura \ref{fig
 
 \section{Requisitos Funcionais}
 
-Os requisitos funcionais descrevem as funcionalidades que o sistema deverá oferecer aos usuários. Com base na proposta do Seller Hub e nos diagramas elaborados, foram definidos os seguintes requisitos iniciais.
+Os requisitos funcionais descrevem as funcionalidades que o sistema deverá oferecer aos usuários. Com base na proposta do SellerHub e nos diagramas elaborados, foram definidos os seguintes requisitos iniciais.
 
 \begin{itemize}
     \item \textbf{RF01} - O sistema deverá permitir a autenticação dos usuários.
@@ -142,7 +142,7 @@ A publicação direta de anúncios não foi estabelecida como requisito confirma
 
 \section{Requisitos Não Funcionais}
 
-Os requisitos não funcionais estabelecem critérios de qualidade e condições de operação que deverão orientar o desenvolvimento do Seller Hub.
+Os requisitos não funcionais estabelecem critérios de qualidade e condições de operação que deverão orientar o desenvolvimento do SellerHub.
 
 \begin{itemize}
     \item \textbf{RNF01 - Usabilidade:} a interface deverá apresentar organização clara, facilitando o acesso às funcionalidades de gerenciamento de produtos, anúncios, vendas e estoque.
@@ -159,7 +159,7 @@ Os critérios mensuráveis para avaliação desses requisitos, como tempos máxi
 
 \section{Restrições do Sistema}
 
-O desenvolvimento do Seller Hub está sujeito a restrições técnicas e operacionais que podem influenciar a disponibilidade e o funcionamento das funcionalidades propostas.
+O desenvolvimento do SellerHub está sujeito a restrições técnicas e operacionais que podem influenciar a disponibilidade e o funcionamento das funcionalidades propostas.
 
 A principal restrição está relacionada às integrações com marketplaces. Cada plataforma possui seus próprios recursos, permissões, políticas e mecanismos de acesso aos dados. Portanto, a possibilidade de consultar vendas, obter informações de estoque, acessar métricas de anúncios ou executar operações relacionadas à publicação deverá ser avaliada individualmente.
 
