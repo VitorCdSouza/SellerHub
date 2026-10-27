@@ -1,29 +1,170 @@
 \chapter{Análise do Sistema}
 \label{cap:analise}
 
-\orientacao{Este capítulo transforma a compreensão do contexto e das necessidades em uma visão estruturada do sistema a ser desenvolvido. Sua função é definir o que o sistema deve fazer, quem interage com ele, quais conceitos compõem seu domínio e quais requisitos e restrições devem ser considerados, sem ainda detalhar sua implementação.}
+Este capítulo apresenta a análise do Seller Hub, contemplando a visão geral do sistema, os atores envolvidos, os casos de uso, o modelo conceitual, os requisitos funcionais e não funcionais e as restrições identificadas para o desenvolvimento da aplicação.
+
+A análise tem como objetivo organizar as funcionalidades previstas e estabelecer uma base para as etapas de projeto e implementação. Considerando que o sistema ainda está em fase de planejamento, os requisitos apresentados representam a definição inicial da solução e poderão ser refinados conforme o detalhamento das regras de negócio e a avaliação da viabilidade técnica das integrações com plataformas externas.
 
 \section{Visão Geral do Sistema}
-\orientacao{Apresentar uma visão macroscópica da solução proposta, delimitando o sistema e sua finalidade antes do detalhamento de suas funcionalidades e estruturas.}
+
+O Seller Hub é uma aplicação web proposta para centralizar informações e facilitar a gestão de negócios que comercializam produtos em diferentes marketplaces. Seu objetivo principal é oferecer ferramentas de gestão em um único ambiente, reduzindo a necessidade de acessar diversas plataformas separadamente para administrar produtos, anúncios, vendas e estoques.
+
+O sistema deverá permitir o cadastro, a consulta e a edição de produtos, além do gerenciamento de anúncios associados aos itens comercializados. Também estão previstas funcionalidades para consultar informações de vendas e estoque e analisar indicadores de desempenho, incluindo acessos aos anúncios e informações relacionadas às vendas, conforme a disponibilidade dos dados.
+
+Outro recurso previsto é o auxílio à criação de anúncios por meio de inteligência artificial. A ferramenta poderá gerar sugestões de títulos, descrições e imagens com base nas informações dos produtos. O conteúdo produzido deverá ser revisado e aprovado pelo vendedor antes de sua eventual utilização ou publicação, mantendo a decisão final sob responsabilidade do usuário.
+
+A aplicação contará com dois perfis principais de usuários: vendedor e administrador do sistema. O primeiro utilizará os recursos relacionados à gestão comercial, enquanto o segundo será responsável por atividades administrativas, como o gerenciamento de usuários e das configurações da plataforma.
+
+A integração com marketplaces será considerada de acordo com os recursos técnicos disponibilizados por cada serviço. Dessa forma, a consulta de informações externas dependerá das possibilidades de integração, das permissões de acesso e das políticas de cada plataforma.
 
 \section{Atores Envolvidos}
-\orientacao{Identificar os atores que interagem diretamente com o sistema e caracterizar seus respectivos papéis.}
+
+Os atores representam as entidades externas que interagem com o Seller Hub. Com base no escopo inicial da aplicação, foram identificados dois atores humanos principais e um ator que representa sistemas externos.
+
+\begin{description}
+    \item[Vendedor:] é o principal usuário da aplicação e responsável pelo gerenciamento das informações comerciais. Pode cadastrar, consultar e editar produtos, gerenciar anúncios, utilizar recursos de inteligência artificial para obter sugestões de conteúdo, revisar e aprovar essas sugestões, consultar vendas e estoques e analisar indicadores de desempenho.
+    \item[Administrador do sistema:] é responsável pelas atividades administrativas da aplicação. Suas atribuições iniciais incluem o gerenciamento de usuários e das configurações administrativas disponibilizadas pelo sistema. As permissões específicas desse perfil deverão ser detalhadas durante a definição das regras de negócio.
+    \item[Marketplaces e plataformas externas:] representam os sistemas com os quais o Seller Hub poderá se comunicar para obter informações comerciais. Entre as plataformas consideradas inicialmente estão Mercado Livre, Shopee, Facebook Marketplace, OLX e Amazon. Sua participação está relacionada às operações que dependem de dados externos, como consultas de vendas, estoque e métricas de acesso aos anúncios. A efetiva disponibilidade dessas operações dependerá da viabilidade técnica de cada integração.
+\end{description}
+
+Os usuários deverão se autenticar para acessar as funcionalidades restritas da aplicação. A comunicação com plataformas externas, quando implementada, deverá respeitar os mecanismos de autenticação, autorização e acesso aos dados exigidos por cada serviço.
 
 \section{Casos de Uso}
-\orientacao{Identificar e descrever as funcionalidades do sistema sob a perspectiva dos atores, incluindo os comportamentos esperados e os fluxos relevantes.}
 
-\diagrama{Diagrama de casos de uso}{casos-de-uso}
+O diagrama de casos de uso representa as principais funcionalidades previstas para o Seller Hub e as interações entre os atores e a aplicação. Sua finalidade é apresentar os serviços oferecidos pelo sistema sem detalhar os procedimentos internos de implementação.
+
+O vendedor concentra as interações relacionadas à gestão comercial, enquanto o administrador possui responsabilidades voltadas à administração da plataforma. Os marketplaces e sistemas externos são representados como atores secundários nas consultas que dependem de informações disponibilizadas por esses serviços.
+
+Os principais casos de uso identificados são:
+
+\begin{itemize}
+    \item \textbf{Autenticar-se:} permite que vendedores e administradores acessem as funcionalidades restritas do sistema.
+    \item \textbf{Cadastrar produto:} permite registrar novos produtos e suas informações.
+    \item \textbf{Consultar produtos:} permite visualizar os produtos cadastrados.
+    \item \textbf{Editar produto:} permite atualizar as informações de produtos existentes.
+    \item \textbf{Gerenciar anúncios:} permite organizar e administrar os anúncios associados aos produtos.
+    \item \textbf{Criar anúncio:} permite preparar um anúncio com base nas informações de um produto.
+    \item \textbf{Gerar sugestões de conteúdo com IA:} permite obter sugestões de títulos, descrições e imagens para auxiliar na elaboração de anúncios.
+    \item \textbf{Revisar e aprovar conteúdo gerado por IA:} permite que o vendedor avalie o conteúdo sugerido antes de utilizá-lo ou publicá-lo.
+    \item \textbf{Consultar vendas:} permite visualizar informações sobre vendas disponíveis no sistema ou obtidas por integrações.
+    \item \textbf{Consultar estoque:} permite acompanhar informações relacionadas à disponibilidade dos produtos.
+    \item \textbf{Analisar acessos aos anúncios:} permite consultar métricas de acesso aos anúncios, quando disponibilizadas pelas plataformas.
+    \item \textbf{Consultar indicadores de desempenho das vendas:} permite visualizar informações para acompanhar o desempenho comercial.
+    \item \textbf{Gerenciar usuários:} permite ao administrador executar operações administrativas relacionadas aos usuários da aplicação.
+    \item \textbf{Gerenciar configurações administrativas:} permite ao administrador administrar as configurações previstas para a plataforma.
+\end{itemize}
+
+No diagrama, a geração de sugestões por inteligência artificial está representada como uma extensão do caso de uso de criação de anúncio, indicando que esse recurso pode auxiliar o processo, mas não é obrigatório para toda criação. A revisão e a aprovação do conteúdo gerado constituem uma etapa necessária antes de sua eventual utilização ou publicação.
+
+As consultas que dependem de informações externas estão associadas ao ator que representa os marketplaces e as plataformas externas. Essa representação indica a necessidade de comunicação com serviços externos, mas não garante que todos os canais disponibilizem os mesmos dados ou operações.
+
+A publicação direta de anúncios não é considerada uma funcionalidade confirmada nesta etapa. Sua inclusão dependerá da definição do escopo e da viabilidade de integração com cada plataforma.
+
+O diagrama de casos de uso do Seller Hub é apresentado na Figura \ref{fig:casos_de_uso}.
+
+\begin{figure}[htbp]
+    \centering
+    % Substitua 'casos_de_uso.pdf' pelo nome real da imagem no seu projeto
+    \includegraphics[width=0.65\textwidth]{imagens/sellerhub - diagrama de caso de uso revisado.png}
+    \caption{Diagrama de Casos de Uso do Seller Hub}
+    \label{fig:casos_de_uso}
+\end{figure}
 
 \section{Modelo Conceitual}
-\orientacao{Representar os principais conceitos do domínio, suas características e relacionamentos, sem incorporar decisões específicas de implementação.}
 
-\diagrama{Diagrama de classes conceitual}{classes-conceitual}
+O modelo conceitual representa os principais conceitos do domínio do Seller Hub e os relacionamentos existentes entre eles. Seu objetivo é organizar as informações relevantes para o funcionamento do sistema, servindo como base para o detalhamento posterior do modelo de dados.
+
+O modelo proposto contempla as seguintes classes conceituais:
+
+\begin{description}
+    \item[Usuário:] representa as pessoas que acessam o sistema, contendo informações básicas de identificação, como nome e e-mail.
+    \item[Vendedor:] representa o perfil de usuário responsável pelo gerenciamento de produtos e vendas.
+    \item[Administrador:] representa o perfil responsável pelas atividades administrativas da aplicação.
+    \item[Produto:] representa os itens comercializados, incluindo nome, descrição, código de identificação e características.
+    \item[Estoque:] representa a quantidade disponível de um produto e a data da última atualização das informações.
+    \item[Marketplace:] representa os canais de venda nos quais os produtos podem ser anunciados e por meio dos quais as vendas podem ser realizadas.
+    \item[Anúncio:] representa a oferta de um produto em determinado marketplace, contendo informações como preço anunciado, situação e data de criação.
+    \item[Conteúdo de Anúncio:] representa os conteúdos associados a um anúncio, incluindo títulos, descrições, imagens, origem do conteúdo e informações sobre sua revisão e aprovação.
+    \item[Métrica de Anúncio:] representa informações utilizadas para acompanhar o desempenho dos anúncios, como quantidade de acessos e período de referência.
+    \item[Venda:] representa uma operação comercial, contendo data, valor total e situação.
+    \item[Item de Venda:] representa cada produto incluído em uma venda, com informações sobre quantidade e valor unitário.
+\end{description}
+
+No modelo, Usuário é uma classe geral especializada em Vendedor e Administrador. Essa estrutura permite representar os diferentes papéis de acesso sem duplicar os atributos comuns aos usuários.
+
+Um vendedor pode gerenciar vários produtos e realizar várias vendas. Cada anúncio está associado a um produto e a um marketplace, enquanto um produto pode possuir diferentes anúncios em canais distintos. O modelo também considera que um marketplace pode hospedar vários anúncios e estar associado a diversas vendas.
+
+A relação entre Venda e Item de Venda permite representar uma operação comercial composta por um ou mais itens. Cada item referencia um produto, possibilitando identificar quais produtos participaram de determinada venda e em quais quantidades.
+
+O modelo também considera que um anúncio pode possuir diferentes versões de conteúdo e diversas métricas associadas a períodos de consulta. Essa estrutura permite representar alterações no conteúdo e acompanhar indicadores de desempenho ao longo do tempo.
+
+Para o estoque, foi adotada inicialmente a hipótese de um registro centralizado por produto, sem separação das quantidades por marketplace. Essa decisão deverá ser validada durante o refinamento dos requisitos, pois diferentes estratégias de controle de estoque podem influenciar a estrutura dos dados e as regras de atualização.
+
+A obtenção de métricas e informações comerciais dependerá da disponibilidade dos dados nas plataformas integradas. Assim, o modelo conceitual representa os dados relevantes para a solução sem pressupor que todos os marketplaces ofereçam os mesmos recursos.
+
+O diagrama de classes conceitual do Seller Hub é apresentado na Figura \ref{fig:modelo_conceitual}.
+
+\begin{figure}[H]
+    \centering
+    \hspace*{-2cm}
+    \includegraphics[width=1.20\textwidth]{imagens/sellerhub - diagrama de classes conceitual revisado.png}
+    \caption{Modelo Conceitual do Hub de Integrações}
+    \label{fig:modelo_conceitual}
+\end{figure}
 
 \section{Requisitos Funcionais}
-\orientacao{Especificar de forma objetiva os serviços e comportamentos que o sistema deverá oferecer para atender às necessidades identificadas.}
+
+Os requisitos funcionais descrevem as funcionalidades que o sistema deverá oferecer aos usuários. Com base na proposta do Seller Hub e nos diagramas elaborados, foram definidos os seguintes requisitos iniciais.
+
+\begin{itemize}
+    \item \textbf{RF01} - O sistema deverá permitir a autenticação dos usuários.
+    \item \textbf{RF02} - O sistema deverá permitir o cadastro de produtos.
+    \item \textbf{RF03} - O sistema deverá permitir a consulta dos produtos cadastrados.
+    \item \textbf{RF04} - O sistema deverá permitir a edição das informações dos produtos.
+    \item \textbf{RF05} - O sistema deverá permitir o gerenciamento dos anúncios associados aos produtos.
+    \item \textbf{RF06} - O sistema deverá permitir a criação e a organização de anúncios para os canais de venda contemplados no escopo.
+    \item \textbf{RF07} - O sistema deverá oferecer recursos de inteligência artificial para sugerir títulos, descrições e imagens para anúncios.
+    \item \textbf{RF08} - O sistema deverá permitir que o vendedor revise e aprove o conteúdo gerado por inteligência artificial antes de sua eventual utilização ou publicação.
+    \item \textbf{RF09} - O sistema deverá permitir a consulta de informações de vendas disponíveis.
+    \item \textbf{RF10} - O sistema deverá permitir a consulta de informações de estoque.
+    \item \textbf{RF11} - O sistema deverá permitir a consulta de métricas de acesso aos anúncios, quando esses dados estiverem disponíveis.
+    \item \textbf{RF12} - O sistema deverá disponibilizar indicadores para acompanhamento do desempenho das vendas, com base nas informações disponíveis.
+    \item \textbf{RF13} - O sistema deverá permitir que o administrador gerencie os usuários da aplicação.
+    \item \textbf{RF14} - O sistema deverá permitir que o administrador gerencie as configurações administrativas previstas.
+    \item \textbf{RF15} - O sistema deverá restringir o acesso às funcionalidades de acordo com as permissões atribuídas aos usuários.
+\end{itemize}
+
+Os requisitos relacionados à consulta de informações externas deverão ser detalhados conforme as integrações efetivamente implementadas. Para cada plataforma contemplada, será necessário definir quais dados poderão ser obtidos, quais operações serão suportadas e quais limitações deverão ser consideradas.
+
+A publicação direta de anúncios não foi estabelecida como requisito confirmado nesta versão. Caso seja incluída no escopo, deverá ocorrer somente após a aprovação explícita do conteúdo pelo vendedor e mediante uma integração tecnicamente viável.
 
 \section{Requisitos Não Funcionais}
-\orientacao{Especificar as características, qualidades e restrições que o sistema deverá atender, além das funcionalidades propriamente ditas.}
+
+Os requisitos não funcionais estabelecem critérios de qualidade e condições de operação que deverão orientar o desenvolvimento do Seller Hub.
+
+\begin{itemize}
+    \item \textbf{RNF01 - Usabilidade:} a interface deverá apresentar organização clara, facilitando o acesso às funcionalidades de gerenciamento de produtos, anúncios, vendas e estoque.
+    \item \textbf{RNF02 - Segurança:} o sistema deverá proteger as informações armazenadas e restringir o acesso às funcionalidades de acordo com as permissões definidas para cada perfil de usuário.
+    \item \textbf{RNF03 - Integridade dos dados:} a aplicação deverá adotar mecanismos que preservem a consistência das informações cadastradas e reduzam a ocorrência de registros inconsistentes.
+    \item \textbf{RNF04 - Manutenibilidade:} o código deverá ser organizado de forma modular, facilitando a compreensão, a correção de falhas e a evolução das funcionalidades.
+    \item \textbf{RNF05 - Desempenho:} as operações de consulta e gerenciamento deverão apresentar tempos de resposta adequados às condições de execução e ao volume de dados previsto para a aplicação.
+    \item \textbf{RNF06 - Confiabilidade:} o sistema deverá tratar erros de processamento e falhas de comunicação de maneira controlada, evitando apresentar informações externas indisponíveis como se estivessem atualizadas.
+    \item \textbf{RNF07 - Compatibilidade:} a interface web deverá ser compatível com os navegadores definidos como alvo do projeto.
+    \item \textbf{RNF08 - Privacidade:} o tratamento de dados pessoais deverá observar os requisitos aplicáveis da Lei Geral de Proteção de Dados Pessoais (LGPD).
+\end{itemize}
+
+Os critérios mensuráveis para avaliação desses requisitos, como tempos máximos de resposta, navegadores suportados e critérios de teste, deverão ser definidos durante o planejamento técnico e a implementação.
 
 \section{Restrições do Sistema}
-\orientacao{Registrar limitações impostas ao desenvolvimento ou à operação do sistema, sejam elas técnicas, institucionais, legais, orçamentárias ou decorrentes do contexto do projeto.}
+
+O desenvolvimento do Seller Hub está sujeito a restrições técnicas e operacionais que podem influenciar a disponibilidade e o funcionamento das funcionalidades propostas.
+
+A principal restrição está relacionada às integrações com marketplaces. Cada plataforma possui seus próprios recursos, permissões, políticas e mecanismos de acesso aos dados. Portanto, a possibilidade de consultar vendas, obter informações de estoque, acessar métricas de anúncios ou executar operações relacionadas à publicação deverá ser avaliada individualmente.
+
+A disponibilidade e a atualização dos dados externos também podem variar conforme a plataforma, os mecanismos de integração disponíveis e as condições de comunicação. Dessa forma, o sistema deverá considerar que determinadas informações podem não estar disponíveis em todos os canais ou apresentar diferenças de atualização e abrangência.
+
+A utilização de inteligência artificial apresenta limitações relacionadas à precisão e à adequação do conteúdo gerado. As sugestões de títulos, descrições e imagens poderão exigir correções, e sua geração não garante conformidade com todas as regras dos marketplaces. Por esse motivo, a revisão e a aprovação pelo vendedor deverão ser preservadas no processo de elaboração dos anúncios.
+
+Outra restrição está relacionada à qualidade dos dados cadastrados. Informações incompletas ou incorretas sobre os produtos podem prejudicar a elaboração dos anúncios e a interpretação dos indicadores apresentados pelo sistema.
+
+Por fim, o escopo da primeira versão estará condicionado ao tempo disponível para o desenvolvimento, à capacidade técnica da equipe e à viabilidade das funcionalidades planejadas. Recursos cuja implementação não seja possível dentro dessas condições poderão ser registrados como limitações ou possibilidades de evolução futura, preservando o objetivo central de oferecer ferramentas de gestão para produtos, anúncios, vendas e estoque.

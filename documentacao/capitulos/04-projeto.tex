@@ -12,9 +12,35 @@
 \orientacao{Detalhar a estrutura e as responsabilidades dos principais componentes definidos na arquitetura, incluindo suas interfaces e relações.}
 
 \section{Modelo de Dados}
-\orientacao{Descrever a estrutura dos dados necessários ao funcionamento do sistema e suas relações, considerando as decisões de projeto adotadas.}
 
-\diagrama{Diagrama de classes de projeto}{classes-projeto}
+O modelo de dados do Seller Hub foi concebido para suportar a centralização das operações comerciais, garantindo a integridade, a consistência e a rastreabilidade das informações compartilhadas entre diferentes canais de venda. Considerando a natureza estruturada dos dados transacionais envolvidos — como produtos, estoques, anúncios e vendas — optou-se pela adoção de um modelo relacional, implementado através do sistema gerenciador de banco de dados PostgreSQL.
+
+A estruturação lógica dos dados deriva das entidades e regras de negócio estabelecidas no modelo conceitual, traduzindo-as em tabelas e relacionamentos que viabilizam a arquitetura da aplicação:
+
+\begin{itemize}
+    \item \textbf{Usuários e Controle de Acesso:} A estrutura centraliza as credenciais e dados cadastrais, diferenciando os perfis de \textit{Vendedor} e \textit{Administrador}. Esta modelagem estabelece a relação de propriedade dos dados, garantindo o isolamento das informações (multitenancy lógico), de forma que cada vendedor tenha acesso exclusivo apenas ao seu catálogo e às suas transações.
+    
+    \item \textbf{Catálogo de Produtos e Estoque:} A entidade de \textit{Produto} atua como o núcleo da plataforma, armazenando atributos universais (nome, descrição base, código de identificação/SKU). O controle de \textit{Estoque} foi projetado seguindo a premissa de um inventário centralizado, o que exige controle transacional rigoroso para garantir que as baixas decorrentes de vendas em diferentes canais reflitam imediatamente na quantidade disponível global.
+    
+    \item \textbf{Marketplaces e Anúncios:} Para suportar a funcionalidade de \textit{hub}, o \textit{Anúncio} atua como a entidade associativa central que liga um \textit{Produto} a um \textit{Marketplace} específico. Esta tabela armazena os parâmetros inerentes àquela oferta na plataforma externa, como o preço praticado, o link de origem e a situação de publicação.
+    
+    \item \textbf{Conteúdo Gerado (Inteligência Artificial):} O \textit{Conteúdo de Anúncio} foi modelado de forma apartada para suportar o fluxo de curadoria do usuário. A estrutura acomoda múltiplas versões de títulos, descrições e imagens para um mesmo anúncio, registrando a origem da sugestão (IA) e o seu status de revisão (pendente, aprovado ou rejeitado), assegurando que o vendedor detenha o controle final sobre a publicação.
+    
+    \item \textbf{Vendas e Itens de Venda:} A modelagem das transações adota o padrão de cabeçalho e detalhes. A tabela de \textit{Venda} consolida os dados gerais do pedido e o canal de origem (\textit{Marketplace}), enquanto a entidade dependente \textit{Item de Venda} destrincha os produtos adquiridos, suas quantidades e valores unitários, servindo de base para o recálculo do estoque e geração de indicadores financeiros.
+    
+    \item \textbf{Métricas de Desempenho:} O armazenamento das \textit{Métricas de Anúncio} foi estruturado para suportar recortes temporais. O modelo vincula quantidades de acessos e indicadores de performance a períodos específicos, possibilitando a geração de gráficos de evolução e a comparação de desempenho do mesmo produto em canais distintos.
+\end{itemize}
+
+Entre as principais decisões de projeto adotadas, destaca-se a normalização dos dados para mitigar redundâncias — separando as informações estruturais do produto das informações voláteis de cada anúncio. A escolha do modelo relacional garante, através da aplicação de chaves estrangeiras (\textit{Foreign Keys}) e restrições de integridade (\textit{Constraints}), que a base de dados não admita inconsistências, como o registro de vendas de produtos inexistentes ou o acúmulo de métricas órfãs no sistema.
+
+\begin{figure}[htbp]
+    \centering
+    \vspace{-1cm} % Valor negativo reduz a margem superior
+    \hspace*{-5cm}
+    \includegraphics[width=1.00\textwidth, angle=-90]{imagens/testeBR.pdf}
+    \caption{Modelo Conceitual do Hub de Integrações}
+    \label{fig:modelo_conceitual_banco_dados}
+\end{figure}
 
 \section{Projeto da Interface do Usuário}
 \orientacao{Apresentar a organização e o comportamento das interfaces pelas quais os usuários interagem com o sistema, incluindo protótipos ou representações visuais quando pertinentes.}
