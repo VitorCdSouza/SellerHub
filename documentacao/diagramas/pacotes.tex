@@ -1,0 +1,34 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  pacote/.style={draw, text width=3.8cm, align=center, minimum height=1.1cm, inner sep=3pt,
+    execute at begin node={\hyphenpenalty=10000}},
+  arquivo/.style={draw, dashed, text width=2.8cm, align=center, minimum height=0.9cm, inner sep=3pt},
+  aba/.style={draw, anchor=south west, inner sep=3pt},
+  usa/.style={dashed, -{Stealth[length=2mm]}},
+  rotulo/.style={font=\scriptsize},
+]
+  % back-end
+  \draw (-2.9,-1.2) rectangle (8.1,7.0);
+  \node[aba] at (-2.9,7.0) {api};
+  \node[pacote] (cmd) at (0,6) {\textbf{cmd}\\inicialização, rotas e CORS};
+  \node[pacote] (controller) at (0,3.9) {\textbf{controller}\\HTTP e JSON};
+  \node[pacote] (service) at (0,1.8) {\textbf{service}\\regras de negócio};
+  \node[pacote] (db) at (0,-0.3) {\textbf{db}\\conexão e código gerado pelo sqlc};
+  \node[arquivo] (sql) at (6.0,-0.3) {estrutura.sql\\queries.sql};
+
+  \draw[usa] (cmd) -- (controller);
+  \draw[usa] (controller) -- (service);
+  \draw[usa] (service) -- (db);
+  \draw[usa] (cmd.west) -- ++(-0.6,0) |- (db.west);
+  \draw[usa] (sql) -- node[rotulo, above] {sqlc generate} (db);
+
+  % front-end
+  \draw (9.0,0.7) rectangle (15.0,7.0);
+  \node[aba] at (9.0,7.0) {web};
+  \node[pacote] (app) at (11.4,6) {\textbf{app}\\configuração e rotas};
+  \node[pacote] (login) at (11.4,3.9) {\textbf{login}\\componente de login};
+  \node[pacote] (services) at (11.4,1.8) {\textbf{services}\\AuthService};
+
+  \draw[usa] (app) -- node[rotulo, right] {carga sob demanda} (login);
+  \draw[usa] (login) -- (services);
+\end{tikzpicture}

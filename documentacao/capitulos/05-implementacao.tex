@@ -1,29 +1,218 @@
 \chapter{Implementação}
 \label{cap:implementacao}
 
-\orientacao{Este capítulo apresenta a materialização da solução projetada em software, descrevendo o ambiente utilizado, a organização da aplicação, a implementação dos componentes, sua integração e os procedimentos de teste. Sua função é demonstrar como o projeto definido nos capítulos anteriores foi efetivamente transformado em uma solução executável e quais resultados foram obtidos.}
+Este capítulo descreve como o projeto apresentado nos capítulos anteriores começou a ser transformado em software executável. São apresentados o ambiente de desenvolvimento, a organização do código, a implementação dos componentes já construídos, a forma como eles se comunicam em execução, os testes realizados, os resultados obtidos e as limitações conhecidas.
+
+O conteúdo reflete o estado do repositório em \pendente{outubro de 2026}. Nesse momento, está implementado o fluxo de autenticação, que percorre todas as camadas da arquitetura: interface web, API, regras de negócio e banco de dados. Esse fluxo foi escolhido como primeira entrega justamente por exercitar a pilha completa com uma funcionalidade pequena, o que permitiu validar as decisões de tecnologia e a organização do código antes de iniciar os módulos de produtos, anúncios, estoque e pedidos. As seções serão atualizadas à medida que esses módulos forem concluídos.
 
 \section{Ambiente de Desenvolvimento}
-\orientacao{Descrever o ambiente utilizado para desenvolver e executar o sistema, incluindo hardware, sistema operacional, ferramentas e configurações relevantes.}
+\label{sec:ambiente}
+
+O \sistema{} é desenvolvido e executado inteiramente na máquina de cada integrante. A API e a interface web rodam diretamente no sistema operacional, sem contêineres, e o banco de dados pode ser instalado localmente ou executado por meio do Docker Compose. Essa última opção foi adotada para reduzir as diferenças de configuração entre as máquinas da equipe: com um único comando, todos passam a usar a mesma versão do PostgreSQL, criada a partir dos mesmos scripts.
+
+A \autoref{tab:ambiente} relaciona as ferramentas exigidas para compilar e executar o sistema.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Ferramentas do ambiente de desenvolvimento}
+  \label{tab:ambiente}
+  \begin{tabularx}{\textwidth}{lX}
+    \toprule
+    \textbf{Ferramenta} & \textbf{Uso no projeto} \\
+    \midrule
+    Go 1.27              & Compilação e execução da API \\
+    Node.js 24 e npm     & Execução do Angular CLI e gerenciamento das dependências do front-end \\
+    Angular CLI 21       & Servidor de desenvolvimento, build e testes da interface web \\
+    PostgreSQL 17        & Banco de dados, instalado localmente ou em contêiner \\
+    Docker e Compose     & Execução opcional do PostgreSQL (\texttt{db/docker-compose.yaml}) \\
+    sqlc                 & Geração do código Go de acesso a dados a partir das consultas SQL \\
+    GNU Make             & Atalhos para subir banco, API, web e compilar a documentação \\
+    Git e GitHub         & Controle de versão e colaboração entre os integrantes \\
+    Visual Studio Code   & Editor de código \\
+    \LaTeX{} e latexmk   & Compilação deste documento \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos autores.}
+\end{table}
+
+As máquinas utilizadas pela equipe são \pendente{descrever hardware e sistemas operacionais dos integrantes}.
+
+As configurações que variam entre as máquinas, como usuário, senha e porta do banco, ficam em um arquivo \texttt{.env} na raiz do projeto, criado a partir do modelo \texttt{.env.example}. O \texttt{.env} não é versionado, de forma que nenhuma credencial é enviada ao repositório. O mesmo arquivo é lido pela API e pelo Docker Compose, o que evita que as duas configurações divirjam.
+
+O \texttt{Makefile} da raiz concentra os comandos de uso diário: \texttt{make db} sobe o banco, \texttt{make install} baixa as dependências, \texttt{make run} executa a API e a interface web em paralelo e \texttt{make reset-db} apaga e recria o banco. Esse último comando é parte de uma decisão de projeto: o \sistema{} não utiliza ferramenta de migrations. O esquema do banco é mantido em um único script, \texttt{db/estrutura.sql}, e toda alteração é feita nesse arquivo, seguida da recriação do banco. A alternativa, uma ferramenta de migrations, foi descartada porque o sistema ainda não está em produção e não há dados reais a preservar entre versões do esquema; um script único é mais simples de ler e de revisar.
 
 \section{Estrutura da Aplicação}
-\orientacao{Apresentar a organização dos arquivos, módulos, pacotes e demais elementos que compõem a aplicação implementada.}
+\label{sec:estrutura}
 
-\diagrama{Diagrama de pacotes}{pacotes}
+O repositório reúne, em pastas separadas, o banco de dados, a API, a interface web e esta documentação:
+
+\begin{description}
+  \item[\texttt{db/}:] arquivo do Docker Compose, script de criação das tabelas (\texttt{estrutura.sql}) e script com dados de desenvolvimento (\texttt{dados.sql});
+  \item[\texttt{api/}:] back-end em Go;
+  \item[\texttt{web/}:] front-end em Angular;
+  \item[\texttt{documentacao/}:] este documento, escrito em \LaTeX{} com a classe abnTeX2.
+\end{description}
+
+A API segue uma divisão em camadas, na qual cada pacote tem uma única responsabilidade. O pacote \texttt{cmd} inicializa a aplicação: lê as configurações, abre a conexão com o banco, cria os objetos e registra as rotas. O pacote \texttt{controller} traduz o protocolo HTTP, decodificando as requisições e montando as respostas em JSON. O pacote \texttt{service} contém as regras de negócio e não conhece HTTP. O pacote \texttt{db} contém a conexão com o PostgreSQL e o código de acesso a dados gerado pelo sqlc. As dependências seguem sempre no mesmo sentido, de \texttt{controller} para \texttt{service} e de \texttt{service} para \texttt{db}, o que permite alterar uma camada sem afetar as anteriores.
+
+Essa divisão foi preferida a uma estrutura mais elaborada, como a arquitetura hexagonal, com portas e adaptadores para cada dependência. Para o tamanho do \sistema{}, as três camadas já separam o que muda por motivos diferentes (protocolo, regra e persistência), sem acrescentar interfaces que, por enquanto, teriam uma única implementação. Abstrações desse tipo serão introduzidas quando houver mais de uma implementação real, como no caso da interface de integração com os marketplaces.
+
+A interface web segue a organização padrão do Angular com componentes independentes (\textit{standalone}). A pasta \texttt{app} guarda a configuração da aplicação e as rotas; cada tela fica em uma pasta própria, como \texttt{login}; e a comunicação com a API fica isolada em serviços, na pasta \texttt{services}. Assim, os componentes não conhecem endereços nem formatos de requisição, apenas os métodos dos serviços.
+
+A \autoref{fig:pacotes} apresenta os pacotes da API e da interface web e as dependências entre eles.
+
+\begin{figure}[htbp]
+  \centering
+  \caption{Diagrama de pacotes}
+  \label{fig:pacotes}
+  \resizebox{\linewidth}{!}{\input{diagramas/pacotes}}
+  \fonte{Elaborado pelos autores.}
+\end{figure}
 
 \section{Implementação dos Componentes}
-\orientacao{Descrever como os componentes definidos no projeto foram efetivamente implementados, destacando aspectos técnicos relevantes.}
+\label{sec:componentes}
+
+Esta seção descreve os componentes já implementados, organizados pelas camadas apresentadas na seção anterior.
+
+\subsection{Banco de dados}
+
+O esquema atual contém a tabela \texttt{usuarios}, com identificador, e-mail e hash da senha. O identificador é gerado pelo próprio PostgreSQL (\texttt{GENERATED ALWAYS AS IDENTITY}), e o e-mail possui restrição de unicidade. Uma restrição de verificação (\texttt{CHECK}) exige que o e-mail seja gravado em letras minúsculas e sem espaços nas extremidades. Com isso, a regra de normalização do e-mail não depende apenas do código da aplicação: mesmo um registro inserido diretamente no banco precisa respeitá-la, o que impede, por exemplo, a existência de dois usuários que diferem apenas por letras maiúsculas.
+
+O script \texttt{dados.sql} cadastra um usuário de desenvolvimento, utilizado nos testes manuais. As demais tabelas do modelo de dados apresentado no \autoref{cap:projeto} serão criadas junto com os módulos que as utilizam.
+
+\subsection{Acesso a dados}
+
+O acesso ao banco é feito com o sqlc, ferramenta que lê o esquema (\texttt{estrutura.sql}) e um arquivo de consultas SQL (\texttt{queries.sql}) e gera, a partir deles, funções Go com parâmetros e retornos tipados \cite{sqlc}. A conexão é gerenciada pelo driver pgx, por meio de um conjunto de conexões reutilizáveis (\textit{pool}).
+
+A principal alternativa considerada foi o uso de um ORM, que gera o SQL a partir de estruturas da linguagem. O sqlc foi preferido porque as consultas continuam escritas em SQL, legíveis e revisáveis pela equipe, e porque erros como uma coluna inexistente ou um tipo incompatível são detectados na geração do código, antes da execução. A abordagem também é adequada para as operações de estoque previstas, que exigirão controle explícito de transações e de bloqueios para evitar a venda de um mesmo item em dois canais.
+
+Antes de iniciar o servidor, a API testa a conexão com o banco. Se o banco estiver indisponível, a aplicação encerra com uma mensagem de erro, em vez de iniciar e falhar apenas na primeira requisição. As mensagens de erro da conexão foram tratadas para não exibir a senha do banco no terminal.
+
+\subsection{Regras de negócio: autenticação}
+
+O serviço de autenticação recebe e-mail e senha e executa as seguintes etapas:
+
+\begin{enumerate}
+  \item normaliza o e-mail, convertendo-o para minúsculas e removendo espaços nas extremidades;
+  \item rejeita dados vazios e senhas com mais de 72 bytes;
+  \item busca no banco o hash da senha associado ao e-mail;
+  \item compara a senha informada com o hash por meio do algoritmo bcrypt.
+\end{enumerate}
+
+As senhas não são armazenadas, apenas o seu hash bcrypt. Esse algoritmo é propositalmente lento e incorpora um valor aleatório (\textit{salt}) a cada hash, o que dificulta ataques de força bruta caso o banco seja exposto. O limite de 72 bytes decorre do próprio bcrypt, que ignora os bytes excedentes; sem a verificação, duas senhas diferentes com o mesmo início seriam aceitas como iguais. O limite é medido em bytes, e não em caracteres, porque caracteres acentuados ocupam mais de um byte.
+
+Quando o e-mail não existe e quando a senha está incorreta, o serviço devolve o mesmo erro. Dessa forma, a resposta não revela a quem tenta acessar o sistema quais e-mails estão cadastrados.
+
+\subsection{Camada HTTP}
+
+As rotas são registradas com o pacote \texttt{net/http} da biblioteca padrão do Go, sem framework web. A partir da versão 1.22, esse pacote passou a aceitar o método HTTP na definição da rota (por exemplo, \texttt{POST /login}), recurso que antes justificava o uso de bibliotecas de terceiros \cite{go}. Usar a biblioteca padrão reduz as dependências do projeto e o que a equipe precisa aprender.
+
+O controlador de autenticação limita o corpo da requisição a 4 KiB, decodifica o JSON e converte o resultado do serviço no código HTTP correspondente, conforme a \autoref{tab:respostas-login}. Falhas internas são registradas no log da API com o seu contexto, mas o usuário recebe apenas uma mensagem genérica, sem detalhes técnicos.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Respostas do endpoint \texttt{POST /login}}
+  \label{tab:respostas-login}
+  \begin{tabularx}{\textwidth}{lX}
+    \toprule
+    \textbf{Código HTTP} & \textbf{Situação} \\
+    \midrule
+    200 & Credenciais válidas \\
+    400 & JSON inválido, campos vazios, senha acima de 72 bytes ou corpo acima de 4 KiB \\
+    401 & E-mail não cadastrado ou senha incorreta, com a mesma mensagem nos dois casos \\
+    405 & Método diferente de POST \\
+    500 & Falha interna, como banco de dados indisponível \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos autores.}
+\end{table}
+
+Como a interface web e a API são servidas em portas diferentes, o navegador as trata como origens distintas e bloqueia as requisições entre elas, a menos que a API as autorize pelo mecanismo CORS (\textit{Cross-Origin Resource Sharing}). A API autoriza somente a origem definida na variável \texttt{FRONTEND\_ORIGIN}, em vez de liberar qualquer origem, para que outros sites abertos no navegador não consigam chamar a API.
+
+\subsection{Interface web}
+
+A tela de login é um componente Angular que usa formulários reativos para validar os campos antes do envio: o e-mail precisa ter formato válido e a senha não pode estar vazia. O estado da tela (requisição em andamento, mensagem de sucesso e mensagem de erro) é mantido em \textit{signals}, recurso do Angular que atualiza a interface somente quando esses valores mudam \cite{angular}.
+
+Durante a requisição, o formulário e o botão ficam desabilitados, o que impede envios repetidos por cliques sucessivos. Ao término, com sucesso ou erro, o campo de senha é limpo. Cada código de erro da API é convertido em uma mensagem compreensível para o usuário, inclusive quando a API não responde, caso em que a requisição é interrompida após 10 segundos.
+
+A tela também foi construída considerando a acessibilidade: os campos possuem rótulos associados, os erros de cada campo são vinculados a ele por atributos ARIA e as mensagens de resultado ficam em regiões que os leitores de tela anunciam automaticamente. Quando a validação falha, o foco é levado ao primeiro campo com problema.
 
 \section{Integração dos Módulos}
-\orientacao{Descrever como os diferentes módulos e componentes da aplicação foram integrados e como ocorre sua comunicação em ambiente de execução.}
+\label{sec:integracao}
 
-\diagrama{Diagrama de implantação}{implantacao}
+Em execução, o \sistema{} é composto por três processos na mesma máquina: o servidor de desenvolvimento do Angular, que entrega a aplicação web ao navegador; a API em Go; e o PostgreSQL. A \autoref{fig:implantacao} apresenta essa disposição.
+
+\begin{figure}[htbp]
+  \centering
+  \caption{Diagrama de implantação}
+  \label{fig:implantacao}
+  \resizebox{\linewidth}{!}{\input{diagramas/implantacao}}
+  \fonte{Elaborado pelos autores.}
+\end{figure}
+
+A aplicação Angular, depois de carregada no navegador, comunica-se com a API por requisições HTTP com corpo em JSON. A API, por sua vez, comunica-se com o PostgreSQL pelo protocolo do próprio banco, por meio do driver pgx. A interface web nunca acessa o banco diretamente: toda leitura e escrita passa pela API, que concentra as regras de negócio e a validação dos dados.
+
+O fluxo de autenticação percorre todos esses elementos:
+
+\begin{enumerate}
+  \item o componente de login valida o formulário e chama o serviço de autenticação do front-end;
+  \item esse serviço envia \texttt{POST /login} à API, com e-mail e senha em JSON;
+  \item o controlador decodifica o corpo e repassa os dados ao serviço da API;
+  \item o serviço normaliza o e-mail e consulta o hash da senha no banco, por meio da função gerada pelo sqlc;
+  \item o serviço compara a senha com o hash e devolve o resultado ao controlador;
+  \item o controlador responde com o código HTTP e a mensagem em JSON, que o componente exibe ao usuário.
+\end{enumerate}
+
+A API escuta apenas no endereço local (\texttt{localhost}), e o PostgreSQL, quando executado pelo Docker Compose, também publica sua porta somente para a própria máquina. Nenhum dos serviços fica acessível a outros computadores da rede, o que é adequado ao uso atual, restrito ao desenvolvimento. A forma de implantação para uso pela loja parceira ainda será definida: \pendente{definir onde e como o sistema será executado para a Tutymotos}.
 
 \section{Testes Realizados}
-\orientacao{Apresentar os procedimentos de teste realizados, os aspectos avaliados e os principais resultados obtidos.}
+\label{sec:testes}
+
+A interface web possui testes automatizados executados com o Vitest, por meio do comando \texttt{npm test}. Nesses testes, as requisições HTTP são simuladas: em vez de chamar a API real, o teste define a resposta que o componente receberá. Isso permite verificar o comportamento da tela em situações difíceis de reproduzir manualmente, como a indisponibilidade da API. A \autoref{tab:testes-web} descreve os casos de teste.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Testes automatizados da interface web}
+  \label{tab:testes-web}
+  \begin{tabularx}{\textwidth}{XX}
+    \toprule
+    \textbf{Caso de teste} & \textbf{Comportamento verificado} \\
+    \midrule
+    Criação da aplicação & O componente raiz é criado e disponibiliza o local de exibição das rotas \\
+    Formulário vazio & Nenhuma requisição é enviada e os avisos dos dois campos são exibidos \\
+    Login com sucesso & A requisição usa o método POST e o formato esperado pela API, envios repetidos são bloqueados, a mensagem de sucesso é exibida e a senha é limpa \\
+    Credenciais inválidas & A resposta 401 gera mensagem de erro e o formulário volta a aceitar nova tentativa \\
+    API indisponível & Uma falha de rede gera mensagem orientando o usuário a verificar a disponibilidade da API \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos autores.}
+\end{table}
+
+Na última execução, os 6 testes, distribuídos em 2 arquivos, foram aprovados. O caso de criação da aplicação corresponde a dois testes.
+
+A API ainda não possui testes automatizados. Seu comportamento foi verificado manualmente, por meio de requisições à rota \texttt{/login} com o usuário de desenvolvimento, conferindo os códigos HTTP da \autoref{tab:respostas-login}. O código da API também é verificado pela ferramenta \texttt{go vet}, que aponta erros comuns sem executar o programa. \pendente{Implementar testes automatizados do serviço de autenticação e, nos próximos módulos, das regras de estoque.}
 
 \section{Resultados Obtidos}
-\orientacao{Apresentar os resultados alcançados com a implementação e verificar em que medida eles atendem aos objetivos e às necessidades identificadas.}
+\label{sec:resultados}
+
+Até o momento, foi obtida uma aplicação executável que realiza a autenticação de usuários, atendendo parcialmente ao requisito RF01. O fluxo integra todas as camadas previstas na arquitetura e serve de modelo para os módulos seguintes, que deverão repetir a mesma organização: tabela em \texttt{estrutura.sql}, consulta em \texttt{queries.sql}, serviço com as regras, controlador com a rota HTTP e componente com o serviço correspondente no front-end.
+
+Também foram alcançados resultados que não são visíveis ao usuário, mas que sustentam o restante do desenvolvimento: um ambiente reproduzível, montado com poucos comandos em qualquer máquina da equipe; credenciais fora do repositório; e um padrão de tratamento de erros, validação e armazenamento de senhas definido desde a primeira funcionalidade.
+
+Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF06, RF09 e RF10), ainda não foram implementados. A avaliação dos resultados em relação às necessidades da loja parceira, por meio das métricas de tempo de publicação de anúncios e de esforço para atualização de preços, depende desses módulos: \pendente{apresentar os resultados das métricas comparados com o levantamento inicial feito com a Tutymotos}.
 
 \section{Limitações da Implementação}
-\orientacao{Registrar limitações, funcionalidades não implementadas, problemas conhecidos e aspectos que possam exigir complementação ou evolução futura.}
+\label{sec:limitacoes}
+
+No estado atual, a implementação apresenta as seguintes limitações:
+
+\begin{itemize}
+  \item \textbf{Autenticação sem sessão:} a API confirma se as credenciais são válidas, mas não cria sessão nem emite token. Assim, ainda não há como proteger as demais rotas nem manter o usuário identificado entre requisições, o que impede o cumprimento completo de RF01 e RF15.
+  \item \textbf{Módulos de negócio ausentes:} produtos, anúncios, estoque e pedidos ainda não foram implementados, assim como as tabelas correspondentes no banco.
+  \item \textbf{Sem integração com marketplaces:} nenhuma comunicação com o Mercado Livre ou com os demais canais foi implementada. A integração depende do cadastro de contas de desenvolvedor em cada plataforma.
+  \item \textbf{Testes apenas no front-end:} a API não possui testes automatizados.
+  \item \textbf{Execução restrita à máquina local:} o endereço da API está fixo no front-end e os serviços escutam apenas em \texttt{localhost}, configuração adequada ao desenvolvimento, mas não ao uso pela loja.
+  \item \textbf{Usuários cadastrados por script:} não há tela de cadastro nem de gerenciamento de usuários; o único usuário existente é criado pelo script de dados de desenvolvimento.
+\end{itemize}
+
+Essas limitações são consequência da ordem adotada no desenvolvimento, que priorizou validar a arquitetura com uma funcionalidade completa antes de ampliar o escopo. Elas serão revistas ao fim da implementação, e as que permanecerem serão registradas como trabalhos futuros no \autoref{cap:conclusao}.

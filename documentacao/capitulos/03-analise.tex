@@ -119,21 +119,21 @@ O diagrama de classes conceitual do SellerHub é apresentado na Figura \ref{fig:
 Os requisitos funcionais descrevem as funcionalidades que o sistema deverá oferecer aos usuários. Com base na proposta do SellerHub e nos diagramas elaborados, foram definidos os seguintes requisitos iniciais.
 
 \begin{itemize}
-    \item \textbf{RF01} - O sistema deverá permitir a autenticação dos usuários.
-    \item \textbf{RF02} - O sistema deverá permitir o cadastro de produtos.
-    \item \textbf{RF03} - O sistema deverá permitir a consulta dos produtos cadastrados.
-    \item \textbf{RF04} - O sistema deverá permitir a edição das informações dos produtos.
-    \item \textbf{RF05} - O sistema deverá permitir o gerenciamento dos anúncios associados aos produtos.
-    \item \textbf{RF06} - O sistema deverá permitir a criação e a organização de anúncios para os canais de venda contemplados no escopo.
-    \item \textbf{RF07} - O sistema deverá oferecer recursos de inteligência artificial para sugerir títulos, descrições e imagens para anúncios.
-    \item \textbf{RF08} - O sistema deverá permitir que o vendedor revise e aprove o conteúdo gerado por inteligência artificial antes de sua eventual utilização ou publicação.
-    \item \textbf{RF09} - O sistema deverá permitir a consulta de informações de vendas disponíveis.
-    \item \textbf{RF10} - O sistema deverá permitir a consulta de informações de estoque.
-    \item \textbf{RF11} - O sistema deverá permitir a consulta de métricas de acesso aos anúncios, quando esses dados estiverem disponíveis.
-    \item \textbf{RF12} - O sistema deverá disponibilizar indicadores para acompanhamento do desempenho das vendas, com base nas informações disponíveis.
-    \item \textbf{RF13} - O sistema deverá permitir que o administrador gerencie os usuários da aplicação.
-    \item \textbf{RF14} - O sistema deverá permitir que o administrador gerencie as configurações administrativas previstas.
-    \item \textbf{RF15} - O sistema deverá restringir o acesso às funcionalidades de acordo com as permissões atribuídas aos usuários.
+    \item \textbf{RF01:} O sistema deverá permitir a autenticação dos usuários.
+    \item \textbf{RF02:} O sistema deverá permitir o cadastro de produtos.
+    \item \textbf{RF03:} O sistema deverá permitir a consulta dos produtos cadastrados.
+    \item \textbf{RF04:} O sistema deverá permitir a edição das informações dos produtos.
+    \item \textbf{RF05:} O sistema deverá permitir o gerenciamento dos anúncios associados aos produtos.
+    \item \textbf{RF06:} O sistema deverá permitir a criação e a organização de anúncios para os canais de venda contemplados no escopo.
+    \item \textbf{RF07:} O sistema deverá oferecer recursos de inteligência artificial para sugerir títulos, descrições e imagens para anúncios.
+    \item \textbf{RF08:} O sistema deverá permitir que o vendedor revise e aprove o conteúdo gerado por inteligência artificial antes de sua eventual utilização ou publicação.
+    \item \textbf{RF09:} O sistema deverá permitir a consulta de informações de vendas disponíveis.
+    \item \textbf{RF10:} O sistema deverá permitir a consulta de informações de estoque.
+    \item \textbf{RF11:} O sistema deverá permitir a consulta de métricas de acesso aos anúncios, quando esses dados estiverem disponíveis.
+    \item \textbf{RF12:} O sistema deverá disponibilizar indicadores para acompanhamento do desempenho das vendas, com base nas informações disponíveis.
+    \item \textbf{RF13:} O sistema deverá permitir que o administrador gerencie os usuários da aplicação.
+    \item \textbf{RF14:} O sistema deverá permitir que o administrador gerencie as configurações administrativas previstas.
+    \item \textbf{RF15:} O sistema deverá restringir o acesso às funcionalidades de acordo com as permissões atribuídas aos usuários.
 \end{itemize}
 
 Os requisitos relacionados à consulta de informações externas deverão ser detalhados conforme as integrações efetivamente implementadas. Para cada plataforma contemplada, será necessário definir quais dados poderão ser obtidos, quais operações serão suportadas e quais limitações deverão ser consideradas.
@@ -145,14 +145,14 @@ A publicação direta de anúncios não foi estabelecida como requisito confirma
 Os requisitos não funcionais estabelecem critérios de qualidade e condições de operação que deverão orientar o desenvolvimento do SellerHub.
 
 \begin{itemize}
-    \item \textbf{RNF01 - Usabilidade:} a interface deverá apresentar organização clara, facilitando o acesso às funcionalidades de gerenciamento de produtos, anúncios, vendas e estoque.
-    \item \textbf{RNF02 - Segurança:} o sistema deverá proteger as informações armazenadas e restringir o acesso às funcionalidades de acordo com as permissões definidas para cada perfil de usuário.
-    \item \textbf{RNF03 - Integridade dos dados:} a aplicação deverá adotar mecanismos que preservem a consistência das informações cadastradas e reduzam a ocorrência de registros inconsistentes.
-    \item \textbf{RNF04 - Manutenibilidade:} o código deverá ser organizado de forma modular, facilitando a compreensão, a correção de falhas e a evolução das funcionalidades.
-    \item \textbf{RNF05 - Desempenho:} as operações de consulta e gerenciamento deverão apresentar tempos de resposta adequados às condições de execução e ao volume de dados previsto para a aplicação.
-    \item \textbf{RNF06 - Confiabilidade:} o sistema deverá tratar erros de processamento e falhas de comunicação de maneira controlada, evitando apresentar informações externas indisponíveis como se estivessem atualizadas.
-    \item \textbf{RNF07 - Compatibilidade:} a interface web deverá ser compatível com os navegadores definidos como alvo do projeto.
-    \item \textbf{RNF08 - Privacidade:} o tratamento de dados pessoais deverá observar os requisitos aplicáveis da Lei Geral de Proteção de Dados Pessoais (LGPD).
+    \item \textbf{RNF01 (Usabilidade):} a interface deverá apresentar organização clara, facilitando o acesso às funcionalidades de gerenciamento de produtos, anúncios, vendas e estoque.
+    \item \textbf{RNF02 (Segurança):} o sistema deverá proteger as informações armazenadas e restringir o acesso às funcionalidades de acordo com as permissões definidas para cada perfil de usuário.
+    \item \textbf{RNF03 (Integridade dos dados):} a aplicação deverá adotar mecanismos que preservem a consistência das informações cadastradas e reduzam a ocorrência de registros inconsistentes.
+    \item \textbf{RNF04 (Manutenibilidade):} o código deverá ser organizado de forma modular, facilitando a compreensão, a correção de falhas e a evolução das funcionalidades.
+    \item \textbf{RNF05 (Desempenho):} as operações de consulta e gerenciamento deverão apresentar tempos de resposta adequados às condições de execução e ao volume de dados previsto para a aplicação.
+    \item \textbf{RNF06 (Confiabilidade):} o sistema deverá tratar erros de processamento e falhas de comunicação de maneira controlada, evitando apresentar informações externas indisponíveis como se estivessem atualizadas.
+    \item \textbf{RNF07 (Compatibilidade):} a interface web deverá ser compatível com os navegadores definidos como alvo do projeto.
+    \item \textbf{RNF08 (Privacidade):} o tratamento de dados pessoais deverá observar os requisitos aplicáveis da Lei Geral de Proteção de Dados Pessoais (LGPD).
 \end{itemize}
 
 Os critérios mensuráveis para avaliação desses requisitos, como tempos máximos de resposta, navegadores suportados e critérios de teste, deverão ser definidos durante o planejamento técnico e a implementação.

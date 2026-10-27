@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  componente/.style={draw, text width=3.6cm, align=center, minimum height=1.6cm, inner sep=4pt},
+  aba/.style={draw, anchor=south west, inner sep=3pt},
+  liga/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}},
+  rotulo/.style={font=\scriptsize, align=center},
+]
+  % no fisico: maquina do desenvolvedor
+  \draw (-0.6,-0.8) rectangle (15.6,5.8);
+  \node[aba] at (-0.6,5.8) {\guillemotleft dispositivo\guillemotright{} Máquina local};
+
+  \node[componente] (navegador) at (1.6,3.6) {\guillemotleft ambiente\guillemotright\\\textbf{Navegador}\\aplicação Angular};
+  \node[componente] (ngserve) at (1.6,0.6) {\guillemotleft processo\guillemotright\\\textbf{ng serve}\\localhost:4200};
+  \node[componente] (api) at (7.5,3.6) {\guillemotleft processo\guillemotright\\\textbf{API Go}\\localhost:8080};
+  \node[componente] (env) at (7.5,0.6) {\guillemotleft arquivo\guillemotright\\\textbf{.env}\\credenciais e origem};
+
+  % banco: local ou em conteiner
+  \draw[dashed] (11.3,-0.3) rectangle (15.1,5.0);
+  \node[rotulo, anchor=south] at (13.2,-0.2) {\guillemotleft opcional\guillemotright\\contêiner Docker};
+  \node[componente] (banco) at (13.2,3.6) {\guillemotleft SGBD\guillemotright\\\textbf{PostgreSQL 17}\\porta 5432};
+
+  \draw[liga] (navegador) -- node[rotulo, left] {HTTP\\(arquivos)} (ngserve);
+  \draw[liga] (navegador) -- node[rotulo, above] {HTTP/JSON\\POST /login} (api);
+  \draw[-{Stealth[length=2mm]}, dashed] (env) -- node[rotulo, right] {leitura} (api);
+  \draw[liga] (api) -- node[rotulo, above] {TCP\\(pgx)} (banco);
+\end{tikzpicture}

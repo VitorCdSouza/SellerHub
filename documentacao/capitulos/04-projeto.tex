@@ -13,7 +13,7 @@
 
 \section{Modelo de Dados}
 
-O modelo de dados do SellerHub foi concebido para suportar a centralização das operações comerciais, garantindo a integridade, a consistência e a rastreabilidade das informações compartilhadas entre diferentes canais de venda. Considerando a natureza estruturada dos dados transacionais envolvidos — como produtos, estoques, anúncios e vendas — optou-se pela adoção de um modelo relacional, implementado através do sistema gerenciador de banco de dados PostgreSQL.
+O modelo de dados do SellerHub foi concebido para suportar a centralização das operações comerciais, garantindo a integridade, a consistência e a rastreabilidade das informações compartilhadas entre diferentes canais de venda. Considerando a natureza estruturada dos dados transacionais envolvidos, como produtos, estoques, anúncios e vendas, optou-se pela adoção de um modelo relacional, implementado através do sistema gerenciador de banco de dados PostgreSQL.
 
 A estruturação lógica dos dados deriva das entidades e regras de negócio estabelecidas no modelo conceitual, traduzindo-as em tabelas e relacionamentos que viabilizam a arquitetura da aplicação:
 
@@ -31,7 +31,7 @@ A estruturação lógica dos dados deriva das entidades e regras de negócio est
     \item \textbf{Métricas de Desempenho:} O armazenamento das \textit{Métricas de Anúncio} foi estruturado para suportar recortes temporais. O modelo vincula quantidades de acessos e indicadores de performance a períodos específicos, possibilitando a geração de gráficos de evolução e a comparação de desempenho do mesmo produto em canais distintos.
 \end{itemize}
 
-Entre as principais decisões de projeto adotadas, destaca-se a normalização dos dados para mitigar redundâncias — separando as informações estruturais do produto das informações voláteis de cada anúncio. A escolha do modelo relacional garante, através da aplicação de chaves estrangeiras (\textit{Foreign Keys}) e restrições de integridade (\textit{Constraints}), que a base de dados não admita inconsistências, como o registro de vendas de produtos inexistentes ou o acúmulo de métricas órfãs no sistema.
+Entre as principais decisões de projeto adotadas, destaca-se a normalização dos dados para mitigar redundâncias, separando as informações estruturais do produto das informações voláteis de cada anúncio. A escolha do modelo relacional garante, através da aplicação de chaves estrangeiras (\textit{Foreign Keys}) e restrições de integridade (\textit{Constraints}), que a base de dados não admita inconsistências, como o registro de vendas de produtos inexistentes ou o acúmulo de métricas órfãs no sistema.
 
 O modelo entidade-relacionamento resultante é apresentado na Figura \ref{fig:modelo_conceitual_banco_dados}.
 
