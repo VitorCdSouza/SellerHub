@@ -1,28 +1,88 @@
 \chapter{Contexto do Projeto}
 \label{cap:contexto}
 
-\orientacao{Este capítulo apresenta o contexto real no qual o projeto está inserido, caracterizando o cenário, o público envolvido, as necessidades identificadas e as regras de negócio do domínio. Sua função é estabelecer a compreensão do problema sob a perspectiva da comunidade atendida antes de apresentar a solução computacional.}
-
-\orientacao{Incluir estudo sobre a área de atuação do parceiro do projeto, mercado, índices, demandas, etc.}
+Este capítulo apresenta o contexto real no qual o SellerHub está inserido. Descrevemos o cenário do comércio eletrônico e do mercado de peças para motocicletas, caracterizamos a loja parceira e o público que utilizará a solução, apresentamos as necessidades identificadas e, por fim, enunciamos as regras de negócio do domínio. O objetivo é estabelecer a compreensão do problema sob a perspectiva de quem o vivencia antes de apresentarmos a solução computacional.
 
 \section{Cenário}
-\orientacao{Descrever o contexto em que o projeto será aplicado, incluindo as características relevantes do ambiente, organização, atividade ou situação que originou a demanda.}
+\label{sec:cenario}
+
+O SellerHub nasce da necessidade de uma pequena empresa familiar que pretende vender em vários canais digitais ao mesmo tempo. Para compreender esse ambiente, descrevemos a seguir o mercado de comércio eletrônico e de marketplaces, o mercado de peças para motocicletas e, por fim, a loja parceira.
+
+\subsection{Comércio eletrônico e marketplaces no Brasil}
+
+O comércio eletrônico brasileiro segue em expansão. Segundo levantamento da FecomercioSP com dados do IBGE e do MDIC, o setor faturou R$ 295,6 bilhões em 2025, alta de 20% em relação ao ano anterior \cite{fecomercio2026}. A Associação Brasileira de Comércio Eletrônico (ABComm), que adota metodologia própria, registrou R$ 204,3 bilhões em 2024, crescimento de 10,5%, e projetou R$ 234,9 bilhões para 2025 \cite{abcomm2025}. Embora os valores absolutos difiram entre as fontes, ambas indicam crescimento consistente do setor.
+
+Esse crescimento alcança também os pequenos negócios. De acordo com a FecomercioSP, a participação de empresas do Simples Nacional nas vendas pela internet passou de 3,6% em 2016 para 34% em 2025 \cite{fecomercio2026}. Isso mostra que o comércio eletrônico deixou de ser um espaço dominado por grandes redes e passou a ser um canal relevante para o pequeno vendedor.
+
+Grande parte dessas vendas ocorre em marketplaces. A Sociedade Brasileira de Varejo e Consumo (SBVC) aponta que 78% das vendas online no país passaram por esses ambientes em 2023, movimentando R$ 203,4 bilhões \cite{sbvc2024}. Para o lojista, estar em mais de um marketplace amplia o alcance, mas multiplica o trabalho operacional, pois cada plataforma possui seu próprio painel, suas regras de cadastro e sua política de cobrança.
+
+Essa política de cobrança, aliás, é instável. Ao longo de 2026, Shopee e Mercado Livre reajustaram comissões, taxas fixas por item e regras de frete \cite{gosmarter2026a}. No TikTok Shop, a comissão sobre produtos abaixo de R$ 50 passou de 6% para 10% a partir de julho de 2026 \cite{gosmarter2026b}. Como consequência, um mesmo produto rende margens diferentes em cada canal, e o vendedor precisa reavaliar seus preços com frequência.
+
+\subsection{Mercado de peças para motocicletas}
+
+A loja parceira atua no mercado de reposição de peças para motocicletas, cuja demanda acompanha o tamanho da frota. A Associação Brasileira dos Fabricantes de Motocicletas, Ciclomotores, Motonetas, Bicicletas e Similares (Abraciclo) informa que a frota nacional chegou a 38,4 milhões de unidades em junho de 2026, alta de 46,8% em dez anos \cite{dgabc2026}. Entre janeiro e setembro de 2026, foram emplacadas 1.783.972 motocicletas, aumento de 10,5% sobre o mesmo período de 2025, e a entidade projeta 2,35 milhões de emplacamentos no ano, alta de 6,9% sobre os 2,2 milhões de 2025 \cite{ohoje2026,movimentoeconomico2026}.
+
+Quanto maior a frota circulante, maior a necessidade de manutenção e reposição de componentes \cite{ohoje2026b}. Além disso, a motocicleta é, para muitos brasileiros, uma ferramenta de trabalho, como no caso de entregadores, o que torna a manutenção regular uma necessidade recorrente e não uma compra eventual \cite{omecanico2026}. Trata-se, portanto, de um mercado em crescimento e com demanda estável, no qual o pequeno lojista compete pela disponibilidade de peças, pelo preço e pela rapidez na entrega.
+
+\subsection{A loja parceira: Tutymotos}
+
+A Tutymotos é uma loja de peças para motocicletas, administrada em conjunto por pai e filho, Adilson Aparecido da Silva e Gabriel do Prado Silva. Os dois mantêm há cerca de cinco anos uma oficina de mecânica de motocicletas e pretendem começar a vender online as peças com as quais já trabalham, nos canais Mercado Livre, Shopee, TikTok Shop e Facebook Marketplace. Neste trabalho, chamamos de lojista quem opera o sistema em nome da loja.
+
+Embora ainda não tenham vendido peças mecânicas pela internet, os administradores já têm experiência com vendas sazonais de outros produtos em comércios eletrônicos, sempre com estoque próprio. Essa experiência é a principal fonte das observações que fundamentam este capítulo. O catálogo da loja abrangerá as mais diversas categorias de peças de reposição e não possui um limite de itens fixado, visto que a proposta do SellerHub é escalar de forma transparente sem restringir quantidades ou tipos de produto. Atualmente, os itens sazonais são comercializados majoritariamente pelo Mercado Livre, mas a adoção da nova ferramenta reflete justamente a estratégia de expansão da empresa para os demais canais disponíveis.
+
+Hoje, toda a operação é manual. O controle de produtos, estoque e vendas é feito em caderno, a mão. Cada produto é cadastrado separadamente em cada marketplace, o estoque de cada canal é atualizado individualmente, os pedidos são acompanhados em painéis distintos e o preço de cada anúncio é calculado considerando as comissões de cada plataforma. É nesse cenário que o SellerHub será aplicado.
 
 \section{Público-Alvo}
-\orientacao{Caracterizar as pessoas, grupos ou organizações que utilizarão, serão atendidos ou serão diretamente afetados pelo projeto.}
+\label{sec:publico-alvo}
 
-\section{Necessidades Identificadas}
-\orientacao{Apresentar as necessidades observadas no contexto do projeto que motivaram a proposição da solução, sem ainda detalhar os requisitos do sistema.}
+O público diretamente atendido pelo projeto são os administradores da Tutymotos, pai e filho. Na fase inicial (MVP), o SellerHub será utilizado por meio de uma única conta compartilhada entre os dois administradores, que responde por todas as atividades da loja: cadastro de produtos, controle de estoque, precificação, publicação de anúncios e acompanhamento de pedidos. Por isso, o sistema não prevê, neste momento, perfis de acesso diferentes.
+
+De forma indireta, são afetados os compradores finais, que compõem um perfil bastante diversificado. A base de clientes atende desde outras oficinas mecânicas que buscam peças para reparo de clientes próprios, passando por entregadores (motoboys) que dependem da agilidade na manutenção de sua ferramenta de trabalho, até motociclistas em geral que utilizam o veículo para locomoção diária. Todos eles dependem de anúncios precisos e de um estoque confiável para comprar a peça certa e recebê-la no prazo.
+
+Em uma etapa posterior, o produto poderá ser comercializado para outros pequenos e médios vendedores que atuam em vários marketplaces. A presença crescente do Simples Nacional nas vendas online \cite{fecomercio2026} indica que esse público é numeroso. Essa possibilidade orienta nossas decisões de projeto, mas não altera o escopo do MVP, que é validado com a loja parceira.
+
+\sectionsection{Necessidades Identificadas}
+\label{sec:necessidades}
+
+As necessidades descritas a seguir foram levantadas por meio de conversas com os administradores e da observação direta da rotina da loja. Segundo o relato da Tutymotos, o processo manual de cadastro de um único item consome cerca de 15 minutos em cada canal de venda, o que representa até uma hora de trabalho operacional repetitivo para disponibilizar um mesmo produto nas quatro plataformas. Além disso, a falta de sincronização unificada de estoque já acarretou situações de venda sem o item físico na prateleira. Quando isso ocorre, a loja tenta adquirir a peça com fornecedores terceiros para honrar a compra; não sendo possível, a venda é cancelada, prejudicando a reputação da conta da empresa perante a plataforma.
+
+A partir desse cenário, estruturam-se as seguintes necessidades:
+
+\begin{enumerate}
+\item \textbf{Redução do retrabalho de cadastro.} O mesmo produto, com título, descrição, fotos, categoria e preço, é digitado de novo em cada marketplace. Além de repetitiva, a tarefa favorece erros e inconsistências entre os anúncios.
+\item \textbf{Redução do tempo gasto na operação.} Nos períodos de vendas sazonais, só o cadastro chega a consumir cerca de dez horas por semana, segundo os administradores. A soma das tarefas repetitivas consome tempo que poderia ser dedicado à compra de mercadoria, ao atendimento e à melhoria dos anúncios, especialmente em uma loja que concilia a venda online com a rotina de uma oficina.
+\item \textbf{Controle confiável de estoque.} Como o saldo é mantido em caderno e em cada canal separadamente, uma venda feita em um marketplace pode não ser refletida nos demais, o que gera risco de vender um item que já não existe. O cancelamento por falta de estoque prejudica a reputação do vendedor nas plataformas.
+\item \textbf{Precificação consciente por canal.} Cada marketplace cobra comissões e taxas diferentes e as altera com frequência. O lojista precisa de apoio para saber qual preço praticar em cada canal sem perder margem.
+\item \textbf{Visão unificada dos pedidos.} Acompanhar vendas em painéis distintos dificulta saber o que está pendente, em separação, enviado ou cancelado.
+\item \textbf{Apoio na criação de anúncios.} Escrever títulos e descrições adequados a cada plataforma é uma tarefa demorada. Um recurso de geração assistida por inteligência artificial pode acelerá-la, desde que o lojista continue responsável pelo conteúdo publicado.
+\end{enumerate}
+
+Essas necessidades motivam a proposição do SellerHub, cujos requisitos serão detalhados no capítulo seguinte.
 
 \section{Regras de Negócio}
-\orientacao{Enunciar e discutir as regras, condições, políticas e restrições próprias do domínio que devem ser respeitadas pela solução, mantendo a descrição em nível conceitual e independente da implementação.}
+\label{sec:regras-negocio}
+
+As regras a seguir descrevem condições e restrições do domínio que a solução deve respeitar, independentemente de como venham a ser implementadas.
+
+\begin{description}
+\item[RN01 -- Estoque único.] Cada produto possui um único saldo de estoque, compartilhado por todos os canais. Toda venda confirmada em qualquer marketplace reduz esse saldo, e o novo valor deve ser refletido nos demais anúncios.
+\item[RN02 -- Proibição de venda sem estoque.] Um anúncio não deve permanecer disponível quando o saldo do produto for zero, a fim de evitar cancelamentos por falta de mercadoria.
+\item[RN03 -- Preço por canal.] O preço de um produto pode ser diferente em cada marketplace, porque comissões, taxas fixas e custos de frete variam entre plataformas. O preço de cada canal deve ser definido de modo a preservar a margem desejada pelo lojista sobre o custo do produto.
+\item[RN04 -- Padronização do status do pedido.] Cada marketplace usa nomes e fluxos próprios para os estados de um pedido. O sistema deve tratá-los em um conjunto único de situações (por exemplo: aguardando pagamento, pago, em separação, enviado, entregue, cancelado e devolvido), preservando o significado de cada situação original.
+\item[RN05 -- Efeitos do status sobre o estoque.] A simples geração de um pedido por parte do cliente já reserva imediatamente a unidade e a desconta do estoque disponível, prevenindo vendas em duplicidade antes mesmo da confirmação do pagamento. Em caso de cancelamento, a peça volta ao saldo. No entanto, em caso de devolução de um pedido enviado, o produto não deve ser restituído ao estoque automaticamente; a unidade devolvida precisa aguardar a inspeção física e a liberação manual pelo lojista para só então compor novamente o saldo disponível.
+\item[RN06 -- Ciclo de vida do anúncio.] Um anúncio passa por situações distintas, como rascunho, publicado, pausado e encerrado, e só é publicado quando os campos exigidos pelo marketplace de destino estiverem preenchidos.
+\item[RN07 -- Facebook Marketplace fora da automação.] O Facebook Marketplace restringe o uso de APIs de publicação automatizada a parceiros comerciais selecionados (geralmente grandes concessionárias de veículos e imobiliárias) e proíbe explicitamente em seus Termos de Serviço o uso de robôs, \textit{scrapers} ou automações não autorizadas para publicação em massa \cite{meta2026}. Por isso, a publicação e a atualização de anúncios nesse canal não são automatizadas pelo SellerHub, e o lojista continua realizando essas tarefas manualmente. O sistema pode, no entanto, manter o produto e o estoque desse canal sob controle, desde que o lojista registre as vendas feitas por ele.
+\item[RN08 -- Conta única no MVP.] O acesso ao sistema é restrito a uma única conta, compartilhada entre os administradores da loja, que respondem por todas as operações realizadas.
+\end{description}
+
+A Figura~\ref{fig:atividades} ilustra como essas regras se articulam no fluxo de cadastro de um produto e de publicação de seu anúncio nos marketplaces.
 
 \begin{landscape}
 \begin{figure}[htbp]
-    \centering
-    \caption{Diagrama de atividades do cadastro e da publicação de anúncio}
-    \label{fig:atividades}
-    \resizebox{\linewidth}{!}{\input{diagramas/atividades}}
-    \fonte{Elaborado pelos autores.}
+\centering
+\caption{Diagrama de atividades do cadastro e da publicação de anúncio}
+\label{fig:atividades}
+\resizebox{\linewidth}{!}{\input{diagramas/atividades}}
+\fonte{Elaborado pelos autores.}
 \end{figure}
 \end{landscape}
