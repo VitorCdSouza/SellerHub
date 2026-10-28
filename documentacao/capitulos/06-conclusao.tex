@@ -1,13 +1,35 @@
 \chapter{Conclusão}
 \label{cap:conclusao}
 
-\orientacao{Este capítulo encerra o documento avaliando o projeto como um todo e relacionando os resultados alcançados aos objetivos inicialmente estabelecidos. Sua função é sintetizar as principais conclusões, registrar as dificuldades encontradas e indicar possibilidades de continuidade ou evolução do trabalho.}
+Este capítulo apresenta as conclusões da etapa atual de desenvolvimento do \sistema{}, considerando os objetivos definidos na introdução, as necessidades da Tutymotos e os resultados apresentados no \autoref{cap:implementacao}. A avaliação distingue o que já foi produzido das funcionalidades e verificações que ainda dependem da continuidade do projeto.
 
 \section{Considerações Finais}
-\orientacao{Retomar os principais aspectos do projeto e avaliar seus resultados em relação aos objetivos estabelecidos.}
+
+O \sistema{} foi proposto para enfrentar a fragmentação das atividades de vendedores que operam em diferentes canais de comércio eletrônico. No contexto da Tutymotos, o cadastro repetido de produtos, o acompanhamento separado de pedidos e a atualização manual de estoque motivam a busca por uma ferramenta que reúna essas operações. O levantamento apresentado no \autoref{cap:contexto} permitiu relacionar essas necessidades a uma proposta de aplicação web, com apoio à gestão de produtos e anúncios e à preparação de conteúdo sob revisão do lojista.
+
+Nesta etapa, o trabalho produziu um levantamento inicial de requisitos, modelos para representar o domínio e uma organização técnica baseada em Angular, Go e PostgreSQL. A implementação começou pelo fluxo de verificação de credenciais, com separação entre interface, tratamento de requisições, regras de negócio e acesso ao banco. Os seis testes automatizados do front-end foram aprovados, e a análise estática da API foi concluída sem apontamentos, conforme descrito na \autoref{sec:testes}. Esses resultados verificam uma parte da implementação. A integração com o banco ainda precisa ser verificada, e o gerenciamento de sessão não foi implementado.
+
+O objetivo geral de centralizar e simplificar a gestão comercial ainda não foi alcançado integralmente. Os módulos de produtos, anúncios, estoque e pedidos, assim como as integrações externas e o apoio por inteligência artificial, permanecem por desenvolver. Também não há resultados que permitam afirmar uma redução do tempo de cadastro, dos erros de estoque ou do esforço operacional da loja. Os tempos informados pelos lojistas são estimativas sobre a rotina atual e não constituem uma comparação de desempenho com o sistema.
+
+A contribuição desta etapa está na organização do problema e na construção de uma base técnica para a solução. O trabalho articula análise de requisitos, modelagem de dados e desenvolvimento web em torno de uma necessidade concreta. A contribuição prática para a Tutymotos dependerá da conclusão das funcionalidades e de sua avaliação com os lojistas.
 
 \section{Dificuldades Encontradas}
-\orientacao{Relatar as principais dificuldades enfrentadas durante o desenvolvimento e, quando pertinente, as soluções adotadas.}
+
+As limitações documentadas evidenciam desafios de planejamento e de validação que permanecem em aberto. O escopo reúne atividades distintas, como cadastro de produtos, gestão de anúncios, consulta de pedidos, controle de estoque e geração assistida de conteúdo. Transformar esse conjunto em uma aplicação utilizável exige detalhar cada fluxo e manter coerência entre os requisitos, os modelos e o código. A existência dos modelos não significa que as funcionalidades correspondentes já estejam implementadas.
+
+A dependência de plataformas externas também limita o que pode ser confirmado nesta etapa. As integrações previstas dependem dos recursos, das permissões e das condições de acesso de cada marketplace. Como ainda não foram implementadas, sua viabilidade na operação da loja não foi demonstrada. A definição dos fluxos de integração deverá considerar essas condições e os resultados dos testes com cada canal.
+
+Outra limitação é a ausência de evidências suficientes para avaliar o sistema completo. Os testes existentes usam respostas HTTP simuladas, não há testes automatizados da API e não existem resultados confirmados de testes manuais da versão atual. A falta de medições cronometradas da rotina da loja também impede uma comparação quantitativa de ganhos. Os scripts e as orientações de execução oferecem uma referência comum para os ambientes Windows e Linux, mas ainda é necessário verificar o funcionamento integrado e definir a implantação para uso pela Tutymotos.
 
 \section{Trabalhos Futuros}
-\orientacao{Indicar possíveis evoluções, melhorias, ampliações ou funcionalidades que poderão ser desenvolvidas posteriormente.}
+
+A continuidade do trabalho deve contemplar a conclusão das funcionalidades já previstas no escopo e a ampliação das verificações da implementação. No fluxo de acesso, permanecem necessários o gerenciamento de sessão e a proteção das funcionalidades restritas. Também devem ser realizados testes automatizados da API e testes de integração com o PostgreSQL, incluindo entradas inválidas, credenciais incorretas e falhas de comunicação. Essas verificações permitirão avaliar o comportamento do conjunto, além das respostas simuladas utilizadas no front-end.
+
+No domínio comercial, as próximas entregas abrangem o cadastro de produtos, a gestão de anúncios, o acompanhamento de pedidos e o controle de estoque. As integrações deverão ser verificadas nos canais efetivamente contemplados, respeitando os recursos disponíveis em cada plataforma. O apoio por inteligência artificial deverá preservar a revisão e a aprovação do conteúdo pelo lojista. Indicadores de vendas e de acesso aos anúncios dependerão da disponibilidade e da consistência dos dados obtidos.
+
+\begin{samepage}
+A avaliação com a Tutymotos deverá comparar tarefas equivalentes no processo manual e no sistema, com registro dos tempos e das condições de execução. Essa avaliação poderá verificar se a centralização reduz o retrabalho e facilita a operação da loja, sem tratar as estimativas iniciais como resultados experimentais. A definição do ambiente de implantação e a verificação dos fluxos em uso também permanecem necessárias antes da adoção pela empresa.
+
+\end{samepage}
+
+O avanço do projeto será demonstrado pela passagem dos requisitos e modelos para funcionalidades verificadas em conjunto e avaliadas com os usuários. É essa continuidade que permitirá determinar em que medida o \sistema{} atende às necessidades identificadas e quais limitações deverão orientar suas etapas posteriores.
