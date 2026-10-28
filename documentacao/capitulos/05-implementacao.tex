@@ -3,7 +3,7 @@
 
 Este capítulo descreve como o projeto apresentado nos capítulos anteriores começou a ser transformado em software executável. São apresentados o ambiente de desenvolvimento, a organização do código, a implementação dos componentes já construídos, a forma como eles se comunicam em execução, os testes realizados, os resultados obtidos e as limitações conhecidas.
 
-O conteúdo reflete o estado do repositório em \pendente{outubro de 2026}. Nesse momento, está implementado o fluxo de autenticação, que percorre todas as camadas da arquitetura: interface web, API, regras de negócio e banco de dados. Esse fluxo foi escolhido como primeira entrega justamente por exercitar a pilha completa com uma funcionalidade pequena, o que permitiu validar as decisões de tecnologia e a organização do código antes de iniciar os módulos de produtos, anúncios, estoque e pedidos. As seções serão atualizadas à medida que esses módulos forem concluídos.
+O conteúdo reflete o estado do repositório em 28 de outubro de 2026. Nesse momento, está implementado o fluxo de verificação de credenciais, que percorre todas as camadas da arquitetura: interface web, API, regras de negócio e banco de dados. Esse fluxo foi escolhido como primeira entrega por exercitar a pilha completa com uma funcionalidade pequena, antes de iniciar os módulos de produtos, anúncios, estoque e pedidos. A resposta de sucesso confirma a combinação de e-mail e senha, mas ainda não cria uma sessão nem mantém o usuário autenticado entre requisições. As seções serão atualizadas à medida que esses módulos forem concluídos.
 
 \section{Ambiente de Desenvolvimento}
 \label{sec:ambiente}
@@ -35,7 +35,7 @@ A \autoref{tab:ambiente} relaciona as ferramentas exigidas para compilar e execu
   \fonte{Elaborado pelos autores.}
 \end{table}
 
-As máquinas utilizadas pela equipe são \pendente{descrever hardware e sistemas operacionais dos integrantes}.
+A equipe utiliza computadores pessoais com os sistemas operacionais Windows e Linux. O desenvolvimento é realizado com instalações locais das ferramentas indicadas na \autoref{tab:ambiente}, e as configurações de acesso ao banco são ajustadas em cada máquina.
 
 As configurações que variam entre as máquinas, como usuário, senha e porta do banco, ficam em um arquivo \texttt{.env} na raiz do projeto, criado a partir do modelo \texttt{.env.example}. O \texttt{.env} não é versionado, de forma que nenhuma credencial é enviada ao repositório. O mesmo arquivo é lido pela API e pelo Docker Compose, o que evita que as duas configurações divirjam.
 
@@ -78,11 +78,11 @@ Esta seção descreve os componentes já implementados, organizados pelas camada
 
 O esquema atual contém a tabela \texttt{usuarios}, com identificador, e-mail e hash da senha. O identificador é gerado pelo próprio PostgreSQL (\texttt{GENERATED ALWAYS AS IDENTITY}), e o e-mail possui restrição de unicidade. Uma restrição de verificação (\texttt{CHECK}) exige que o e-mail seja gravado em letras minúsculas e sem espaços nas extremidades. Com isso, a regra de normalização do e-mail não depende apenas do código da aplicação: mesmo um registro inserido diretamente no banco precisa respeitá-la, o que impede, por exemplo, a existência de dois usuários que diferem apenas por letras maiúsculas.
 
-O script \texttt{dados.sql} cadastra um usuário de desenvolvimento, utilizado nos testes manuais. As demais tabelas do modelo de dados apresentado no \autoref{cap:projeto} serão criadas junto com os módulos que as utilizam.
+O script \texttt{dados.sql} cadastra um usuário de desenvolvimento, disponível para os testes de login. As demais tabelas do modelo de dados apresentado no \autoref{cap:projeto} serão criadas junto com os módulos que as utilizam.
 
 \subsection{Acesso a dados}
 
-O acesso ao banco é feito com o sqlc, ferramenta que lê o esquema (\texttt{estrutura.sql}) e um arquivo de consultas SQL (\texttt{queries.sql}) e gera, a partir deles, funções Go com parâmetros e retornos tipados \cite{sqlc}. A conexão é gerenciada pelo driver pgx, por meio de um conjunto de conexões reutilizáveis (\textit{pool}).
+O acesso ao banco usa funções Go geradas pelo sqlc \cite{sqlc}. A ferramenta lê o esquema em \texttt{estrutura.sql} e as consultas em \texttt{queries.sql}, produzindo funções com parâmetros e retornos tipados. A conexão é gerenciada pelo driver pgx, por meio de um conjunto de conexões reutilizáveis (\textit{pool}).
 
 A principal alternativa considerada foi o uso de um ORM, que gera o SQL a partir de estruturas da linguagem. O sqlc foi preferido porque as consultas continuam escritas em SQL, legíveis e revisáveis pela equipe, e porque erros como uma coluna inexistente ou um tipo incompatível são detectados na geração do código, antes da execução. A abordagem também é adequada para as operações de estoque previstas, que exigirão controle explícito de transações e de bloqueios para evitar a venda de um mesmo item em dois canais.
 
@@ -163,7 +163,7 @@ O fluxo de autenticação percorre todos esses elementos:
   \item o controlador responde com o código HTTP e a mensagem em JSON, que o componente exibe ao usuário.
 \end{enumerate}
 
-A API escuta apenas no endereço local (\texttt{localhost}), e o PostgreSQL, quando executado pelo Docker Compose, também publica sua porta somente para a própria máquina. Nenhum dos serviços fica acessível a outros computadores da rede, o que é adequado ao uso atual, restrito ao desenvolvimento. A forma de implantação para uso pela loja parceira ainda será definida: \pendente{definir onde e como o sistema será executado para a Tutymotos}.
+A API escuta apenas no endereço local (\texttt{localhost}), e o PostgreSQL, quando executado pelo Docker Compose, também publica sua porta somente para a própria máquina. Essa configuração atende ao desenvolvimento local. O ambiente de implantação para uso pela Tutymotos ainda não foi definido: permanecem em aberto o local de execução e a forma de acesso dos administradores da loja. Portanto, a configuração descrita neste capítulo corresponde ao ambiente de desenvolvimento, e não a uma implantação já realizada na loja.
 
 \section{Testes Realizados}
 \label{sec:testes}
@@ -188,18 +188,24 @@ A interface web possui testes automatizados executados com o Vitest, por meio do
   \fonte{Elaborado pelos autores.}
 \end{table}
 
-Na última execução, os 6 testes, distribuídos em 2 arquivos, foram aprovados. O caso de criação da aplicação corresponde a dois testes.
+Em 28 de outubro de 2026, o comando \texttt{npm test -- --watch=false}, executado na pasta \texttt{web/}, concluiu os 6 testes com sucesso, distribuídos em 2 arquivos. O caso de criação da aplicação corresponde a dois testes. Como as respostas HTTP são simuladas, esse resultado verifica o comportamento do front-end e seu contrato de requisição, mas não comprova a comunicação com a API nem o acesso ao PostgreSQL.
 
-A API ainda não possui testes automatizados. Seu comportamento foi verificado manualmente, por meio de requisições à rota \texttt{/login} com o usuário de desenvolvimento, conferindo os códigos HTTP da \autoref{tab:respostas-login}. O código da API também é verificado pela ferramenta \texttt{go vet}, que aponta erros comuns sem executar o programa. \pendente{Implementar testes automatizados do serviço de autenticação e, nos próximos módulos, das regras de estoque.}
+A API da pasta \texttt{api/} ainda não possui testes automatizados. Em 28 de outubro de 2026, o comando \texttt{go vet ./...} foi executado nessa pasta e concluído sem apontamentos. Essa análise estática identifica determinados problemas no código, mas não executa o fluxo de login e não substitui testes de comportamento ou de integração com o banco.
+
+Não há resultados confirmados de testes manuais da API para esta versão. Assim, os códigos HTTP da \autoref{tab:respostas-login} descrevem as respostas previstas na implementação, sem representar casos já verificados em execução. A validação do fluxo completo entre navegador, API e PostgreSQL permanece como uma etapa a realizar.
+
+A cobertura automatizada da API permanece como trabalho a realizar. Para o fluxo existente, devem ser verificados a normalização do e-mail, a rejeição de dados vazios e senhas acima de 72 bytes, as credenciais válidas e inválidas e o tratamento de falhas de consulta. Os testes de estoque dependem da implementação desse módulo e ainda não compõem os resultados apresentados neste capítulo.
 
 \section{Resultados Obtidos}
 \label{sec:resultados}
 
-Até o momento, foi obtida uma aplicação executável que realiza a autenticação de usuários, atendendo parcialmente ao requisito RF01. O fluxo integra todas as camadas previstas na arquitetura e serve de modelo para os módulos seguintes, que deverão repetir a mesma organização: tabela em \texttt{estrutura.sql}, consulta em \texttt{queries.sql}, serviço com as regras, controlador com a rota HTTP e componente com o serviço correspondente no front-end.
+Até o momento, foi implementado o fluxo de verificação de credenciais, correspondente a parte do requisito RF01. O código conecta as camadas previstas na arquitetura e serve de referência para os módulos seguintes: tabela e consulta SQL, serviço com as regras, controlador HTTP e componente com o serviço correspondente no front-end. Sua verificação está limitada aos testes da interface web e à análise estática da API descritos na \autoref{sec:testes}.
 
-Também foram alcançados resultados que não são visíveis ao usuário, mas que sustentam o restante do desenvolvimento: um ambiente reproduzível, montado com poucos comandos em qualquer máquina da equipe; credenciais fora do repositório; e um padrão de tratamento de erros, validação e armazenamento de senhas definido desde a primeira funcionalidade.
+Também estão presentes no repositório os scripts de criação do banco e de dados de desenvolvimento, a configuração por variáveis de ambiente e os comandos para iniciar os componentes. Esses recursos oferecem uma base comum de trabalho, cuja execução ainda precisa ser verificada em cada ambiente da equipe.
 
-Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF06, RF09 e RF10), ainda não foram implementados. A avaliação dos resultados em relação às necessidades da loja parceira, por meio das métricas de tempo de publicação de anúncios e de esforço para atualização de preços, depende desses módulos: \pendente{apresentar os resultados das métricas comparados com o levantamento inicial feito com a Tutymotos}.
+Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF06, RF09 e RF10), ainda não foram implementados. Por isso, ainda não é possível apresentar resultados do \sistema{} para a redução do tempo de publicação de anúncios ou do esforço de atualização de preços.
+
+Os valores apresentados na \autoref{sec:necessidades}, de aproximadamente 15 minutos para cadastrar um produto por canal e dez horas semanais de cadastro nos períodos de vendas sazonais, são estimativas relatadas pelos lojistas, e não medições cronometradas. Não há, no repositório, medições comparativas realizadas com o \sistema{}. A avaliação de ganhos dependerá da implementação dos módulos e da medição de tarefas equivalentes no processo manual e no sistema, considerando os canais efetivamente integrados.
 
 \section{Limitações da Implementação}
 \label{sec:limitacoes}
@@ -215,4 +221,4 @@ No estado atual, a implementação apresenta as seguintes limitações:
   \item \textbf{Usuários cadastrados por script:} não há tela de cadastro nem de gerenciamento de usuários; o único usuário existente é criado pelo script de dados de desenvolvimento.
 \end{itemize}
 
-Essas limitações são consequência da ordem adotada no desenvolvimento, que priorizou validar a arquitetura com uma funcionalidade completa antes de ampliar o escopo. Elas serão revistas ao fim da implementação, e as que permanecerem serão registradas como trabalhos futuros no \autoref{cap:conclusao}.
+As limitações serão reavaliadas nas próximas etapas. As que permanecerem ao fim do projeto serão registradas como trabalhos futuros no \autoref{cap:conclusao}.
