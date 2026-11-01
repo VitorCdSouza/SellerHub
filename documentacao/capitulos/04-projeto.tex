@@ -70,7 +70,7 @@ O modelo entidade-relacionamento resultante é apresentado na Figura \ref{fig:mo
 
 \section{Projeto da Interface do Usuário}
 
-A interface web é organizada em uma tela para cada grupo de funcionalidades. Até o momento, apenas a tela de login foi implementada; as demais estão previstas e poderão ser ajustadas com a validação junto aos lojistas. A \autoref{tab:telas} relaciona as telas aos requisitos que atendem.
+A interface web é organizada em uma tela para cada grupo de funcionalidades. Até o momento, apenas a tela de login foi implementada, ainda sem a recuperação de senha; as demais estão previstas e poderão ser ajustadas com a validação junto aos lojistas. A \autoref{tab:telas} relaciona as telas aos requisitos que atendem.
 
 \begin{table}[htbp]
   \centering
@@ -80,12 +80,13 @@ A interface web é organizada em uma tela para cada grupo de funcionalidades. At
     \toprule
     \textbf{Tela} & \textbf{Finalidade} & \textbf{Requisitos} & \textbf{Situação} \\
     \midrule
-    Login         & Verificar as credenciais de acesso          & RF01         & Implementada \\
+    Login         & Verificar as credenciais de acesso e recuperar a senha & RF01 e RF12  & Parcial \\
     Produtos      & Cadastrar, consultar e editar produtos      & RF02 a RF04  & Prevista \\
     Anúncios      & Criar, publicar e gerenciar anúncios por canal & RF05 e RF06  & Prevista \\
     Vendas        & Consultar as vendas e marcar pedidos como cancelados & RF07 e RF11  & Prevista \\
     Estoque       & Consultar o saldo e as divergências com os canais & RF08         & Prevista \\
     Indicadores   & Acompanhar acessos e desempenho das vendas  & RF09 e RF10  & Prevista \\
+    Administração & Manter a conta, conectar os canais e ajustar a sincronização & RF06 e RF08  & Prevista \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos autores.}
@@ -94,6 +95,20 @@ A interface web é organizada em uma tela para cada grupo de funcionalidades. At
 A tela de produtos é o ponto de partida do fluxo principal, pois o anúncio de cada canal é preparado a partir de um produto já cadastrado, sem digitar as mesmas informações novamente. Esse aproveitamento atende à necessidade de reduzir o retrabalho de cadastro descrita na \autoref{sec:necessidades}.
 
 As telas seguem os critérios adotados no login: validação dos campos antes do envio, mensagens de erro compreensíveis, bloqueio de envios repetidos durante uma requisição e recursos de acessibilidade, como rótulos associados aos campos. Assim, o usuário recebe o mesmo tratamento em todo o sistema, conforme o requisito de usabilidade RNF01.
+
+As Figuras~\ref{fig:prot-login} a~\ref{fig:prot-administracao} apresentam os protótipos das telas. A tela de anúncios mostra as situações da regra RN06, e a de vendas, as situações padronizadas da regra RN04. No cadastro de anúncio, a publicação fica indisponível enquanto faltarem campos exigidos pelo marketplace. A tela de administração reúne as configurações da conta única da regra RN08, sem perfis de acesso: dados da conta, conexão com cada canal e preferências de estoque e de sincronização.
+
+Os protótipos não contemplam a marcação de pedido como cancelado (RF11) nem a sinalização de divergências (RF08), que serão acrescentadas às telas de vendas e de estoque na implementação. O registro de entrada, presente no protótipo de estoque, ainda não consta nos requisitos e deverá ser avaliado.
+
+\prototipo{login}{Protótipo da tela de login}
+\prototipo{produtos}{Protótipo da tela de produtos}
+\prototipo{novo-produto}{Protótipo do cadastro de produto}
+\prototipo{anuncios}{Protótipo da tela de anúncios}
+\prototipo{novo-anuncio}{Protótipo do cadastro de anúncio}
+\prototipo{vendas}{Protótipo da tela de vendas}
+\prototipo{estoque}{Protótipo da tela de estoque}
+\prototipo{indicadores}{Protótipo da tela de indicadores}
+\prototipo{administracao}{Protótipo da tela de administração}
 
 \section{Comportamento do Sistema}
 
@@ -147,9 +162,9 @@ A escolha dessas tecnologias considerou a simplicidade da solução e o conhecim
 
 \section{Segurança e Controle de Acesso}
 
-As decisões de segurança atendem aos requisitos RF01, RNF02 e RNF08. As medidas já implementadas no fluxo de autenticação são detalhadas no \autoref{cap:implementacao}: armazenamento apenas do hash bcrypt das senhas, resposta idêntica para e-mail inexistente e senha incorreta, limite de tamanho do corpo das requisições, mensagens de erro sem detalhes técnicos, autorização de uma única origem pelo mecanismo CORS e manutenção das credenciais fora do repositório, no arquivo \texttt{.env}.
+As decisões de segurança atendem aos requisitos RF01, RF12, RNF02 e RNF08. As medidas já implementadas no fluxo de autenticação são detalhadas no \autoref{cap:implementacao}: armazenamento apenas do hash bcrypt das senhas, resposta idêntica para e-mail inexistente e senha incorreta, limite de tamanho do corpo das requisições, mensagens de erro sem detalhes técnicos, autorização de uma única origem pelo mecanismo CORS e manutenção das credenciais fora do repositório, no arquivo \texttt{.env}.
 
-Ainda falta o gerenciamento de sessão. Hoje, a API apenas confirma se as credenciais são válidas e, por isso, as demais rotas não podem ser protegidas. Antes da criação dos módulos de negócio, será necessário definir o mecanismo de sessão e exigir que toda rota, exceto a de login, verifique se o usuário está autenticado.
+Ainda faltam a recuperação de senha (RF12) e o gerenciamento de sessão. Hoje, a API apenas confirma se as credenciais são válidas e, por isso, as demais rotas não podem ser protegidas. Antes da criação dos módulos de negócio, será necessário definir o mecanismo de sessão e exigir que toda rota, exceto a de login, verifique se o usuário está autenticado.
 
 Quanto ao controle de acesso, a regra RN08 restringe o MVP a uma única conta, compartilhada pelos administradores da loja. Por esse motivo, o sistema não tem perfis nem permissões distintas, e todas as funcionalidades exigem apenas autenticação.
 

@@ -214,6 +214,7 @@ No estado atual, a implementação apresenta as seguintes limitações:
 
 \begin{itemize}
   \item \textbf{Autenticação sem sessão:} a API confirma se as credenciais são válidas, mas não cria sessão nem emite token. Assim, ainda não há como proteger as demais rotas nem manter o usuário identificado entre requisições, o que impede o cumprimento completo de RF01.
+  \item \textbf{Sem recuperação de senha:} o requisito RF12 ainda não foi implementado, nem na API nem na tela de login.
   \item \textbf{Módulos de negócio ausentes:} produtos, anúncios, estoque e pedidos ainda não foram implementados, assim como as tabelas de produtos e anúncios no banco.
   \item \textbf{Sem integração com marketplaces:} nenhuma comunicação com o Mercado Livre ou com os demais canais foi implementada. A integração depende do cadastro de contas de desenvolvedor em cada plataforma.
   \item \textbf{Testes apenas no front-end:} a API não possui testes automatizados.

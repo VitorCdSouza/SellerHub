@@ -6,6 +6,19 @@
 % dado ainda nao definido, em vermelho para nao passar despercebido
 \newcommand{\pendente}[1]{\textcolor{red}{#1}}
 
+% tela de imagens/prototipos, com moldura porque o fundo se confunde com a pagina
+% uso: \prototipo{arquivo}{legenda}, referenciado com \ref{fig:prot-arquivo}
+\newcommand{\prototipo}[2]{%
+  \begin{figure}[H]
+    \centering
+    \caption{#2}
+    \label{fig:prot-#1}
+    \setlength{\fboxsep}{0pt}%
+    \fbox{\includegraphics[width=\dimexpr\linewidth-2\fboxrule\relax]{imagens/prototipos/#1.jpg}}
+    \fonte{Elaborado pelos autores.}
+  \end{figure}%
+}
+
 % espaco reservado para diagrama ainda nao desenhado
 % uso: \diagrama{legenda}{rotulo}, referenciado com \ref{fig:rotulo}
 % quando a imagem existir em imagens/, trocar pelo ambiente figure com \includegraphics
