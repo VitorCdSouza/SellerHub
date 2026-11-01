@@ -42,6 +42,7 @@ Os principais casos de uso identificados são:
     \item \textbf{Editar produto:} permite atualizar as informações de produtos existentes.
     \item \textbf{Gerenciar anúncios:} permite organizar e administrar os anúncios associados aos produtos.
     \item \textbf{Criar anúncio:} permite preparar um anúncio com base nas informações de um produto.
+    \item \textbf{Publicar anúncio:} permite enviar ao marketplace de destino um anúncio preparado pelo vendedor, após a aprovação de seu conteúdo.
     \item \textbf{Consultar vendas:} permite visualizar informações sobre vendas obtidas dos marketplaces por meio das integrações.
     \item \textbf{Consultar estoque:} permite acompanhar informações relacionadas à disponibilidade dos produtos.
     \item \textbf{Analisar acessos aos anúncios:} permite consultar métricas de acesso aos anúncios, quando disponibilizadas pelas plataformas.
@@ -51,8 +52,6 @@ Os principais casos de uso identificados são:
 \end{itemize}
 
 As consultas que dependem de informações externas estão associadas ao ator que representa os marketplaces e as plataformas externas. Essa representação indica a necessidade de comunicação com serviços externos, mas não garante que todos os canais disponibilizem os mesmos dados ou operações.
-
-A publicação direta de anúncios não é considerada uma funcionalidade confirmada nesta etapa. Sua inclusão dependerá da definição do escopo e da viabilidade de integração com cada plataforma.
 
 O diagrama de casos de uso do SellerHub é apresentado na Figura \ref{fig:casos_de_uso}.
 
@@ -102,7 +101,7 @@ Os requisitos funcionais descrevem as funcionalidades que o sistema deverá ofer
     \item \textbf{RF03:} O sistema deverá permitir a consulta dos produtos cadastrados.
     \item \textbf{RF04:} O sistema deverá permitir a edição das informações dos produtos.
     \item \textbf{RF05:} O sistema deverá permitir o gerenciamento dos anúncios associados aos produtos.
-    \item \textbf{RF06:} O sistema deverá permitir a criação e a organização de anúncios para os canais de venda contemplados no escopo.
+    \item \textbf{RF06:} O sistema deverá permitir a criação, a organização e a publicação de anúncios nos canais de venda contemplados no escopo.
     \item \textbf{RF07:} O sistema deverá permitir a consulta de informações de vendas disponíveis.
     \item \textbf{RF08:} O sistema deverá permitir a consulta de informações de estoque.
     \item \textbf{RF09:} O sistema deverá permitir a consulta de métricas de acesso aos anúncios, quando esses dados estiverem disponíveis.
@@ -114,7 +113,7 @@ Os requisitos funcionais descrevem as funcionalidades que o sistema deverá ofer
 
 Os requisitos relacionados à consulta de informações externas deverão ser detalhados conforme as integrações efetivamente implementadas. Para cada plataforma contemplada, será necessário definir quais dados poderão ser obtidos, quais operações serão suportadas e quais limitações deverão ser consideradas.
 
-A publicação direta de anúncios não foi estabelecida como requisito confirmado nesta versão. Caso seja incluída no escopo, deverá ocorrer somente após a aprovação explícita do conteúdo pelo vendedor e mediante uma integração tecnicamente viável.
+A publicação de um anúncio deverá ocorrer somente após a aprovação explícita do conteúdo pelo vendedor e dependerá dos recursos de integração disponíveis em cada plataforma.
 
 \section{Requisitos Não Funcionais}
 
