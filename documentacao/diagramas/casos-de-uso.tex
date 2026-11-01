@@ -12,40 +12,32 @@
   rotulo/.style={align=center, anchor=north},
 ]
   % fronteira do sistema
-  \draw (3.1,0) rectangle (9.9,16.3);
-  \node[anchor=north] at (6.5,16.3) {\textbf{\sistema}};
+  \draw (3.1,0) rectangle (9.9,15.1);
+  \node[anchor=north] at (6.5,15.1) {\textbf{\sistema}};
 
-  \node[caso] (vendas) at (6.5,15.0) {Consultar vendas};
-  \node[caso] (estoque) at (6.5,13.8) {Consultar estoque};
-  \node[caso] (acessos) at (6.5,12.6) {Analisar acessos aos anúncios};
-  \node[caso] (indicadores) at (6.5,11.4) {Consultar indicadores de desempenho das vendas};
-  \node[caso] (gerenciar) at (6.5,10.2) {Gerenciar anúncios};
-  \node[caso] (publicar) at (6.5,9.0) {Publicar anúncio};
-  \node[caso] (criar) at (6.5,7.8) {Criar anúncio};
-  \node[caso] (editar) at (6.5,6.6) {Editar produto};
-  \node[caso] (consultar) at (6.5,5.4) {Consultar produtos};
-  \node[caso] (cadastrar) at (6.5,4.2) {Cadastrar produto};
-  \node[caso] (autenticar) at (6.5,3.0) {Autenticar-se};
-  \node[caso] (usuarios) at (6.5,1.8) {Gerenciar usuários};
-  \node[caso] (configuracoes) at (6.5,0.6) {Gerenciar configurações administrativas};
+  \node[caso] (vendas) at (6.5,13.8) {Consultar vendas};
+  \node[caso] (marcar) at (6.5,12.6) {Marcar pedido como cancelado};
+  \node[caso] (estoque) at (6.5,11.4) {Consultar estoque};
+  \node[caso] (acessos) at (6.5,10.2) {Analisar acessos aos anúncios};
+  \node[caso] (indicadores) at (6.5,9.0) {Consultar indicadores de desempenho das vendas};
+  \node[caso] (gerenciar) at (6.5,7.8) {Gerenciar anúncios};
+  \node[caso] (publicar) at (6.5,6.6) {Publicar anúncio};
+  \node[caso] (criar) at (6.5,5.4) {Criar anúncio};
+  \node[caso] (editar) at (6.5,4.2) {Editar produto};
+  \node[caso] (consultar) at (6.5,3.0) {Consultar produtos};
+  \node[caso] (cadastrar) at (6.5,1.8) {Cadastrar produto};
+  \node[caso] (autenticar) at (6.5,0.6) {Autenticar-se};
 
-  \pic at (1,9) {ator};
-  \node[rotulo] at (0.6,8.35) {Vendedor};
-  \coordinate (vendedor) at (1.4,9.1);
+  \pic at (1,7.2) {ator};
+  \node[rotulo] at (0.6,6.55) {Vendedor};
+  \coordinate (vendedor) at (1.4,7.3);
 
-  \pic at (1,2) {ator};
-  \node[rotulo] at (1,1.35) {Administrador\\do sistema};
-  \coordinate (administrador) at (1.4,2.1);
+  \pic at (11.2,10.2) {ator};
+  \node[align=center, anchor=west] at (11.7,10.3) {\guillemotleft sistema externo\guillemotright\\Marketplaces e\\plataformas externas};
+  \coordinate (marketplaces) at (10.8,10.3);
 
-  \pic at (11.2,12) {ator};
-  \node[align=center, anchor=west] at (11.7,12.1) {\guillemotleft sistema externo\guillemotright\\Marketplaces e\\plataformas externas};
-  \coordinate (marketplaces) at (10.8,12.1);
-
-  \foreach \caso in {vendas, estoque, acessos, indicadores, gerenciar, publicar, criar, editar, consultar, cadastrar, autenticar}
+  \foreach \caso in {vendas, marcar, estoque, acessos, indicadores, gerenciar, publicar, criar, editar, consultar, cadastrar, autenticar}
     \draw (vendedor) -- (\caso.west);
-
-  \foreach \caso in {autenticar, usuarios, configuracoes}
-    \draw (administrador) -- (\caso.west);
 
   \foreach \caso in {vendas, estoque, acessos, publicar}
     \draw (marketplaces) -- (\caso.east);

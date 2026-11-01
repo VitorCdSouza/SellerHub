@@ -3,7 +3,7 @@
 
 Este capítulo apresenta a análise do SellerHub, contemplando a visão geral do sistema, os atores envolvidos, os casos de uso, o modelo conceitual, os requisitos funcionais e não funcionais e as restrições identificadas para o desenvolvimento da aplicação.
 
-A análise tem como objetivo organizar as funcionalidades previstas e estabelecer uma base para as etapas de projeto e implementação. Considerando que o sistema ainda está em fase de planejamento, os requisitos apresentados representam a definição inicial da solução e poderão ser refinados conforme o detalhamento das regras de negócio e a avaliação da viabilidade técnica das integrações com plataformas externas.
+A análise tem como objetivo organizar as funcionalidades previstas e estabelecer uma base para as etapas de projeto e implementação. Considerando que o sistema está na etapa de desenvolvimento do MVP, os requisitos apresentados representam a definição inicial da solução e poderão ser refinados conforme o detalhamento das regras de negócio e a avaliação da viabilidade técnica das integrações com plataformas externas.
 
 \section{Visão Geral do Sistema}
 
@@ -11,17 +11,16 @@ O SellerHub é uma aplicação web proposta para centralizar informações e fac
 
 O sistema deverá permitir o cadastro, a consulta e a edição de produtos, além do gerenciamento de anúncios associados aos itens comercializados. Também estão previstas funcionalidades para consultar informações de vendas e estoque e analisar indicadores de desempenho, incluindo acessos aos anúncios e informações relacionadas às vendas, conforme a disponibilidade dos dados.
 
-A aplicação contará com dois perfis principais de usuários: vendedor e administrador do sistema. O primeiro utilizará os recursos relacionados à gestão comercial, enquanto o segundo será responsável por atividades administrativas, como o gerenciamento de usuários e das configurações da plataforma.
+A aplicação será utilizada por uma única conta, conforme a regra RN08, sem perfis distintos de usuário. O vendedor utilizará todos os recursos relacionados à gestão comercial.
 
 A integração com marketplaces será considerada de acordo com os recursos técnicos disponibilizados por cada serviço. Dessa forma, a consulta de informações externas dependerá das possibilidades de integração, das permissões de acesso e das políticas de cada plataforma.
 
 \section{Atores Envolvidos}
 
-Os atores representam as entidades externas que interagem com o SellerHub. Com base no escopo inicial da aplicação, foram identificados dois atores humanos principais e um ator que representa sistemas externos.
+Os atores representam as entidades externas que interagem com o SellerHub. Com base no escopo inicial da aplicação, foram identificados um ator humano e um ator que representa sistemas externos.
 
 \begin{description}
-    \item[Vendedor:] é o principal usuário da aplicação e responsável pelo gerenciamento das informações comerciais. Pode cadastrar, consultar e editar produtos, gerenciar anúncios, consultar vendas e estoques e analisar indicadores de desempenho.
-    \item[Administrador do sistema:] é responsável pelas atividades administrativas da aplicação. Suas atribuições iniciais incluem o gerenciamento de usuários e das configurações administrativas disponibilizadas pelo sistema. As permissões específicas desse perfil deverão ser detalhadas durante a definição das regras de negócio.
+    \item[Vendedor:] é o principal usuário da aplicação e responsável pelo gerenciamento das informações comerciais. Pode cadastrar, consultar e editar produtos, gerenciar e publicar anúncios, consultar vendas e estoques, marcar pedidos como cancelados e analisar indicadores de desempenho.
     \item[Marketplaces e plataformas externas:] representam os sistemas com os quais o SellerHub poderá se comunicar para obter informações comerciais. Entre as plataformas consideradas inicialmente estão Mercado Livre, Shopee, Facebook Marketplace, OLX e Amazon. Sua participação está relacionada às operações que dependem de dados externos, como consultas de vendas, estoque e métricas de acesso aos anúncios. A efetiva disponibilidade dessas operações dependerá da viabilidade técnica de cada integração.
 \end{description}
 
@@ -31,12 +30,12 @@ Os usuários deverão se autenticar para acessar as funcionalidades restritas da
 
 O diagrama de casos de uso representa as principais funcionalidades previstas para o SellerHub e as interações entre os atores e a aplicação. Sua finalidade é apresentar os serviços oferecidos pelo sistema sem detalhar os procedimentos internos de implementação.
 
-O vendedor concentra as interações relacionadas à gestão comercial, enquanto o administrador possui responsabilidades voltadas à administração da plataforma. Os marketplaces e sistemas externos são representados como atores secundários nas consultas que dependem de informações disponibilizadas por esses serviços.
+O vendedor concentra as interações com a aplicação. Os marketplaces e sistemas externos são representados como atores secundários nas operações que dependem desses serviços.
 
 Os principais casos de uso identificados são:
 
 \begin{itemize}
-    \item \textbf{Autenticar-se:} permite que vendedores e administradores acessem as funcionalidades restritas do sistema.
+    \item \textbf{Autenticar-se:} permite que o vendedor acesse as funcionalidades restritas do sistema.
     \item \textbf{Cadastrar produto:} permite registrar novos produtos e suas informações.
     \item \textbf{Consultar produtos:} permite visualizar os produtos cadastrados.
     \item \textbf{Editar produto:} permite atualizar as informações de produtos existentes.
@@ -44,11 +43,10 @@ Os principais casos de uso identificados são:
     \item \textbf{Criar anúncio:} permite preparar um anúncio com base nas informações de um produto.
     \item \textbf{Publicar anúncio:} permite enviar ao marketplace de destino um anúncio preparado pelo vendedor, após a aprovação de seu conteúdo.
     \item \textbf{Consultar vendas:} permite visualizar informações sobre vendas obtidas dos marketplaces por meio das integrações.
-    \item \textbf{Consultar estoque:} permite acompanhar informações relacionadas à disponibilidade dos produtos.
+    \item \textbf{Marcar pedido como cancelado:} permite devolver ao saldo do produto a quantidade de um pedido cancelado, sem alterar o pedido no marketplace.
+    \item \textbf{Consultar estoque:} permite acompanhar informações relacionadas à disponibilidade dos produtos, incluindo divergências entre o saldo e os canais.
     \item \textbf{Analisar acessos aos anúncios:} permite consultar métricas de acesso aos anúncios, quando disponibilizadas pelas plataformas.
     \item \textbf{Consultar indicadores de desempenho das vendas:} permite visualizar informações para acompanhar o desempenho comercial.
-    \item \textbf{Gerenciar usuários:} permite ao administrador executar operações administrativas relacionadas aos usuários da aplicação.
-    \item \textbf{Gerenciar configurações administrativas:} permite ao administrador administrar as configurações previstas para a plataforma.
 \end{itemize}
 
 As consultas que dependem de informações externas estão associadas ao ator que representa os marketplaces e as plataformas externas. Essa representação indica a necessidade de comunicação com serviços externos, mas não garante que todos os canais disponibilizem os mesmos dados ou operações.
@@ -70,24 +68,22 @@ O modelo conceitual representa os principais conceitos do domínio do SellerHub 
 O modelo proposto contempla as seguintes classes conceituais:
 
 \begin{description}
-    \item[Usuário:] representa as pessoas que acessam o sistema, contendo informações básicas de identificação, como nome e e-mail.
-    \item[Vendedor:] representa o perfil de usuário responsável pelo gerenciamento de produtos e anúncios.
-    \item[Administrador:] representa o perfil responsável pelas atividades administrativas da aplicação.
+    \item[Pessoa:] representa os dados cadastrais de quem utiliza o sistema, como o nome.
+    \item[Usuário:] representa a conta que acessa o sistema e gerencia produtos e anúncios, contendo as credenciais de acesso, como e-mail e senha.
     \item[Produto:] representa os itens comercializados, incluindo nome, descrição, código de identificação, características e quantidade disponível em estoque.
     \item[Marketplace:] representa os canais de venda nos quais os produtos podem ser anunciados e por meio dos quais as vendas podem ser realizadas.
     \item[Anúncio:] representa a oferta de um produto em determinado marketplace, contendo informações como preço anunciado, situação e data de criação.
     \item[Métrica de Anúncio:] representa informações utilizadas para acompanhar o desempenho dos anúncios, como quantidade de acessos e período de referência.
+    \item[Auditoria:] representa o registro das operações realizadas pelos usuários, permitindo identificar o responsável por uma alteração.
 \end{description}
 
-No modelo, Usuário é uma classe geral especializada em Vendedor e Administrador. Essa estrutura permite representar os diferentes papéis de acesso sem duplicar os atributos comuns aos usuários.
-
-Um vendedor pode gerenciar vários produtos. Cada anúncio está associado a um produto e a um marketplace, enquanto um produto pode possuir diferentes anúncios em canais distintos. O modelo também considera que um marketplace pode hospedar vários anúncios.
+Uma pessoa pode possuir um ou mais usuários, e cada usuário pertence a uma única pessoa. Um usuário pode gerenciar vários produtos e possuir vários registros de auditoria. Cada anúncio está associado a um produto e a um marketplace, enquanto um produto pode possuir diferentes anúncios em canais distintos. O modelo também considera que um marketplace pode hospedar vários anúncios.
 
 Pedidos e vendas não são classes do modelo, pois permanecem nos marketplaces e são apenas consultados pelo sistema.
 
 O modelo também considera que um anúncio pode possuir diversas métricas associadas a períodos de consulta. Essa estrutura permite acompanhar indicadores de desempenho ao longo do tempo.
 
-Para o estoque, foi adotada inicialmente a hipótese de um registro centralizado por produto, sem separação das quantidades por marketplace. Essa decisão deverá ser validada durante o refinamento dos requisitos, pois diferentes estratégias de controle de estoque podem influenciar a estrutura dos dados e as regras de atualização.
+Para o estoque, foi adotado um registro centralizado por produto, sem separação das quantidades por marketplace.
 
 A obtenção de métricas e informações comerciais dependerá da disponibilidade dos dados nas plataformas integradas. Assim, o modelo conceitual representa os dados relevantes para a solução sem pressupor que todos os marketplaces ofereçam os mesmos recursos.
 
@@ -103,12 +99,10 @@ Os requisitos funcionais descrevem as funcionalidades que o sistema deverá ofer
     \item \textbf{RF05:} O sistema deverá permitir o gerenciamento dos anúncios associados aos produtos.
     \item \textbf{RF06:} O sistema deverá permitir a criação, a organização e a publicação de anúncios nos canais de venda contemplados no escopo.
     \item \textbf{RF07:} O sistema deverá permitir a consulta de informações de vendas disponíveis.
-    \item \textbf{RF08:} O sistema deverá permitir a consulta de informações de estoque.
+    \item \textbf{RF08:} O sistema deverá permitir a consulta de informações de estoque, incluindo as divergências entre o saldo e os canais de venda.
     \item \textbf{RF09:} O sistema deverá permitir a consulta de métricas de acesso aos anúncios, quando esses dados estiverem disponíveis.
     \item \textbf{RF10:} O sistema deverá disponibilizar indicadores para acompanhamento do desempenho das vendas, com base nas informações disponíveis.
-    \item \textbf{RF11:} O sistema deverá permitir que o administrador gerencie os usuários da aplicação.
-    \item \textbf{RF12:} O sistema deverá permitir que o administrador gerencie as configurações administrativas previstas.
-    \item \textbf{RF13:} O sistema deverá restringir o acesso às funcionalidades de acordo com as permissões atribuídas aos usuários.
+    \item \textbf{RF11:} O sistema deverá permitir a marcação de um pedido como cancelado, devolvendo a quantidade correspondente ao saldo do produto.
 \end{itemize}
 
 Os requisitos relacionados à consulta de informações externas deverão ser detalhados conforme as integrações efetivamente implementadas. Para cada plataforma contemplada, será necessário definir quais dados poderão ser obtidos, quais operações serão suportadas e quais limitações deverão ser consideradas.
@@ -121,7 +115,7 @@ Os requisitos não funcionais estabelecem critérios de qualidade e condições 
 
 \begin{itemize}
     \item \textbf{RNF01 (Usabilidade):} a interface deverá apresentar organização clara, facilitando o acesso às funcionalidades de gerenciamento de produtos, anúncios, vendas e estoque.
-    \item \textbf{RNF02 (Segurança):} o sistema deverá proteger as informações armazenadas e restringir o acesso às funcionalidades de acordo com as permissões definidas para cada perfil de usuário.
+    \item \textbf{RNF02 (Segurança):} o sistema deverá proteger as informações armazenadas e restringir o acesso às funcionalidades a usuários autenticados.
     \item \textbf{RNF03 (Integridade dos dados):} a aplicação deverá adotar mecanismos que preservem a consistência das informações cadastradas e reduzam a ocorrência de registros inconsistentes.
     \item \textbf{RNF04 (Manutenibilidade):} o código deverá ser organizado de forma modular, facilitando a compreensão, a correção de falhas e a evolução das funcionalidades.
     \item \textbf{RNF05 (Desempenho):} as operações de consulta e gerenciamento deverão apresentar tempos de resposta adequados às condições de execução e ao volume de dados previsto para a aplicação.

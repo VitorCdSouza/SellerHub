@@ -34,9 +34,9 @@ Os componentes da \autoref{fig:componentes} organizam o sistema pelos módulos d
   \item[Auditoria:] registra as operações realizadas sobre os anúncios, permitindo rastrear as alterações feitas.
 \end{description}
 
-Os conectores seguem uma meta escalonada: o Mercado Livre é a integração obrigatória; a Shopee é desejável; e a Amazon é opcional, pois depende da aprovação de uma conta de desenvolvedor. Como todos ficam atrás da mesma interface, a extensibilidade pode ser demonstrada mesmo que alguma aprovação não seja obtida a tempo. O Facebook Marketplace não terá conector, conforme a regra RN07.
+Os conectores seguem uma meta escalonada: o Mercado Livre é a integração obrigatória; a Shopee é desejável; e a Amazon é opcional, pois depende da aprovação de uma conta de desenvolvedor. Como todos ficam atrás da mesma interface, a extensibilidade pode ser demonstrada mesmo que alguma aprovação não seja obtida a tempo. O Facebook Marketplace não terá conector, conforme a regra RN07, e a OLX não terá conector nesta etapa. Outros canais poderão ser incorporados depois, com novas implementações da mesma interface.
 
-O serviço de estoque exige cuidados adicionais, pois uma mesma peça pode ser vendida em dois canais quase ao mesmo tempo. Para evitar a sobrevenda, cada alteração de saldo ocorrerá em uma transação com bloqueio do registro do produto. Como os pedidos são apenas consultados nos marketplaces, o sistema não mantém registro dos pedidos já processados, e a idempotência vem da comparação de quantidades: cada anúncio guarda a última quantidade enviada ao canal, e o ajuste do saldo corresponde à diferença entre esse valor e a quantidade disponível informada pela plataforma. Uma notificação repetida encontra a diferença já aplicada e não gera nova baixa. As alterações serão percebidas por notificações (\textit{webhooks}) nos canais que as oferecerem, complementadas por consultas periódicas (\textit{polling}) que recuperam eventos perdidos e reconciliam os saldos entre o sistema e cada canal. A viabilidade dessas estratégias deverá ser confirmada para cada plataforma durante a implementação dos conectores.
+O serviço de estoque exige cuidados adicionais, pois uma mesma peça pode ser vendida em dois canais quase ao mesmo tempo. Para evitar a sobrevenda, cada alteração de saldo ocorrerá em uma transação com bloqueio do registro do produto. O saldo do \sistema{} é a referência para todos os canais, conforme a regra RN01. Como os pedidos são apenas consultados nos marketplaces, o sistema não mantém registro dos pedidos já processados, e a idempotência vem da comparação de quantidades: cada anúncio guarda a última quantidade enviada ao canal, e uma quantidade menor na plataforma gera uma baixa igual à diferença entre os dois valores. Uma notificação repetida encontra a diferença já aplicada e não gera nova baixa. As alterações serão percebidas por notificações (\textit{webhooks}) nos canais que as oferecerem, complementadas por uma rotina periódica (\textit{polling}) que recupera eventos perdidos e reconcilia os saldos entre o sistema e cada canal. A mesma comparação ocorre antes de cada envio de saldo, para que uma venda ainda não notificada não seja sobrescrita. Resta uma janela curta entre essa leitura e o envio, na qual uma venda pode se perder sem ser detectada; esse risco é aceito no MVP. A viabilidade dessas estratégias deverá ser confirmada para cada plataforma durante a implementação dos conectores.
 
 \section{Modelo de Dados}
 
@@ -51,7 +51,7 @@ A estruturação lógica traduz os conceitos do domínio em entidades e relacion
 
     \item \textbf{Produtos:} \texttt{CAD\_PRODUTO} atua como o núcleo da plataforma, armazenando atributos universais (nome, descrição base, código de identificação/SKU). Cada produto pertence a um único usuário. Como a regra RN01 define um saldo único por produto, o estoque não forma uma entidade própria e é mantido como atributo do produto, o que exige controle transacional rigoroso para que as baixas decorrentes de vendas em diferentes canais reflitam imediatamente na quantidade disponível.
 
-    \item \textbf{Marketplaces e Anúncios:} Para suportar a funcionalidade de \textit{hub}, \texttt{CAD\_ANUNCIO} liga um produto a um marketplace específico, representado em \texttt{CAD\_MARKETPLACE}. Um produto pode ter vários anúncios, e cada anúncio pertence a um único produto e a um único marketplace. Essa entidade armazena os parâmetros inerentes àquela oferta na plataforma externa, como o preço praticado, o link de origem, a situação de publicação e a última quantidade enviada ao canal.
+    \item \textbf{Marketplaces e Anúncios:} Para suportar a funcionalidade de \textit{hub}, \texttt{CAD\_ANUNCIO} liga um produto a um marketplace específico, representado em \texttt{CAD\_MARKETPLACE}. Um produto pode ter vários anúncios, e cada anúncio pertence a um único produto e a um único marketplace. Essa entidade armazena os parâmetros inerentes àquela oferta na plataforma externa, como o preço praticado, o link de origem, a situação de publicação, a última quantidade enviada ao canal e a indicação de divergência exibida no painel.
 
     \item \textbf{Métricas de Desempenho:} \texttt{HIST\_METRICA\_ANUNCIO\_MP} guarda o histórico de métricas de cada anúncio. O modelo vincula quantidades de acessos e indicadores de desempenho a períodos específicos, possibilitando acompanhar a evolução de um anúncio e comparar o mesmo produto em canais distintos.
 \end{itemize}
@@ -83,10 +83,9 @@ A interface web é organizada em uma tela para cada grupo de funcionalidades. At
     Login         & Verificar as credenciais de acesso          & RF01         & Implementada \\
     Produtos      & Cadastrar, consultar e editar produtos      & RF02 a RF04  & Prevista \\
     Anúncios      & Criar, publicar e gerenciar anúncios por canal & RF05 e RF06  & Prevista \\
-    Vendas        & Consultar as vendas e os itens de cada uma  & RF07         & Prevista \\
-    Estoque       & Consultar o saldo de cada produto           & RF08         & Prevista \\
+    Vendas        & Consultar as vendas e marcar pedidos como cancelados & RF07 e RF11  & Prevista \\
+    Estoque       & Consultar o saldo e as divergências com os canais & RF08         & Prevista \\
     Indicadores   & Acompanhar acessos e desempenho das vendas  & RF09 e RF10  & Prevista \\
-    Administração & Gerenciar usuários e configurações          & RF11 e RF12  & Prevista \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos autores.}
@@ -100,16 +99,18 @@ As telas seguem os critérios adotados no login: validação dos campos antes do
 
 Esta seção descreve a colaboração entre os componentes nos principais fluxos e os estados de um anúncio. O fluxo de autenticação, já implementado, é detalhado na \autoref{sec:integracao}, e o fluxo de cadastro e publicação é representado na \autoref{fig:atividades}. Os fluxos são descritos em etapas, sem diagrama de sequência, porque ainda não foram implementados e dependem das APIs de cada plataforma.
 
-A sincronização de estoque é o fluxo que reúne mais componentes. Quando ocorre uma venda em um marketplace, as seguintes etapas são previstas:
+A sincronização de estoque é o fluxo que reúne mais componentes. A cada notificação de um marketplace ou execução da rotina periódica, as seguintes etapas são previstas:
 
 \begin{enumerate}
-  \item o marketplace notifica a API, ou a consulta periódica identifica uma alteração no anúncio;
   \item o conector do canal obtém a quantidade disponível do anúncio;
-  \item o serviço de estoque compara essa quantidade com a última enviada ao canal e, se não houver diferença, encerra o fluxo;
-  \item o serviço de estoque, em uma transação, ajusta o saldo do produto pela diferença, conforme a regra RN05: uma redução gera baixa, e um aumento só é somado ao saldo se o pedido consultado no canal estiver cancelado, pois uma devolução aguarda a liberação manual do lojista;
-  \item o serviço de estoque envia o novo saldo aos demais canais por meio de seus conectores, atualiza a última quantidade enviada de cada anúncio e, se o saldo chegar a zero, os anúncios do produto deixam de ficar disponíveis, conforme a regra RN02;
-  \item os envios que falharem são repetidos, e a reconciliação periódica corrige eventuais diferenças de saldo entre o sistema e os canais.
+  \item o serviço de estoque compara essa quantidade com a última enviada ao canal e com o saldo do produto; se as três forem iguais, encerra o fluxo;
+  \item se a quantidade for menor que a última enviada, o serviço de estoque, em uma transação, dá baixa da diferença no saldo do produto; uma redução feita diretamente no marketplace recebe o mesmo tratamento, pois não se distingue de uma venda;
+  \item se a quantidade for maior que a última enviada, o saldo não é alterado, e o painel sinaliza a divergência, pois o aumento pode indicar um cancelamento a ser marcado pelo lojista;
+  \item o serviço de estoque envia o saldo aos canais por meio de seus conectores, repetindo antes a comparação com a quantidade atual de cada anúncio, atualiza a última quantidade enviada e, se o saldo chegar a zero, os anúncios do produto deixam de ficar disponíveis, conforme a regra RN02;
+  \item os envios que falharem são repetidos; se a falha persistir, o painel sinaliza a divergência até que a rotina periódica conclua a atualização.
 \end{enumerate}
+
+O retorno de um pedido cancelado ao saldo é feito pelo lojista, que marca o pedido como cancelado na tela de vendas, conforme a regra RN05. A marcação soma a quantidade do pedido ao saldo do produto e dispara o envio do novo saldo aos canais, sem cancelar o pedido no marketplace. Como os pedidos não são armazenados, a marcação não fica registrada: a tela pede confirmação antes de aplicá-la, e repeti-la soma a quantidade novamente.
 
 Um anúncio passa pelas situações definidas na regra RN06, representadas na \autoref{fig:estados}. Todo anúncio começa como rascunho e permanece nessa situação enquanto os campos exigidos pelo marketplace não forem atendidos. Um anúncio publicado pode ser pausado pelo vendedor ou automaticamente, quando o saldo do produto chegar a zero, e só retorna à publicação com saldo positivo.
 
@@ -146,11 +147,11 @@ A escolha dessas tecnologias considerou a simplicidade da solução e o conhecim
 
 \section{Segurança e Controle de Acesso}
 
-As decisões de segurança atendem aos requisitos RF01, RF13, RNF02 e RNF08. As medidas já implementadas no fluxo de autenticação são detalhadas no \autoref{cap:implementacao}: armazenamento apenas do hash bcrypt das senhas, resposta idêntica para e-mail inexistente e senha incorreta, limite de tamanho do corpo das requisições, mensagens de erro sem detalhes técnicos, autorização de uma única origem pelo mecanismo CORS e manutenção das credenciais fora do repositório, no arquivo \texttt{.env}.
+As decisões de segurança atendem aos requisitos RF01, RNF02 e RNF08. As medidas já implementadas no fluxo de autenticação são detalhadas no \autoref{cap:implementacao}: armazenamento apenas do hash bcrypt das senhas, resposta idêntica para e-mail inexistente e senha incorreta, limite de tamanho do corpo das requisições, mensagens de erro sem detalhes técnicos, autorização de uma única origem pelo mecanismo CORS e manutenção das credenciais fora do repositório, no arquivo \texttt{.env}.
 
 Ainda falta o gerenciamento de sessão. Hoje, a API apenas confirma se as credenciais são válidas e, por isso, as demais rotas não podem ser protegidas. Antes da criação dos módulos de negócio, será necessário definir o mecanismo de sessão e exigir que toda rota, exceto a de login, verifique se o usuário está autenticado.
 
-Quanto ao controle de acesso, a regra RN08 restringe o MVP a uma única conta, compartilhada pelos administradores da loja. Por esse motivo, os perfis de vendedor e de administrador definidos na análise não terão, nessa etapa, permissões distintas; o requisito RF13 será atendido por completo quando esses perfis forem implementados.
+Quanto ao controle de acesso, a regra RN08 restringe o MVP a uma única conta, compartilhada pelos administradores da loja. Por esse motivo, o sistema não tem perfis nem permissões distintas, e todas as funcionalidades exigem apenas autenticação.
 
 As credenciais de acesso às APIs dos marketplaces ficarão somente na API do \sistema{}, nunca na interface web nem no repositório, e cada conector solicitará apenas as permissões necessárias às suas operações. As notificações recebidas por \textit{webhook} deverão ter sua origem verificada com os mecanismos oferecidos por cada plataforma, para que uma requisição forjada não dispare consultas e atualizações indevidas.
 

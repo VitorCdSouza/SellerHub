@@ -203,7 +203,7 @@ Até o momento, foi implementado o fluxo de verificação de credenciais, corres
 
 Também estão presentes no repositório os scripts de criação do banco e de dados de desenvolvimento, a configuração por variáveis de ambiente e os comandos para iniciar os componentes. Esses recursos oferecem uma base comum de trabalho, cuja execução ainda precisa ser verificada em cada ambiente da equipe.
 
-Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF08), ainda não foram implementados. Por isso, ainda não é possível apresentar resultados do \sistema{} para a redução do tempo de publicação de anúncios ou do esforço de atualização de preços.
+Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF08 e RF11), ainda não foram implementados. Por isso, ainda não é possível apresentar resultados do \sistema{} para a redução do tempo de publicação de anúncios ou do esforço de atualização de preços.
 
 Os valores apresentados na \autoref{sec:necessidades}, de aproximadamente 15 minutos para cadastrar um produto por canal e dez horas semanais de cadastro nos períodos de vendas sazonais, são estimativas relatadas pelos lojistas, e não medições cronometradas. Não há, no repositório, medições comparativas realizadas com o \sistema{}. A avaliação de ganhos dependerá da implementação dos módulos e da medição de tarefas equivalentes no processo manual e no sistema, considerando os canais efetivamente integrados.
 
@@ -213,7 +213,7 @@ Os valores apresentados na \autoref{sec:necessidades}, de aproximadamente 15 min
 No estado atual, a implementação apresenta as seguintes limitações:
 
 \begin{itemize}
-  \item \textbf{Autenticação sem sessão:} a API confirma se as credenciais são válidas, mas não cria sessão nem emite token. Assim, ainda não há como proteger as demais rotas nem manter o usuário identificado entre requisições, o que impede o cumprimento completo de RF01 e RF13.
+  \item \textbf{Autenticação sem sessão:} a API confirma se as credenciais são válidas, mas não cria sessão nem emite token. Assim, ainda não há como proteger as demais rotas nem manter o usuário identificado entre requisições, o que impede o cumprimento completo de RF01.
   \item \textbf{Módulos de negócio ausentes:} produtos, anúncios, estoque e pedidos ainda não foram implementados, assim como as tabelas de produtos e anúncios no banco.
   \item \textbf{Sem integração com marketplaces:} nenhuma comunicação com o Mercado Livre ou com os demais canais foi implementada. A integração depende do cadastro de contas de desenvolvedor em cada plataforma.
   \item \textbf{Testes apenas no front-end:} a API não possui testes automatizados.
