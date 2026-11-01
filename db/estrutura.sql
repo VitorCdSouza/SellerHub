@@ -1,4 +1,4 @@
-CREATE TABLE usuarios (
+CREATE TABLE CAD_USUARIO (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email varchar(254) NOT NULL UNIQUE,
     senha_hash text NOT NULL,

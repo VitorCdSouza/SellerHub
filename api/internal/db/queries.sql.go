@@ -10,7 +10,7 @@ import (
 )
 
 const getPasswordHash = `-- name: GetPasswordHash :one
-SELECT senha_hash FROM usuarios WHERE email = $1
+SELECT senha_hash FROM CAD_USUARIO WHERE email = $1
 `
 
 func (q *Queries) GetPasswordHash(ctx context.Context, email string) (string, error) {

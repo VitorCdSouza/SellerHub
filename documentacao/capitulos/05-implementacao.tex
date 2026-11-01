@@ -3,7 +3,7 @@
 
 Este capítulo descreve como o projeto apresentado nos capítulos anteriores começou a ser transformado em software executável. São apresentados o ambiente de desenvolvimento, a organização do código, a implementação dos componentes já construídos, a forma como eles se comunicam em execução, os testes realizados, os resultados obtidos e as limitações conhecidas.
 
-O conteúdo reflete o estado do repositório em 28 de outubro de 2026. Nesse momento, está implementado o fluxo de verificação de credenciais, que percorre todas as camadas da arquitetura: interface web, API, regras de negócio e banco de dados. Esse fluxo foi escolhido como primeira entrega por exercitar a pilha completa com uma funcionalidade pequena, antes de iniciar os módulos de produtos, anúncios, estoque e pedidos. A resposta de sucesso confirma a combinação de e-mail e senha, mas ainda não cria uma sessão nem mantém o usuário autenticado entre requisições. As seções serão atualizadas à medida que esses módulos forem concluídos.
+O conteúdo reflete o estado do repositório em 1º de novembro de 2026. Nesse momento, está implementado o fluxo de verificação de credenciais, que percorre todas as camadas da arquitetura: interface web, API, regras de negócio e banco de dados. Esse fluxo foi escolhido como primeira entrega por exercitar a pilha completa com uma funcionalidade pequena, antes de iniciar os módulos de produtos, anúncios, estoque e pedidos. A resposta de sucesso confirma a combinação de e-mail e senha, mas ainda não cria uma sessão nem mantém o usuário autenticado entre requisições. As seções serão atualizadas à medida que esses módulos forem concluídos.
 
 \section{Ambiente de Desenvolvimento}
 \label{sec:ambiente}
@@ -76,7 +76,7 @@ Esta seção descreve os componentes já implementados, organizados pelas camada
 
 \subsection{Banco de dados}
 
-O esquema atual contém a tabela \texttt{usuarios}, com identificador, e-mail e hash da senha. O identificador é gerado pelo próprio PostgreSQL (\texttt{GENERATED ALWAYS AS IDENTITY}), e o e-mail possui restrição de unicidade. Uma restrição de verificação (\texttt{CHECK}) exige que o e-mail seja gravado em letras minúsculas e sem espaços nas extremidades. Com isso, a regra de normalização do e-mail não depende apenas do código da aplicação: mesmo um registro inserido diretamente no banco precisa respeitá-la, o que impede, por exemplo, a existência de dois usuários que diferem apenas por letras maiúsculas.
+O esquema atual contém a tabela \texttt{CAD\_USUARIO}, com identificador, e-mail e hash da senha. O identificador é gerado pelo próprio PostgreSQL (\texttt{GENERATED ALWAYS AS IDENTITY}), e o e-mail possui restrição de unicidade. Uma restrição de verificação (\texttt{CHECK}) exige que o e-mail seja gravado em letras minúsculas e sem espaços nas extremidades. Com isso, a regra de normalização do e-mail não depende apenas do código da aplicação: mesmo um registro inserido diretamente no banco precisa respeitá-la, o que impede, por exemplo, a existência de dois usuários que diferem apenas por letras maiúsculas.
 
 O script \texttt{dados.sql} cadastra um usuário de desenvolvimento, disponível para os testes de login. As demais tabelas do modelo de dados apresentado no \autoref{cap:projeto} serão criadas junto com os módulos que as utilizam.
 
@@ -203,7 +203,7 @@ Até o momento, foi implementado o fluxo de verificação de credenciais, corres
 
 Também estão presentes no repositório os scripts de criação do banco e de dados de desenvolvimento, a configuração por variáveis de ambiente e os comandos para iniciar os componentes. Esses recursos oferecem uma base comum de trabalho, cuja execução ainda precisa ser verificada em cada ambiente da equipe.
 
-Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF06, RF09 e RF10), ainda não foram implementados. Por isso, ainda não é possível apresentar resultados do \sistema{} para a redução do tempo de publicação de anúncios ou do esforço de atualização de preços.
+Os requisitos relacionados ao objetivo central do sistema, ou seja, cadastro de produtos, gestão de anúncios, sincronização de estoque e consulta de pedidos (RF02 a RF08), ainda não foram implementados. Por isso, ainda não é possível apresentar resultados do \sistema{} para a redução do tempo de publicação de anúncios ou do esforço de atualização de preços.
 
 Os valores apresentados na \autoref{sec:necessidades}, de aproximadamente 15 minutos para cadastrar um produto por canal e dez horas semanais de cadastro nos períodos de vendas sazonais, são estimativas relatadas pelos lojistas, e não medições cronometradas. Não há, no repositório, medições comparativas realizadas com o \sistema{}. A avaliação de ganhos dependerá da implementação dos módulos e da medição de tarefas equivalentes no processo manual e no sistema, considerando os canais efetivamente integrados.
 
@@ -213,8 +213,8 @@ Os valores apresentados na \autoref{sec:necessidades}, de aproximadamente 15 min
 No estado atual, a implementação apresenta as seguintes limitações:
 
 \begin{itemize}
-  \item \textbf{Autenticação sem sessão:} a API confirma se as credenciais são válidas, mas não cria sessão nem emite token. Assim, ainda não há como proteger as demais rotas nem manter o usuário identificado entre requisições, o que impede o cumprimento completo de RF01 e RF15.
-  \item \textbf{Módulos de negócio ausentes:} produtos, anúncios, estoque e pedidos ainda não foram implementados, assim como as tabelas correspondentes no banco.
+  \item \textbf{Autenticação sem sessão:} a API confirma se as credenciais são válidas, mas não cria sessão nem emite token. Assim, ainda não há como proteger as demais rotas nem manter o usuário identificado entre requisições, o que impede o cumprimento completo de RF01 e RF13.
+  \item \textbf{Módulos de negócio ausentes:} produtos, anúncios, estoque e pedidos ainda não foram implementados, assim como as tabelas de produtos e anúncios no banco.
   \item \textbf{Sem integração com marketplaces:} nenhuma comunicação com o Mercado Livre ou com os demais canais foi implementada. A integração depende do cadastro de contas de desenvolvedor em cada plataforma.
   \item \textbf{Testes apenas no front-end:} a API não possui testes automatizados.
   \item \textbf{Execução restrita à máquina local:} o endereço da API está fixo no front-end e os serviços escutam apenas em \texttt{localhost}, configuração adequada ao desenvolvimento, mas não ao uso pela loja.

@@ -85,7 +85,7 @@ psql -h localhost -U saleshub -d saleshub -v ON_ERROR_STOP=1 -f db/estrutura.sql
 psql -h localhost -U saleshub -d saleshub -v ON_ERROR_STOP=1 -f db/dados.sql
 ```
 
-Para mudar o schema, edite `db/estrutura.sql` e recrie o banco. Não há ferramenta de migrations, e o banco não deve ser alterado manualmente. A tabela `usuarios` garante a normalização do e-mail com a constraint `email_normalizado`.
+Para mudar o schema, edite `db/estrutura.sql` e recrie o banco. Não há ferramenta de migrations, e o banco não deve ser alterado manualmente. A tabela `CAD_USUARIO` garante a normalização do e-mail com a constraint `email_normalizado`.
 
 ## Executar tudo
 
@@ -214,7 +214,7 @@ documentacao/
 ├── documento.tex          arquivo principal: ordem de capa, listas, capítulos e referências
 ├── referencias.bib        base BibTeX das referências
 ├── configuracoes/
-│   ├── preambulo.tex      classe, pacotes, fontes e estilo dos títulos
+│   ├── preambulo.tex      pacotes, fontes e estilo dos títulos
 │   ├── metadados.tex      título, autores, instituição, curso, orientador
 │   ├── capa.tex           layout da capa e da folha de rosto
 │   └── comandos.tex       comandos próprios (\orientacao, \pendente, \diagrama)

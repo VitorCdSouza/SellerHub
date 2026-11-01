@@ -1,0 +1,25 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  estado/.style={draw, rounded corners=6pt, text width=2.2cm, align=center, minimum height=1cm, inner sep=3pt},
+  inicio/.style={circle, fill=black, minimum size=0.35cm, inner sep=0pt},
+  final/.style={circle, draw, minimum size=0.4cm, inner sep=0pt},
+  fluxo/.style={-{Stealth[length=2mm]}},
+  guarda/.style={font=\scriptsize, align=center},
+]
+  \node[inicio] (ini) at (0,2) {};
+  \node[estado] (rascunho) at (2.4,2) {Rascunho};
+  \node[estado] (publicado) at (7.8,2) {Publicado};
+  \node[estado] (pausado) at (7.8,-1) {Pausado};
+  \node[estado] (encerrado) at (12.8,2) {Encerrado};
+  \node[final] (fim) at (15,2) {};
+  \fill (fim.center) circle (0.12cm);
+
+  \draw[fluxo] (ini) -- node[guarda, above] {criar} (rascunho);
+  \draw[fluxo] (rascunho.north west) .. controls +(0.2,1.2) and +(-0.2,1.2) .. node[guarda, above] {corrigir ou recusado\\pelo marketplace} (rascunho.north east);
+  \draw[fluxo] (rascunho) -- node[guarda, above] {publicar\\{[campos exigidos}\\{preenchidos]}} (publicado);
+  \draw[fluxo] ([xshift=-0.5cm]publicado.south) -- node[guarda, left] {pausar ou\\saldo zerado} ([xshift=-0.5cm]pausado.north);
+  \draw[fluxo] ([xshift=0.5cm]pausado.north) -- node[guarda, right] {reativar\\{[saldo positivo]}} ([xshift=0.5cm]publicado.south);
+  \draw[fluxo] (publicado) -- node[guarda, above] {encerrar} (encerrado);
+  \draw[fluxo] (pausado) -| node[guarda, pos=0.25, below] {encerrar} (encerrado);
+  \draw[fluxo] (encerrado) -- (fim);
+\end{tikzpicture}

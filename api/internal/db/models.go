@@ -4,7 +4,7 @@
 
 package db
 
-type Usuario struct {
+type CadUsuario struct {
 	ID        int64
 	Email     string
 	SenhaHash string

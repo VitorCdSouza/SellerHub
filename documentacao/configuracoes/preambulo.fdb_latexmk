@@ -1,0 +1,13 @@
+# Fdb version 4
+["pdflatex"] 1793466842.50259 "/mnt/dados/IFSP/Extensao/SellerHub/documentacao/configuracoes/preambulo.tex" "preambulo.pdf" "preambulo" 1793466842.62997 2
+  "/mnt/dados/IFSP/Extensao/SellerHub/documentacao/configuracoes/preambulo.tex" 1793466841.72659 1787 7830bccf9bdcf5ca07b7dd21c1bd2a6a ""
+  "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1777593600 43785 66587115382950aca692b5f6e3c2fb74 ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1793108895 3334141 8c6f23e5d4cabc27d06326c28ea3001b ""
+  "configuracoes/metadados.tex" 0 -1 0 ""
+  "preambulo.aux" 1793466834.50185 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "preambulo.tex" 1793466841.72659 1787 7830bccf9bdcf5ca07b7dd21c1bd2a6a ""
+  (generated)
+  "preambulo.aux"
+  "preambulo.log"
+  "preambulo.pdf"
+  (rewritten before read)

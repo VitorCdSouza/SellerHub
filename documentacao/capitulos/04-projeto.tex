@@ -1,37 +1,62 @@
 \chapter{Projeto do Sistema}
 \label{cap:projeto}
 
-\orientacao{Este capítulo define como a solução será estruturada para atender aos requisitos identificados na análise. Sua função é transformar o modelo conceitual em uma especificação técnica da solução, estabelecendo sua arquitetura, componentes, dados, interfaces, interações, tecnologias e mecanismos de segurança.}
+Este capítulo descreve como a solução está estruturada para atender aos requisitos identificados no \autoref{cap:analise}. São apresentados a arquitetura, os componentes, o modelo de dados, a interface do usuário, o comportamento do sistema, as tecnologias adotadas e as decisões de segurança. Os elementos descritos aqui incluem o que já foi construído e o que ainda está previsto; o estado atual do código é apresentado no \autoref{cap:implementacao}.
 
 \section{Arquitetura do Sistema}
-\orientacao{Apresentar a organização geral da solução, definindo seus principais elementos, responsabilidades e relações em nível arquitetural.}
 
-\diagrama{Diagrama de componentes}{componentes}
+O \sistema{} adota uma arquitetura cliente-servidor com três partes: a interface web, executada no navegador; a API, que concentra as regras de negócio; e o banco de dados PostgreSQL. Toda leitura e escrita de dados passa pela API, e a comunicação com os marketplaces também parte dela, de modo que a interface web não depende das particularidades de nenhuma plataforma externa.
+
+A API é uma única aplicação, organizada internamente em camadas e implantada como um só processo. Uma arquitetura de microsserviços, com um serviço para cada módulo, foi descartada: o sistema atende a uma única loja, a equipe é pequena e a divisão acrescentaria comunicação em rede e implantação independente sem benefício para esse volume de uso. A separação em camadas preserva a organização do código sem esse custo.
+
+Duas decisões sustentam a integração entre canais. A primeira é o modelo canônico: cada produto é cadastrado uma única vez no banco e depois mapeado para as categorias e os atributos de cada marketplace. Os dados comuns ficam em colunas tipadas, e os campos específicos de cada canal, em colunas JSONB. A segunda é a interface \texttt{ConectorMarketplace}, com uma implementação por canal, que isola as diferenças entre as APIs das plataformas. Assim, os serviços de negócio operam sempre sobre o modelo canônico, e incluir um novo canal exige apenas uma nova implementação da interface.
+
+A \autoref{fig:componentes} apresenta os componentes do sistema e as interfaces pelas quais eles se relacionam.
+
+\begin{figure}[htbp]
+  \centering
+  \caption{Diagrama de componentes}
+  \label{fig:componentes}
+  \includegraphics[width=\linewidth]{imagens/diagrama-componentes.png}
+  \fonte{Elaborado pelos autores.}
+\end{figure}
 
 \section{Projeto dos Componentes}
-\orientacao{Detalhar a estrutura e as responsabilidades dos principais componentes definidos na arquitetura, incluindo suas interfaces e relações.}
+
+Os componentes da \autoref{fig:componentes} organizam o sistema pelos módulos do domínio. Na API, cada módulo segue as camadas descritas na \autoref{sec:estrutura} (controlador, serviço e acesso a dados), e a interface web mantém telas e serviços próprios para consumi-los. As responsabilidades de cada componente são:
+
+\begin{description}
+  \item[Usuário:] mantém as credenciais, verifica o acesso ao sistema e identifica o vendedor responsável pelos dados, informação fornecida ao componente Produto.
+  \item[Produto:] mantém o cadastro central de produtos, base do modelo canônico, e o serviço de estoque, com o saldo único compartilhado por todos os canais (regra RN01). Fornece esses dados aos componentes Anúncio e Integração.
+  \item[Anúncio:] mantém a oferta de um produto em cada canal, com seu preço, sua situação e suas métricas.
+  \item[Integração:] contém a interface \texttt{ConectorMarketplace}, que define as operações comuns aos canais: publicar e atualizar anúncios, atualizar o saldo disponível, obter a quantidade disponível de cada anúncio e consultar pedidos. Cada implementação converte o modelo canônico para o formato da plataforma e trata sua autenticação e seus limites de uso. O serviço de pedidos também fica neste componente, pois os pedidos são consultados por meio dos conectores, sem serem gravados no banco, e a situação de cada um é padronizada no momento da consulta, conforme a regra RN04.
+  \item[Marketplace:] representa os canais de venda, acessados apenas por meio do componente Integração.
+  \item[Auditoria:] registra as operações realizadas sobre os anúncios, permitindo rastrear as alterações feitas.
+\end{description}
+
+Os conectores seguem uma meta escalonada: o Mercado Livre é a integração obrigatória; a Shopee é desejável; e a Amazon é opcional, pois depende da aprovação de uma conta de desenvolvedor. Como todos ficam atrás da mesma interface, a extensibilidade pode ser demonstrada mesmo que alguma aprovação não seja obtida a tempo. O Facebook Marketplace não terá conector, conforme a regra RN07.
+
+O serviço de estoque exige cuidados adicionais, pois uma mesma peça pode ser vendida em dois canais quase ao mesmo tempo. Para evitar a sobrevenda, cada alteração de saldo ocorrerá em uma transação com bloqueio do registro do produto. Como os pedidos são apenas consultados nos marketplaces, o sistema não mantém registro dos pedidos já processados, e a idempotência vem da comparação de quantidades: cada anúncio guarda a última quantidade enviada ao canal, e o ajuste do saldo corresponde à diferença entre esse valor e a quantidade disponível informada pela plataforma. Uma notificação repetida encontra a diferença já aplicada e não gera nova baixa. As alterações serão percebidas por notificações (\textit{webhooks}) nos canais que as oferecerem, complementadas por consultas periódicas (\textit{polling}) que recuperam eventos perdidos e reconciliam os saldos entre o sistema e cada canal. A viabilidade dessas estratégias deverá ser confirmada para cada plataforma durante a implementação dos conectores.
 
 \section{Modelo de Dados}
 
-O modelo de dados do SellerHub foi concebido para suportar a centralização das operações comerciais, garantindo a integridade, a consistência e a rastreabilidade das informações compartilhadas entre diferentes canais de venda. Considerando a natureza estruturada dos dados transacionais envolvidos, como produtos, estoques, anúncios e vendas, optou-se pela adoção de um modelo relacional, implementado através do sistema gerenciador de banco de dados PostgreSQL.
+O modelo de dados do SellerHub foi concebido para suportar a centralização das operações comerciais, garantindo a integridade, a consistência e a rastreabilidade das informações compartilhadas entre diferentes canais de venda. Considerando a natureza estruturada dos dados envolvidos, como produtos, anúncios e métricas, optou-se pela adoção de um modelo relacional, implementado através do sistema gerenciador de banco de dados PostgreSQL.
 
-A estruturação lógica dos dados deriva das entidades e regras de negócio estabelecidas no modelo conceitual, traduzindo-as em tabelas e relacionamentos que viabilizam a arquitetura da aplicação:
+A estruturação lógica traduz os conceitos do domínio em entidades e relacionamentos que viabilizam a arquitetura da aplicação:
 
 \begin{itemize}
-    \item \textbf{Usuários e Controle de Acesso:} A estrutura centraliza as credenciais e dados cadastrais, diferenciando os perfis de \textit{Vendedor} e \textit{Administrador}. Esta modelagem estabelece a relação de propriedade dos dados, garantindo o isolamento das informações (multitenancy lógico), de forma que cada vendedor tenha acesso exclusivo apenas ao seu catálogo e às suas transações.
-    
-    \item \textbf{Catálogo de Produtos e Estoque:} A entidade de \textit{Produto} atua como o núcleo da plataforma, armazenando atributos universais (nome, descrição base, código de identificação/SKU). O controle de \textit{Estoque} foi projetado seguindo a premissa de um inventário centralizado, o que exige controle transacional rigoroso para garantir que as baixas decorrentes de vendas em diferentes canais reflitam imediatamente na quantidade disponível global.
-    
-    \item \textbf{Marketplaces e Anúncios:} Para suportar a funcionalidade de \textit{hub}, o \textit{Anúncio} atua como a entidade associativa central que liga um \textit{Produto} a um \textit{Marketplace} específico. Esta tabela armazena os parâmetros inerentes àquela oferta na plataforma externa, como o preço praticado, o link de origem e a situação de publicação.
-    
-    \item \textbf{Conteúdo Gerado (Inteligência Artificial):} O \textit{Conteúdo de Anúncio} foi modelado de forma apartada para suportar o fluxo de curadoria do usuário. A estrutura acomoda múltiplas versões de títulos, descrições e imagens para um mesmo anúncio, registrando a origem da sugestão (IA) e o seu status de revisão (pendente, aprovado ou rejeitado), assegurando que o vendedor detenha o controle final sobre a publicação.
-    
-    \item \textbf{Vendas e Itens de Venda:} A modelagem das transações adota o padrão de cabeçalho e detalhes. A tabela de \textit{Venda} consolida os dados gerais do pedido e o canal de origem (\textit{Marketplace}), enquanto a entidade dependente \textit{Item de Venda} destrincha os produtos adquiridos, suas quantidades e valores unitários, servindo de base para o recálculo do estoque e geração de indicadores financeiros.
-    
-    \item \textbf{Métricas de Desempenho:} O armazenamento das \textit{Métricas de Anúncio} foi estruturado para suportar recortes temporais. O modelo vincula quantidades de acessos e indicadores de performance a períodos específicos, possibilitando a geração de gráficos de evolução e a comparação de desempenho do mesmo produto em canais distintos.
+    \item \textbf{Pessoas e Usuários:} \texttt{CAD\_PESSOA} guarda os dados cadastrais, e \texttt{CAD\_USUARIO}, as credenciais de acesso. Uma pessoa pode ter um ou mais usuários, e cada usuário pertence a uma única pessoa. O usuário é a entidade que estabelece a responsabilidade pelos dados, pois a ele se ligam os produtos e os registros de auditoria.
+
+    \item \textbf{Auditoria:} \texttt{CAD\_AUDITORIA} registra as operações realizadas por cada usuário, o que permite identificar o responsável por uma alteração. Cada registro pertence a um único usuário.
+
+    \item \textbf{Produtos:} \texttt{CAD\_PRODUTO} atua como o núcleo da plataforma, armazenando atributos universais (nome, descrição base, código de identificação/SKU). Cada produto pertence a um único usuário. Como a regra RN01 define um saldo único por produto, o estoque não forma uma entidade própria e é mantido como atributo do produto, o que exige controle transacional rigoroso para que as baixas decorrentes de vendas em diferentes canais reflitam imediatamente na quantidade disponível.
+
+    \item \textbf{Marketplaces e Anúncios:} Para suportar a funcionalidade de \textit{hub}, \texttt{CAD\_ANUNCIO} liga um produto a um marketplace específico, representado em \texttt{CAD\_MARKETPLACE}. Um produto pode ter vários anúncios, e cada anúncio pertence a um único produto e a um único marketplace. Essa entidade armazena os parâmetros inerentes àquela oferta na plataforma externa, como o preço praticado, o link de origem, a situação de publicação e a última quantidade enviada ao canal.
+
+    \item \textbf{Métricas de Desempenho:} \texttt{HIST\_METRICA\_ANUNCIO\_MP} guarda o histórico de métricas de cada anúncio. O modelo vincula quantidades de acessos e indicadores de desempenho a períodos específicos, possibilitando acompanhar a evolução de um anúncio e comparar o mesmo produto em canais distintos.
 \end{itemize}
 
-Entre as principais decisões de projeto adotadas, destaca-se a normalização dos dados para mitigar redundâncias, separando as informações estruturais do produto das informações voláteis de cada anúncio. A escolha do modelo relacional garante, através da aplicação de chaves estrangeiras (\textit{Foreign Keys}) e restrições de integridade (\textit{Constraints}), que a base de dados não admita inconsistências, como o registro de vendas de produtos inexistentes ou o acúmulo de métricas órfãs no sistema.
+Entre as principais decisões de projeto adotadas, destaca-se a normalização dos dados para mitigar redundâncias, separando as informações estruturais do produto das informações voláteis de cada anúncio. Pedidos e vendas não formam entidades do modelo, pois permanecem nos marketplaces e são apenas consultados pelo sistema. A escolha do modelo relacional garante, através da aplicação de chaves estrangeiras (\textit{Foreign Keys}) e restrições de integridade (\textit{Constraints}), que a base de dados não admita inconsistências, como o registro de anúncios de produtos inexistentes ou o acúmulo de métricas órfãs no sistema.
 
 O modelo entidade-relacionamento resultante é apresentado na Figura \ref{fig:modelo_conceitual_banco_dados}.
 
@@ -39,22 +64,64 @@ O modelo entidade-relacionamento resultante é apresentado na Figura \ref{fig:mo
     \centering
     \caption{Modelo entidade-relacionamento do SellerHub}
     \label{fig:modelo_conceitual_banco_dados}
-    % trim remove a margem branca da pagina a4 exportada pelo brmodelo
-    \includegraphics[trim=140 269 104 187, clip, angle=-90, width=\textwidth]{imagens/testeBR.pdf}
+    \resizebox{\linewidth}{!}{\input{diagramas/modelo-er}}
     \fonte{Elaborado pelos autores.}
 \end{figure}
 
 \section{Projeto da Interface do Usuário}
-\orientacao{Apresentar a organização e o comportamento das interfaces pelas quais os usuários interagem com o sistema, incluindo protótipos ou representações visuais quando pertinentes.}
 
-\section{Diagramas de Interação}
-\orientacao{Detalhar como os elementos do sistema colaboram para realizar os comportamentos definidos, evidenciando a sequência de mensagens e responsabilidades.}
+A interface web é organizada em uma tela para cada grupo de funcionalidades. Até o momento, apenas a tela de login foi implementada; as demais estão previstas e poderão ser ajustadas com a validação junto aos lojistas. A \autoref{tab:telas} relaciona as telas aos requisitos que atendem.
 
-\diagrama{Diagrama de sequência}{sequencia}
+\begin{table}[htbp]
+  \centering
+  \caption{Telas da interface web}
+  \label{tab:telas}
+  \begin{tabularx}{\textwidth}{lXll}
+    \toprule
+    \textbf{Tela} & \textbf{Finalidade} & \textbf{Requisitos} & \textbf{Situação} \\
+    \midrule
+    Login         & Verificar as credenciais de acesso          & RF01         & Implementada \\
+    Produtos      & Cadastrar, consultar e editar produtos      & RF02 a RF04  & Prevista \\
+    Anúncios      & Criar e gerenciar anúncios por canal        & RF05 e RF06  & Prevista \\
+    Vendas        & Consultar as vendas e os itens de cada uma  & RF07         & Prevista \\
+    Estoque       & Consultar o saldo de cada produto           & RF08         & Prevista \\
+    Indicadores   & Acompanhar acessos e desempenho das vendas  & RF09 e RF10  & Prevista \\
+    Administração & Gerenciar usuários e configurações          & RF11 e RF12  & Prevista \\
+    \bottomrule
+  \end{tabularx}
+  \fonte{Elaborado pelos autores.}
+\end{table}
+
+A tela de produtos é o ponto de partida do fluxo principal, pois o anúncio de cada canal é preparado a partir de um produto já cadastrado, sem digitar as mesmas informações novamente. Esse aproveitamento atende à necessidade de reduzir o retrabalho de cadastro descrita na \autoref{sec:necessidades}.
+
+As telas seguem os critérios adotados no login: validação dos campos antes do envio, mensagens de erro compreensíveis, bloqueio de envios repetidos durante uma requisição e recursos de acessibilidade, como rótulos associados aos campos. Assim, o usuário recebe o mesmo tratamento em todo o sistema, conforme o requisito de usabilidade RNF01.
+
+\section{Comportamento do Sistema}
+
+Esta seção descreve a colaboração entre os componentes nos principais fluxos e os estados de um anúncio. O fluxo de autenticação, já implementado, é detalhado na \autoref{sec:integracao}, e o fluxo de cadastro e publicação é representado na \autoref{fig:atividades}. Os fluxos são descritos em etapas, sem diagrama de sequência, porque ainda não foram implementados e dependem das APIs de cada plataforma.
+
+A sincronização de estoque é o fluxo que reúne mais componentes. Quando ocorre uma venda em um marketplace, as seguintes etapas são previstas:
+
+\begin{enumerate}
+  \item o marketplace notifica a API, ou a consulta periódica identifica uma alteração no anúncio;
+  \item o conector do canal obtém a quantidade disponível do anúncio;
+  \item o serviço de estoque compara essa quantidade com a última enviada ao canal e, se não houver diferença, encerra o fluxo;
+  \item o serviço de estoque, em uma transação, ajusta o saldo do produto pela diferença, conforme a regra RN05: uma redução gera baixa, e um aumento só é somado ao saldo se o pedido consultado no canal estiver cancelado, pois uma devolução aguarda a liberação manual do lojista;
+  \item o serviço de estoque envia o novo saldo aos demais canais por meio de seus conectores, atualiza a última quantidade enviada de cada anúncio e, se o saldo chegar a zero, os anúncios do produto deixam de ficar disponíveis, conforme a regra RN02;
+  \item os envios que falharem são repetidos, e a reconciliação periódica corrige eventuais diferenças de saldo entre o sistema e os canais.
+\end{enumerate}
+
+Um anúncio passa pelas situações definidas na regra RN06, representadas na \autoref{fig:estados}. Todo anúncio começa como rascunho e permanece nessa situação enquanto os campos exigidos pelo marketplace não forem atendidos. Um anúncio publicado pode ser pausado pelo vendedor ou automaticamente, quando o saldo do produto chegar a zero, e só retorna à publicação com saldo positivo.
+
+\begin{figure}[htbp]
+  \centering
+  \caption{Diagrama de estados do anúncio}
+  \label{fig:estados}
+  \resizebox{\linewidth}{!}{\input{diagramas/estados}}
+  \fonte{Elaborado pelos autores.}
+\end{figure}
 
 \section{Tecnologias Utilizadas}
-\orientacao{Relacionar as principais linguagens, frameworks, bibliotecas, sistemas gerenciadores, ferramentas e demais tecnologias adotadas, indicando sua função no projeto.}
-
 A \autoref{tab:tecnologias} resume as tecnologias adotadas em cada camada do \sistema{} \cite{go,sqlc,postgresql,angular}.
 
 \begin{table}[htbp]
@@ -68,14 +135,23 @@ A \autoref{tab:tecnologias} resume as tecnologias adotadas em cada camada do \si
     Back-end       & Go 1.27        & API REST e regras de negócio \\
     Acesso a dados & sqlc           & Geração de código Go tipado a partir de consultas SQL \\
     Banco de dados & PostgreSQL 17  & Persistência dos dados \\
-    Front-end      & Angular 22     & Interface web \\
+    Front-end      & Angular 21     & Interface web \\
     Ambiente       & Docker Compose & Execução opcional do PostgreSQL em contêiner \\
     \bottomrule
   \end{tabularx}
   \fonte{Elaborado pelos autores.}
 \end{table}
 
-\section{Segurança e Controle de Acesso}
-\orientacao{Descrever as decisões relacionadas à autenticação, autorização, controle de acesso, proteção de dados e demais mecanismos de segurança aplicáveis ao sistema.}
+A escolha dessas tecnologias considerou a simplicidade da solução e o conhecimento que a equipe precisa adquirir. O Go oferece na biblioteca padrão o necessário para construir a API, com poucas dependências externas. O PostgreSQL atende à natureza relacional dos dados e, por meio do tipo JSONB, também aos campos específicos de cada marketplace, sem exigir um segundo banco de dados. O sqlc mantém as consultas escritas em SQL, como discutido no \autoref{cap:implementacao}. O Angular fornece, em um único framework, rotas, formulários e comunicação HTTP, o que reduz a necessidade de bibliotecas adicionais na interface web.
 
-\diagrama{Diagrama de estados}{estados}
+\section{Segurança e Controle de Acesso}
+
+As decisões de segurança atendem aos requisitos RF01, RF13, RNF02 e RNF08. As medidas já implementadas no fluxo de autenticação são detalhadas no \autoref{cap:implementacao}: armazenamento apenas do hash bcrypt das senhas, resposta idêntica para e-mail inexistente e senha incorreta, limite de tamanho do corpo das requisições, mensagens de erro sem detalhes técnicos, autorização de uma única origem pelo mecanismo CORS e manutenção das credenciais fora do repositório, no arquivo \texttt{.env}.
+
+Ainda falta o gerenciamento de sessão. Hoje, a API apenas confirma se as credenciais são válidas e, por isso, as demais rotas não podem ser protegidas. Antes da criação dos módulos de negócio, será necessário definir o mecanismo de sessão e exigir que toda rota, exceto a de login, verifique se o usuário está autenticado.
+
+Quanto ao controle de acesso, a regra RN08 restringe o MVP a uma única conta, compartilhada pelos administradores da loja. Por esse motivo, os perfis de vendedor e de administrador definidos na análise não terão, nessa etapa, permissões distintas; o requisito RF13 será atendido por completo quando esses perfis forem implementados.
+
+As credenciais de acesso às APIs dos marketplaces ficarão somente na API do \sistema{}, nunca na interface web nem no repositório, e cada conector solicitará apenas as permissões necessárias às suas operações. As notificações recebidas por \textit{webhook} deverão ter sua origem verificada com os mecanismos oferecidos por cada plataforma, para que uma requisição forjada não dispare consultas e atualizações indevidas.
+
+A consulta de pedidos pode trazer dados pessoais de compradores, como nome e endereço. Em atenção à LGPD (RNF08), esses dados serão apenas exibidos ao vendedor e não serão gravados no banco. Quando o sistema for executado fora da máquina local, a comunicação entre o navegador e a API deverá ocorrer por HTTPS, pois as credenciais trafegam nas requisições de login.

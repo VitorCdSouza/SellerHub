@@ -1,0 +1,51 @@
+\begin{tikzpicture}[
+  font=\footnotesize,
+  caso/.style={draw, ellipse, text width=4.4cm, align=center, minimum height=0.8cm, inner sep=1pt,
+    execute at begin node={\hyphenpenalty=10000}},
+  ator/.pic={
+    \draw (0,0.45) circle (0.16);
+    \draw (0,0.29) -- (0,-0.15);
+    \draw (-0.3,0.1) -- (0.3,0.1);
+    \draw (0,-0.15) -- (-0.25,-0.55);
+    \draw (0,-0.15) -- (0.25,-0.55);
+  },
+  rotulo/.style={align=center, anchor=north},
+]
+  % fronteira do sistema
+  \draw (3.1,0) rectangle (9.9,15.1);
+  \node[anchor=north] at (6.5,15.1) {\textbf{\sistema}};
+
+  \node[caso] (vendas) at (6.5,13.8) {Consultar vendas};
+  \node[caso] (estoque) at (6.5,12.6) {Consultar estoque};
+  \node[caso] (acessos) at (6.5,11.4) {Analisar acessos aos anúncios};
+  \node[caso] (indicadores) at (6.5,10.2) {Consultar indicadores de desempenho das vendas};
+  \node[caso] (gerenciar) at (6.5,9.0) {Gerenciar anúncios};
+  \node[caso] (criar) at (6.5,7.8) {Criar anúncio};
+  \node[caso] (editar) at (6.5,6.6) {Editar produto};
+  \node[caso] (consultar) at (6.5,5.4) {Consultar produtos};
+  \node[caso] (cadastrar) at (6.5,4.2) {Cadastrar produto};
+  \node[caso] (autenticar) at (6.5,3.0) {Autenticar-se};
+  \node[caso] (usuarios) at (6.5,1.8) {Gerenciar usuários};
+  \node[caso] (configuracoes) at (6.5,0.6) {Gerenciar configurações administrativas};
+
+  \pic at (1,9) {ator};
+  \node[rotulo] at (0.6,8.35) {Vendedor};
+  \coordinate (vendedor) at (1.4,9.1);
+
+  \pic at (1,2) {ator};
+  \node[rotulo] at (1,1.35) {Administrador\\do sistema};
+  \coordinate (administrador) at (1.4,2.1);
+
+  \pic at (12.4,12.6) {ator};
+  \node[rotulo] at (12.4,11.95) {\guillemotleft sistema externo\guillemotright\\Marketplaces e\\plataformas externas};
+  \coordinate (marketplaces) at (12,12.7);
+
+  \foreach \caso in {vendas, estoque, acessos, indicadores, gerenciar, criar, editar, consultar, cadastrar, autenticar}
+    \draw (vendedor) -- (\caso.west);
+
+  \foreach \caso in {autenticar, usuarios, configuracoes}
+    \draw (administrador) -- (\caso.west);
+
+  \foreach \caso in {vendas, estoque, acessos}
+    \draw (marketplaces) -- (\caso.east);
+\end{tikzpicture}

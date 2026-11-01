@@ -1,0 +1,35 @@
+% leitura: o rotulo junto de uma entidade diz quantas ocorrencias dela
+% se ligam a uma ocorrencia da entidade do outro lado
+\begin{tikzpicture}[
+  font=\footnotesize\bfseries,
+  entidade/.style={draw, minimum width=2.9cm, minimum height=1cm, inner sep=4pt},
+  relacao/.style={draw, diamond, aspect=2.6, minimum width=2.6cm, inner sep=1pt},
+  card/.style={font=\scriptsize\bfseries, inner sep=2pt},
+]
+  \node[entidade] (pessoa) at (4.2,12) {CAD\_PESSOA};
+  \node[relacao] (cadastra) at (4.2,10.2) {cadastra};
+  \node[entidade] (usuario) at (4.2,8.4) {CAD\_USUARIO};
+  \node[relacao] (possuiauditoria) at (8.2,8.4) {possui};
+  \node[entidade] (auditoria) at (12.2,8.4) {CAD\_AUDITORIA};
+  \node[relacao] (possuiproduto) at (4.2,6.6) {possui};
+  \node[entidade] (produto) at (0,6.6) {CAD\_PRODUTO};
+  \node[relacao] (possuianuncio) at (0,4.8) {possui};
+  \node[entidade] (anuncio) at (0,3) {CAD\_ANUNCIO};
+  \node[relacao] (conecta) at (4.2,3) {conecta};
+  \node[entidade] (marketplace) at (8.4,3) {CAD\_MARKETPLACE};
+  \node[relacao] (possuimetrica) at (0,1.2) {possui};
+  \node[entidade] (metrica) at (0,-0.6) {HIST\_METRICA\_ANUNCIO\_MP};
+
+  \draw (pessoa) -- node[card, pos=0.22, right] {(1,1)} (cadastra);
+  \draw (cadastra) -- node[card, pos=0.78, right] {(1,n)} (usuario);
+  \draw (usuario) -- node[card, pos=0.42, above] {(1,1)} (possuiauditoria);
+  \draw (possuiauditoria) -- node[card, pos=0.7, above] {(0,n)} (auditoria);
+  \draw (usuario) -- node[card, pos=0.22, right] {(1,1)} (possuiproduto);
+  \draw (possuiproduto) -- node[card, pos=0.7, above] {(0,n)} (produto);
+  \draw (produto) -- node[card, pos=0.22, right] {(1,1)} (possuianuncio);
+  \draw (possuianuncio) -- node[card, pos=0.78, right] {(0,n)} (anuncio);
+  \draw (anuncio) -- node[card, pos=0.3, above] {(0,n)} (conecta);
+  \draw (conecta) -- node[card, pos=0.5, above] {(1,1)} (marketplace);
+  \draw (anuncio) -- node[card, pos=0.22, right] {(1,1)} (possuimetrica);
+  \draw (possuimetrica) -- node[card, pos=0.78, right] {(0,n)} (metrica);
+\end{tikzpicture}
