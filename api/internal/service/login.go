@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"golang.org/x/crypto/bcrypt"
 
-	"saleshub/api/internal/db"
+	"sellerhub/api/internal/db"
 )
 
 var (

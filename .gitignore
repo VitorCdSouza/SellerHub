@@ -14,6 +14,7 @@ documentacao/*.out
 documentacao/*.synctex.gz
 documentacao/*.toc
 documentacao/documento.pdf
+documentacao/SellerHub.pdf
 documentacao/configuracoes/preambulo.aux
 documentacao/configuracoes/preambulo.fdb_latexmk
 documentacao/configuracoes/preambulo.fls

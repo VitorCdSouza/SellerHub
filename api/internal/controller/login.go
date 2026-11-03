@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"saleshub/api/internal/service"
+	"sellerhub/api/internal/service"
 )
 
 type loginRequest struct {

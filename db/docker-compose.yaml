@@ -1,4 +1,4 @@
-name: saleshub
+name: sellerhub
 
 services:
   db:

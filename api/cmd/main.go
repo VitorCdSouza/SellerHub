@@ -8,9 +8,9 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"saleshub/api/internal/controller"
-	"saleshub/api/internal/db"
-	"saleshub/api/internal/service"
+	"sellerhub/api/internal/controller"
+	"sellerhub/api/internal/db"
+	"sellerhub/api/internal/service"
 )
 
 func main() {

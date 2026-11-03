@@ -1,4 +1,4 @@
-# SalesHub
+# SellerHub
 
 Hub de integração entre marketplaces desenvolvido como TCC. No estado atual, o sistema tem apenas o fluxo de login: **Angular → API REST em Go → PostgreSQL**. O usuário informa e-mail e senha, a API consulta o banco e devolve sucesso ou credenciais inválidas.
 
@@ -7,7 +7,7 @@ O sucesso ainda não cria sessão, cookie ou token.
 ## Organização
 
 ```text
-SalesHub/
+SellerHub/
 ├── .env.example                   variáveis usadas pela API e pelo banco
 ├── Makefile                       atalhos para subir banco, API e web
 ├── db/
@@ -45,9 +45,9 @@ cp .env.example .env
 ```dotenv
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=saleshub
+DB_USER=sellerhub
 DB_PASSWORD=defina_uma_senha_local
-DB_NAME=saleshub
+DB_NAME=sellerhub
 DB_SSLMODE=disable
 FRONTEND_ORIGIN=http://localhost:4200
 ```
@@ -74,15 +74,15 @@ make stop-db    # para o banco mantendo os dados
 Como administrador (`psql -U postgres`):
 
 ```sql
-CREATE ROLE saleshub LOGIN PASSWORD 'mesma_senha_do_env';
-CREATE DATABASE saleshub OWNER saleshub;
+CREATE ROLE sellerhub LOGIN PASSWORD 'mesma_senha_do_env';
+CREATE DATABASE sellerhub OWNER sellerhub;
 ```
 
 Depois, a partir da raiz:
 
 ```bash
-psql -h localhost -U saleshub -d saleshub -v ON_ERROR_STOP=1 -f db/estrutura.sql
-psql -h localhost -U saleshub -d saleshub -v ON_ERROR_STOP=1 -f db/dados.sql
+psql -h localhost -U sellerhub -d sellerhub -v ON_ERROR_STOP=1 -f db/estrutura.sql
+psql -h localhost -U sellerhub -d sellerhub -v ON_ERROR_STOP=1 -f db/dados.sql
 ```
 
 Para mudar o schema, edite `db/estrutura.sql` e recrie o banco. Não há ferramenta de migrations, e o banco não deve ser alterado manualmente. A tabela `CAD_USUARIO` garante a normalização do e-mail com a constraint `email_normalizado`.
