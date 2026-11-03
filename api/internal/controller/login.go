@@ -21,31 +21,50 @@ type response struct {
 
 type LoginController struct {
 	Service *service.LoginService
+	Session *service.SessionService
 }
 
-func (c *LoginController) Login(w http.ResponseWriter, r *http.Request) {
-	var request loginRequest
-	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&request); err != nil {
-		respond(w, http.StatusBadRequest, false, "JSON inválido")
+func (loginController *LoginController) Login(writer http.ResponseWriter, request *http.Request) {
+	var credentials loginRequest
+	if err := json.NewDecoder(http.MaxBytesReader(writer, request.Body, 4096)).Decode(&credentials); err != nil {
+		respond(writer, http.StatusBadRequest, false, "JSON inválido")
 		return
 	}
 
-	err := c.Service.Login(r.Context(), request.Email, request.Password)
+	userID, err := loginController.Service.Login(request.Context(), credentials.Email, credentials.Password)
 	switch {
 	case err == nil:
-		respond(w, http.StatusOK, true, "Login realizado com sucesso")
+		loginController.startSession(writer, userID)
 	case errors.Is(err, service.ErrInvalidInput):
-		respond(w, http.StatusBadRequest, false, "Informe e-mail e senha de até 72 bytes")
+		respond(writer, http.StatusBadRequest, false, "Informe e-mail e senha de até 72 bytes")
 	case errors.Is(err, service.ErrInvalidCredentials):
-		respond(w, http.StatusUnauthorized, false, "Credenciais inválidas")
+		respond(writer, http.StatusUnauthorized, false, "Credenciais inválidas")
 	default:
 		log.Printf("login: %v", err)
-		respond(w, http.StatusInternalServerError, false, "Não foi possível realizar o login")
+		respond(writer, http.StatusInternalServerError, false, "Não foi possível realizar o login")
 	}
 }
 
-func respond(w http.ResponseWriter, status int, success bool, message string) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(response{Success: success, Message: message})
+func (loginController *LoginController) startSession(writer http.ResponseWriter, userID int64) {
+	token, err := loginController.Session.Create(userID)
+	if err != nil {
+		log.Printf("login: %v", err)
+		respond(writer, http.StatusInternalServerError, false, "Não foi possível realizar o login")
+		return
+	}
+	http.SetCookie(writer, &http.Cookie{
+		Name:     "sessao",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   int(service.SessionDuration.Seconds()),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+	respond(writer, http.StatusOK, true, "Login realizado com sucesso")
+}
+
+func respond(writer http.ResponseWriter, status int, success bool, message string) {
+	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+	writer.WriteHeader(status)
+	_ = json.NewEncoder(writer).Encode(response{Success: success, Message: message})
 }

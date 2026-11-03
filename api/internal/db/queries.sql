@@ -1,2 +1,2 @@
--- name: GetPasswordHash :one
-SELECT senha_hash FROM CAD_USUARIO WHERE email = $1;
+-- name: GetUserByEmail :one
+SELECT id, senha_hash FROM CAD_USUARIO WHERE email = $1;

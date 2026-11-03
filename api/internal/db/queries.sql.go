@@ -9,13 +9,18 @@ import (
 	"context"
 )
 
-const getPasswordHash = `-- name: GetPasswordHash :one
-SELECT senha_hash FROM CAD_USUARIO WHERE email = $1
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, senha_hash FROM CAD_USUARIO WHERE email = $1
 `
 
-func (q *Queries) GetPasswordHash(ctx context.Context, email string) (string, error) {
-	row := q.db.QueryRow(ctx, getPasswordHash, email)
-	var senha_hash string
-	err := row.Scan(&senha_hash)
-	return senha_hash, err
+type GetUserByEmailRow struct {
+	ID        int64
+	SenhaHash string
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(&i.ID, &i.SenhaHash)
+	return i, err
 }

@@ -1,8 +1,8 @@
 # SellerHub
 
-Hub de integração entre marketplaces desenvolvido como TCC. No estado atual, o sistema tem apenas o fluxo de login: **Angular → API REST em Go → PostgreSQL**. O usuário informa e-mail e senha, a API consulta o banco e devolve sucesso ou credenciais inválidas.
+Hub de integração entre marketplaces desenvolvido como TCC. No estado atual, o sistema tem apenas o fluxo de login: **Angular → API REST em Go → PostgreSQL**. O usuário informa e-mail e senha, a API consulta o banco e, se as credenciais conferem, abre uma sessão com um JWT gravado em cookie.
 
-O sucesso ainda não cria sessão, cookie ou token.
+Ainda não há rota protegida: a verificação do cookie entra junto da primeira tela que exigir login.
 
 ## Organização
 
@@ -21,11 +21,12 @@ SellerHub/
 
 Fluxo do login:
 
-1. O componente Angular valida o formulário e envia `POST http://localhost:8080/login`.
+1. O componente Angular valida o formulário e envia `POST /api/login`, que o servidor de desenvolvimento do Angular repassa para a API.
 2. O controller Go decodifica o JSON e repassa e-mail e senha ao service.
 3. O service normaliza o e-mail (minúsculas, sem espaços nas pontas), valida os dados e busca o hash com a consulta gerada pelo sqlc.
 4. `bcrypt.CompareHashAndPassword` compara a senha com o hash.
-5. O controller responde com o status HTTP e o JSON; o Angular exibe a mensagem.
+5. Se a senha confere, o controller gera um JWT com o id do usuário e o grava no cookie `sessao`.
+6. O controller responde com o status HTTP e o JSON; o Angular exibe a mensagem.
 
 ## Pré-requisitos
 
@@ -36,7 +37,7 @@ Fluxo do login:
 
 ## Configuração
 
-Na raiz do projeto, copie o exemplo e defina uma senha para o banco:
+Na raiz do projeto, copie o exemplo, defina uma senha para o banco e gere o segredo do JWT com `openssl rand -hex 32`:
 
 ```bash
 cp .env.example .env
@@ -49,7 +50,7 @@ DB_USER=sellerhub
 DB_PASSWORD=defina_uma_senha_local
 DB_NAME=sellerhub
 DB_SSLMODE=disable
-FRONTEND_ORIGIN=http://localhost:4200
+JWT_SECRET=gere_com_openssl_rand_hex_32
 ```
 
 O `.env` é ignorado pelo Git. Use aspas simples se a senha tiver caracteres como `#` ou `$`. Se a porta 5432 já estiver em uso por outro PostgreSQL, troque `DB_PORT` (por exemplo, `5433`).
@@ -107,7 +108,7 @@ Abra [http://localhost:4200](http://localhost:4200) e entre com o usuário de de
 
 ```text
 api/
-├── cmd/main.go            inicialização, rotas e CORS
+├── cmd/main.go            inicialização e rotas
 ├── internal/
 │   ├── controller/        HTTP e JSON
 │   ├── service/           regras de negócio
@@ -124,12 +125,12 @@ cd api
 go run ./cmd
 ```
 
-A API carrega o `.env` da raiz (`../.env`, relativo a `api/`) sem substituir variáveis já definidas no terminal. Ela verifica a conexão com o banco antes de iniciar e atende em `http://localhost:8080`, somente na máquina local. Reinicie a API depois de mudar o `.env`.
+A API carrega o `.env` da raiz (`../.env`, relativo a `api/`) sem substituir variáveis já definidas no terminal. Ela não inicia sem `JWT_SECRET` com pelo menos 32 caracteres, verifica a conexão com o banco antes de iniciar e atende em `http://localhost:8080`, somente na máquina local. Reinicie a API depois de mudar o `.env`.
 
 ### Endpoint
 
 ```bash
-curl -X POST http://localhost:8080/login \
+curl -i -X POST http://localhost:8080/api/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"teste@email.com","password":"123456"}'
 ```
@@ -140,7 +141,7 @@ curl -X POST http://localhost:8080/login \
 
 | Status | Situação |
 | --- | --- |
-| `200` | Credenciais válidas |
+| `200` | Credenciais válidas; a resposta traz o cookie `sessao` |
 | `400` | JSON inválido, campos vazios, senha acima de 72 bytes ou corpo acima de 4 KiB |
 | `401` | E-mail não cadastrado ou senha incorreta (mesma mensagem nos dois casos) |
 | `405` | Método diferente de POST |
@@ -148,7 +149,9 @@ curl -X POST http://localhost:8080/login \
 
 A senha é limitada a 72 **bytes** porque o bcrypt ignora o que passa disso; caracteres acentuados ocupam mais de um byte.
 
-CORS é liberado somente para `FRONTEND_ORIGIN`. Abra o Angular por `localhost`, já que `http://127.0.0.1:4200` é outra origem.
+O cookie `sessao` guarda um JWT assinado com HS256 e `JWT_SECRET`, com validade de 8 horas. É `HttpOnly`, então o JavaScript da página não consegue lê-lo, e `SameSite=Strict`, então o navegador não o envia em requisições vindas de outros sites. Trocar o `JWT_SECRET` invalida todas as sessões abertas.
+
+A API não libera CORS: o Angular chama `/api` na própria origem (`localhost:4200`) e o servidor de desenvolvimento repassa para `localhost:8080`, conforme `web/proxy.conf.json`. Por isso as rotas da API começam com `/api`.
 
 ### Consultas SQL (sqlc)
 
@@ -158,6 +161,8 @@ As consultas ficam em `api/internal/db/queries.sql`. Depois de alterar esse arqu
 cd api
 sqlc generate
 ```
+
+Sem o sqlc instalado, o mesmo comando roda pelo Go: `go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1 generate`.
 
 Os arquivos `db.go`, `models.go` e `queries.sql.go` são gerados e não devem ser editados à mão.
 
@@ -176,14 +181,14 @@ go vet ./...
 web/src/app/
 ├── login/                 formulário, validação, carregamento e mensagens
 ├── services/
-│   └── auth.service.ts    envia e-mail e senha para POST /login
+│   └── auth.service.ts    envia e-mail e senha para POST /api/login
 ├── app.config.ts          configuração de HTTP e rotas
 └── app.routes.ts          carrega a tela de login sob demanda
 ```
 
-O componente de login usa signals e `OnPush`. Durante a requisição, impede novos envios; ao concluir, limpa a senha. Labels, avisos por campo e regiões de mensagem dão suporte à navegação por teclado e a leitores de tela. Não há sessão nem armazenamento de senha no navegador.
+O componente de login usa signals e `OnPush`. Durante a requisição, impede novos envios; ao concluir, limpa a senha. Labels, avisos por campo e regiões de mensagem dão suporte à navegação por teclado e a leitores de tela. A senha não é guardada no navegador, e o token da sessão fica só no cookie `HttpOnly`, fora do alcance do código Angular.
 
-O endereço da API (`http://localhost:8080`) está fixo no `AuthService`, já que o sistema roda na mesma máquina.
+As chamadas usam caminhos relativos (`/api/...`). O `ng serve` repassa esses caminhos para a API conforme `proxy.conf.json`, configurado em `angular.json`.
 
 ### Executar
 
@@ -270,5 +275,6 @@ Estilo autor-data (`abntex2cite`, opção `alf`). Cadastre a fonte em `referenci
 - **`password authentication failed`:** a senha do `.env` não bate com a do banco. No Docker, as credenciais só são aplicadas na criação do volume; rode `make reset-db`.
 - **`connection refused`:** o banco não está rodando ou `DB_PORT` está errado. Confira com `docker ps`.
 - **`port is already allocated` ao subir o banco:** outro serviço usa a porta; troque `DB_PORT` no `.env`.
-- **Erro de CORS no navegador:** use exatamente `http://localhost:4200` e reinicie a API depois de mudar o `.env`.
+- **`404` ou `504` em `/api/...` no navegador:** a API não está rodando, ou o `ng serve` foi iniciado antes da configuração do proxy; reinicie o `npm start`.
+- **API encerra com `JWT_SECRET ausente`:** gere o segredo com `openssl rand -hex 32` e coloque no `.env`.
 - **PowerShell bloqueia `npm.ps1`:** use `npm.cmd` nos mesmos comandos.
