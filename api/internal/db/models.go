@@ -4,8 +4,62 @@
 
 package db
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+type CadAnuncio struct {
+	IDAnuncio        int32
+	IDMarketplace    int32
+	IDProduto        int32
+	TituloAnuncio    string
+	DescricaoAnuncio pgtype.Text
+	PrecoVenda       pgtype.Numeric
+	IDExternoMp      pgtype.Text
+	StatusCampo      string
+}
+
+type CadAuditorium struct {
+	IDAuditoria   int32
+	IDUsuario     int32
+	Acao          string
+	TabelaAfetada string
+	DataHora      pgtype.Timestamp
+}
+
+type CadMarketplace struct {
+	IDMarketplace   int32
+	NomeMarketplace string
+	TaxaComissao    pgtype.Numeric
+}
+
+type CadPessoa struct {
+	IDPessoa   int32
+	Nome       string
+	CpfCnpj    string
+	TipoPessoa string
+}
+
+type CadProduto struct {
+	IDProduto   int32
+	IDUsuario   int32
+	Sku         string
+	NomeProduto string
+	PrecoBase   pgtype.Numeric
+}
+
 type CadUsuario struct {
-	ID        int64
-	Email     string
-	SenhaHash string
+	IDUsuario  int32
+	IDPessoa   int32
+	LoginCampo string
+	SenhaHash  string
+	Email      string
+}
+
+type HistMetricaAnuncio struct {
+	IDMetrica      int32
+	IDAnuncio      int32
+	DataReferencia pgtype.Date
+	Visualizacoes  pgtype.Int4
+	Conversoes     pgtype.Int4
 }

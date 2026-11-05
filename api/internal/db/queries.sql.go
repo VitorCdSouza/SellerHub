@@ -7,20 +7,123 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, senha_hash FROM CAD_USUARIO WHERE email = $1
+const createProduto = `-- name: CreateProduto :one
+INSERT INTO CAD_PRODUTO (
+    id_usuario, sku, nome_produto, preco_base
+) VALUES (
+    $1, $2, $3, $4
+) RETURNING id_produto
 `
 
-type GetUserByEmailRow struct {
-	ID        int64
-	SenhaHash string
+type CreateProdutoParams struct {
+	IDUsuario   int32
+	Sku         string
+	NomeProduto string
+	PrecoBase   pgtype.Numeric
 }
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i GetUserByEmailRow
-	err := row.Scan(&i.ID, &i.SenhaHash)
+func (q *Queries) CreateProduto(ctx context.Context, arg CreateProdutoParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createProduto,
+		arg.IDUsuario,
+		arg.Sku,
+		arg.NomeProduto,
+		arg.PrecoBase,
+	)
+	var id_produto int32
+	err := row.Scan(&id_produto)
+	return id_produto, err
+}
+
+const getProdutoById = `-- name: GetProdutoById :one
+SELECT id_produto, id_usuario, sku, nome_produto, preco_base 
+FROM CAD_PRODUTO 
+WHERE id_produto = $1 AND id_usuario = $2
+`
+
+type GetProdutoByIdParams struct {
+	IDProduto int32
+	IDUsuario int32
+}
+
+func (q *Queries) GetProdutoById(ctx context.Context, arg GetProdutoByIdParams) (CadProduto, error) {
+	row := q.db.QueryRow(ctx, getProdutoById, arg.IDProduto, arg.IDUsuario)
+	var i CadProduto
+	err := row.Scan(
+		&i.IDProduto,
+		&i.IDUsuario,
+		&i.Sku,
+		&i.NomeProduto,
+		&i.PrecoBase,
+	)
 	return i, err
+}
+
+const listProdutos = `-- name: ListProdutos :many
+SELECT id_produto, nome_produto, sku, preco_base 
+FROM CAD_PRODUTO 
+WHERE id_usuario = $1 
+ORDER BY nome_produto
+`
+
+type ListProdutosRow struct {
+	IDProduto   int32
+	NomeProduto string
+	Sku         string
+	PrecoBase   pgtype.Numeric
+}
+
+func (q *Queries) ListProdutos(ctx context.Context, idUsuario int32) ([]ListProdutosRow, error) {
+	rows, err := q.db.Query(ctx, listProdutos, idUsuario)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListProdutosRow
+	for rows.Next() {
+		var i ListProdutosRow
+		if err := rows.Scan(
+			&i.IDProduto,
+			&i.NomeProduto,
+			&i.Sku,
+			&i.PrecoBase,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateProduto = `-- name: UpdateProduto :exec
+UPDATE CAD_PRODUTO
+SET sku = $3,
+    nome_produto = $4,
+    preco_base = $5
+WHERE id_produto = $1 AND id_usuario = $2
+`
+
+type UpdateProdutoParams struct {
+	IDProduto   int32
+	IDUsuario   int32
+	Sku         string
+	NomeProduto string
+	PrecoBase   pgtype.Numeric
+}
+
+func (q *Queries) UpdateProduto(ctx context.Context, arg UpdateProdutoParams) error {
+	_, err := q.db.Exec(ctx, updateProduto,
+		arg.IDProduto,
+		arg.IDUsuario,
+		arg.Sku,
+		arg.NomeProduto,
+		arg.PrecoBase,
+	)
+	return err
 }
