@@ -1,4 +1,10 @@
 
+## SellerHub — planejamento do front-end
+
+Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). Ele registra a avaliação de 05/11/2026, telas que podem avançar, bloqueios, decisões pendentes e tarefas FE/BE. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
+
+Prioridade inicial: FE-01 (alinhar login), FE-02 (estrutura interna) e FE-04/FE-05/FE-06 (interfaces de produtos). A integração depende das tarefas de back-end indicadas. Simulação deve ser explícita e separada dos serviços reais; SQL ou tabela existente não comprova endpoint pronto. Em tarefas da frente de interface, registre ajustes de API como itens BE para o time responsável.
+
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
