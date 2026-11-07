@@ -14,9 +14,9 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
-type response struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+type userResponse struct {
+	ID    int32  `json:"id"`
+	Email string `json:"email"`
 }
 
 type LoginController struct {
@@ -45,7 +45,33 @@ func (loginController *LoginController) Login(writer http.ResponseWriter, reques
 	}
 }
 
-func (loginController *LoginController) startSession(writer http.ResponseWriter, userID int64) {
+// o jwt continua valido ate expirar; logout so remove o cookie do navegador
+func (loginController *LoginController) Logout(writer http.ResponseWriter, request *http.Request) {
+	http.SetCookie(writer, &http.Cookie{
+		Name:     sessionCookie,
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+	respond(writer, http.StatusOK, true, "Sessão encerrada")
+}
+
+func (loginController *LoginController) CurrentUser(writer http.ResponseWriter, request *http.Request) {
+	user, err := loginController.Service.User(request.Context(), sessionUserID(request))
+	switch {
+	case err == nil:
+		writeJSON(writer, http.StatusOK, userResponse{ID: user.IDUsuario, Email: user.Email})
+	case errors.Is(err, service.ErrNotFound):
+		respond(writer, http.StatusUnauthorized, false, "Sessão inválida ou expirada")
+	default:
+		log.Printf("sessao: %v", err)
+		respond(writer, http.StatusInternalServerError, false, "Não foi possível consultar a sessão")
+	}
+}
+
+func (loginController *LoginController) startSession(writer http.ResponseWriter, userID int32) {
 	token, err := loginController.Session.Create(userID)
 	if err != nil {
 		log.Printf("login: %v", err)
@@ -53,7 +79,7 @@ func (loginController *LoginController) startSession(writer http.ResponseWriter,
 		return
 	}
 	http.SetCookie(writer, &http.Cookie{
-		Name:     "sessao",
+		Name:     sessionCookie,
 		Value:    token,
 		Path:     "/",
 		MaxAge:   int(service.SessionDuration.Seconds()),
@@ -61,10 +87,4 @@ func (loginController *LoginController) startSession(writer http.ResponseWriter,
 		SameSite: http.SameSiteStrictMode,
 	})
 	respond(writer, http.StatusOK, true, "Login realizado com sucesso")
-}
-
-func respond(writer http.ResponseWriter, status int, success bool, message string) {
-	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-	writer.WriteHeader(status)
-	_ = json.NewEncoder(writer).Encode(response{Success: success, Message: message})
 }

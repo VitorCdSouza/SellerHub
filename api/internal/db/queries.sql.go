@@ -11,6 +11,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countProdutos = `-- name: CountProdutos :one
+SELECT COUNT(*)
+FROM CAD_PRODUTO
+WHERE id_usuario = $1
+`
+
+func (q *Queries) CountProdutos(ctx context.Context, idUsuario int32) (int64, error) {
+	row := q.db.QueryRow(ctx, countProdutos, idUsuario)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createProduto = `-- name: CreateProduto :one
 INSERT INTO CAD_PRODUTO (
     id_usuario, sku, nome_produto, preco_base
@@ -62,12 +75,55 @@ func (q *Queries) GetProdutoById(ctx context.Context, arg GetProdutoByIdParams) 
 	return i, err
 }
 
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id_usuario, senha_hash
+FROM CAD_USUARIO
+WHERE email = $1
+`
+
+type GetUserByEmailRow struct {
+	IDUsuario int32
+	SenhaHash string
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(&i.IDUsuario, &i.SenhaHash)
+	return i, err
+}
+
+const getUserById = `-- name: GetUserById :one
+SELECT id_usuario, email
+FROM CAD_USUARIO
+WHERE id_usuario = $1
+`
+
+type GetUserByIdRow struct {
+	IDUsuario int32
+	Email     string
+}
+
+func (q *Queries) GetUserById(ctx context.Context, idUsuario int32) (GetUserByIdRow, error) {
+	row := q.db.QueryRow(ctx, getUserById, idUsuario)
+	var i GetUserByIdRow
+	err := row.Scan(&i.IDUsuario, &i.Email)
+	return i, err
+}
+
 const listProdutos = `-- name: ListProdutos :many
 SELECT id_produto, nome_produto, sku, preco_base 
 FROM CAD_PRODUTO 
 WHERE id_usuario = $1 
-ORDER BY nome_produto
+ORDER BY nome_produto, id_produto
+LIMIT $2 OFFSET $3
 `
+
+type ListProdutosParams struct {
+	IDUsuario int32
+	Limit     int32
+	Offset    int32
+}
 
 type ListProdutosRow struct {
 	IDProduto   int32
@@ -76,8 +132,8 @@ type ListProdutosRow struct {
 	PrecoBase   pgtype.Numeric
 }
 
-func (q *Queries) ListProdutos(ctx context.Context, idUsuario int32) ([]ListProdutosRow, error) {
-	rows, err := q.db.Query(ctx, listProdutos, idUsuario)
+func (q *Queries) ListProdutos(ctx context.Context, arg ListProdutosParams) ([]ListProdutosRow, error) {
+	rows, err := q.db.Query(ctx, listProdutos, arg.IDUsuario, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +157,7 @@ func (q *Queries) ListProdutos(ctx context.Context, idUsuario int32) ([]ListProd
 	return items, nil
 }
 
-const updateProduto = `-- name: UpdateProduto :exec
+const updateProduto = `-- name: UpdateProduto :execrows
 UPDATE CAD_PRODUTO
 SET sku = $3,
     nome_produto = $4,
@@ -117,13 +173,16 @@ type UpdateProdutoParams struct {
 	PrecoBase   pgtype.Numeric
 }
 
-func (q *Queries) UpdateProduto(ctx context.Context, arg UpdateProdutoParams) error {
-	_, err := q.db.Exec(ctx, updateProduto,
+func (q *Queries) UpdateProduto(ctx context.Context, arg UpdateProdutoParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateProduto,
 		arg.IDProduto,
 		arg.IDUsuario,
 		arg.Sku,
 		arg.NomeProduto,
 		arg.PrecoBase,
 	)
-	return err
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }

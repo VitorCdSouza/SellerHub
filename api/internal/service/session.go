@@ -14,10 +14,10 @@ type SessionService struct {
 	Secret []byte
 }
 
-func (sessionService *SessionService) Create(userID int64) (string, error) {
+func (sessionService *SessionService) Create(userID int32) (string, error) {
 	now := time.Now()
 	claims := jwt.RegisteredClaims{
-		Subject:   strconv.FormatInt(userID, 10),
+		Subject:   strconv.FormatInt(int64(userID), 10),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ExpiresAt: jwt.NewNumericDate(now.Add(SessionDuration)),
 	}
@@ -26,4 +26,21 @@ func (sessionService *SessionService) Create(userID int64) (string, error) {
 		return "", fmt.Errorf("assinar token: %w", err)
 	}
 	return token, nil
+}
+
+func (sessionService *SessionService) Validate(token string) (int32, error) {
+	claims := &jwt.RegisteredClaims{}
+	_, err := jwt.ParseWithClaims(token, claims,
+		func(*jwt.Token) (any, error) { return sessionService.Secret, nil },
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}),
+		jwt.WithExpirationRequired(),
+	)
+	if err != nil {
+		return 0, fmt.Errorf("validar token: %w", err)
+	}
+	userID, err := strconv.ParseInt(claims.Subject, 10, 32)
+	if err != nil {
+		return 0, fmt.Errorf("ler usuario do token: %w", err)
+	}
+	return int32(userID), nil
 }

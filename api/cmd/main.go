@@ -30,13 +30,26 @@ func main() {
 	defer pool.Close()
 
 	queries := db.New(pool)
+	sessionService := &service.SessionService{Secret: []byte(secret)}
 	loginController := &controller.LoginController{
 		Service: &service.LoginService{Queries: queries},
-		Session: &service.SessionService{Secret: []byte(secret)},
+		Session: sessionService,
+	}
+	productController := &controller.ProductController{
+		Service: &service.ProductService{Queries: queries},
+	}
+	protected := func(handler http.HandlerFunc) http.HandlerFunc {
+		return controller.RequireSession(sessionService, handler)
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/login", loginController.Login)
+	mux.HandleFunc("POST /api/logout", loginController.Logout)
+	mux.HandleFunc("GET /api/sessao", protected(loginController.CurrentUser))
+	mux.HandleFunc("GET /api/produtos", protected(productController.List))
+	mux.HandleFunc("GET /api/produtos/{id}", protected(productController.Get))
+	mux.HandleFunc("POST /api/produtos", protected(productController.Create))
+	mux.HandleFunc("PUT /api/produtos/{id}", protected(productController.Update))
 
 	log.Print("API em http://localhost:8080")
 	log.Fatal(http.ListenAndServe("localhost:8080", mux))

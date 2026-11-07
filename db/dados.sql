@@ -1,6 +1,4 @@
--- usuario de desenvolvimento: teste@email.com / 123456 (bcrypt, custo 10)
---INSERT INTO CAD_USUARIO (email, senha_hash)
---VALUES ('teste@email.com', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y');
+-- senha de todos os usuarios de desenvolvimento: 123456 (bcrypt, custo 10)
 
 -- 1. Inserir Pessoas
 INSERT INTO CAD_PESSOA (nome, cpf_cnpj, tipo_pessoa) VALUES
@@ -16,9 +14,9 @@ INSERT INTO CAD_MARKETPLACE (nome_marketplace, taxa_comissao) VALUES
 
 -- 3. Inserir Usuários (Relacionados aos IDs das pessoas acima: 1, 2 e 3)
 INSERT INTO CAD_USUARIO (id_pessoa, login_campo, senha_hash, email) VALUES
-(1, 'samuel.admin', 'hash_abc123', 'samuel@sellerhub.com'),
-(2, 'caio.beneton', 'hash_def456', 'caio@sellerhub.com'),
-(3, 'vitor.souza', 'hash_ghi789', 'vitor@sellerhub.com');
+(1, 'samuel.admin', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'samuel@sellerhub.com'),
+(2, 'caio.beneton', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'caio@sellerhub.com'),
+(3, 'vitor.souza', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'vitor@sellerhub.com');
 
 -- 4. Inserir Auditoria de exemplo
 INSERT INTO CAD_AUDITORIA (id_usuario, acao, tabela_afetada) VALUES
