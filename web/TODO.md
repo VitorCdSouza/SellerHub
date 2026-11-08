@@ -9,14 +9,14 @@ Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d
 - **Pode avançar com simulação:** componentes, formulários e estados usando dados fictícios separados dos serviços HTTP. O contrato continua pendente; simulação não comprova persistência nem integração.
 - **Integração bloqueada:** ainda não há API utilizável para concluir o fluxo real.
 
-**Login/proxy, consulta de sessão/saída e estrutura interna já têm implementação local.** O serviço HTTP de produtos está preparado; páginas de catálogo continuam pendentes com Leticia. Nenhuma integração com PostgreSQL foi validada neste incremento. A liberação é limitada aos campos e operações abaixo; tabelas, exemplos e protótipos não equivalem a endpoints disponíveis.
+**Login/proxy, consulta de sessão/saída e estrutura interna já têm implementação local.** O serviço HTTP de produtos está preparado; páginas de catálogo continuam pendentes com Leticia. O ensaio HTTP com Go/PostgreSQL passou em 42 cenários e o produto criado/editado foi conferido por SQL. O usuário confirmou no navegador senha incorreta/correta, entrada em `/inicio`, identificação, recarga, saída e bloqueio de acesso após sair. Acessibilidade, demais cenários e fluxo completo do catálogo continuam pendentes. A liberação é limitada aos campos e operações abaixo; tabelas, exemplos e protótipos não equivalem a endpoints disponíveis.
 
 ## O que o commit de aplicação `88731577` desbloqueou
 
 | Pendência anterior | Entrega em `88731577` | Situação após a revisão |
 | --- | --- | --- |
 | BE-01: API não compilava | Consulta de usuário restaurada, sqlc atualizado e identificador corrigido para `IDUsuario`/`int32`. | Resolvido; `go vet ./...` passou em 08/11. |
-| BE-02: hashes fictícios no seed | Três usuários de desenvolvimento passaram a usar bcrypt; senha documentada no seed. | Código corrigido; aplicação no banco, login real e README continuam pendentes. |
+| BE-02: hashes fictícios no seed | Três usuários de desenvolvimento passaram a usar bcrypt; senha documentada no seed. | Carga e login HTTP real verificados nesta cópia; ambientes dos demais integrantes e ensaio pelo navegador seguem pendentes. |
 | BE-03: só emissão de JWT | Validação HS256/expiração, middleware, `GET /api/sessao` e `POST /api/logout`. | Libera FE-03; logout remove cookie, sem revogar JWT. Homologação e decisão sobre revogação permanecem pendentes. |
 | BE-04: produtos só no SQL | Controller/service/rotas HTTP autenticadas, paginação/total e atualização com contagem de linhas. | Base HTTP entregue; libera FE-04/FE-05/FE-06 para o cadastro básico. |
 | BE-05: validações do produto | Nome/SKU obrigatórios com limites e preço positivo com até duas casas. | Parcial: sem unicidade de SKU, controle de versão ou campos adicionais do protótipo. |
@@ -31,7 +31,7 @@ Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d
 | [`login.go`](../api/internal/service/login.go), [`queries.sql`](../api/internal/db/queries.sql) e sqlc agora usam `GetUserByEmail` e `IDUsuario`. | Bloqueio de compilação resolvido, confirmado por `go vet ./...`. |
 | [`session.go`](../api/internal/service/session.go) valida assinatura HS256/expiração; [`middleware`](../api/internal/controller/session.go) protege sessão e todas as rotas de produto. | Já é possível consultar usuário e tratar `401`. Cookie `sessao` continua HttpOnly/SameSite Strict/8 horas. Não ler o cookie no Angular nem guardar JWT em localStorage. |
 | [`login.go`](../api/internal/controller/login.go) implementa consulta de sessão e logout por remoção de cookie. | FE-03 está liberado para esse comportamento. Um JWT previamente copiado continua válido até expirar; não anunciar revogação no servidor. |
-| [`dados.sql`](../db/dados.sql) contém bcrypt para os três usuários de desenvolvimento e o guia de execução usa uma conta fictícia desse seed. | A documentação do usuário de demonstração foi alinhada; falta conferir a carga efetiva no banco do ensaio. Não recriar banco automaticamente. |
+| [`dados.sql`](../db/dados.sql) contém bcrypt para os três usuários de desenvolvimento e o guia de execução usa uma conta fictícia desse seed. | Carga local conferida e login HTTP de duas contas aprovado; senha incorreta/e-mail inexistente retornaram `401`. Não recriar banco automaticamente. |
 | [`product.go`](../api/internal/controller/product.go) e seu [`service`](../api/internal/service/product.go) expõem lista, detalhe, criação e atualização. SQL usa `LIMIT/OFFSET`, contagem e `:execrows`. | Libera catálogo básico com paginação. Produto inexistente ou de outro usuário retorna `404`; não se perde mais esse caso na atualização. |
 | `CAD_PRODUTO` contém ID, usuário, SKU, nome e preço decimal. | Descrição, categoria, características, fotos, saldo e unicidade de SKU não estão implementados no schema. O protótipo de novo produto pede mais campos que o banco atual. |
 | Existem tabelas de anúncios, marketplaces, auditoria e métricas. | Não há consultas e rotas desses módulos, conectores, OAuth ou chamadas Gemini. Os registros de exemplo não comprovam canais conectados. |
@@ -41,18 +41,18 @@ Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d
 
 | Item | Entrega | O que falta para concluir |
 | --- | --- | --- |
-| FE-01 | Login relativo, proxy, validações existentes preservadas e confirmação de sessão antes de navegar. | Ensaio com API/usuário/banco reais, navegador e acessibilidade. |
+| FE-01 | Login relativo, proxy, validações preservadas, confirmação de sessão e ensaio real básico no navegador confirmado pelo usuário. | Auditoria de acessibilidade e cenários de falha restantes. |
 | FE-02 | Estrutura responsiva, conta por e-mail, menu, saída, foco inicial e tratamento de rota inexistente. | Integração das páginas FE-04/FE-05/FE-06 e conferência visual/AXE. |
 | FE-03 | Guard, consulta de sessão, recuperação de indisponibilidade, interceptor de `401`, logout e proteção contra respostas atrasadas de outra sessão. | Ensaio real de cookie/expiração/saída e conferência de interface. |
 | Serviço de produtos | [`ProdutosService`](src/app/produtos/produtos.service.ts) e [`modelos`](src/app/produtos/produto.model.ts) para as páginas de Leticia. | Usar nas páginas e verificar persistência com Go/PostgreSQL. Não conclui FE-04/FE-05/FE-06. |
 | Ambiente de desenvolvimento sem banco | Simulador HTTP isolado, comandos próprios, aviso permanente e cenários de catálogo/vazio/falhas/atraso/expiração; instruções em [README.md](README.md). | As páginas continuam com Leticia. O simulador apoia o desenvolvimento; não conclui integração ou homologação real. |
-| Verificação da base | Testes com rotas reais para acesso direto, proteção, recuperação de indisponibilidade, saída e expiração por `401`. | Conferência visual/AXE e API/banco reais continuam pendentes. |
+| Verificação da base | Testes Angular, 42 cenários HTTP reais, conferência SQL e roteiro de acesso/recarga/saída no navegador confirmado pelo usuário. | AXE/390 px/teclado, indisponibilidade no navegador, expiração temporal e persistência após reinício. |
 
 O serviço disponibiliza `listar(pagina, limite)`, `consultar(id)`, `cadastrar(dados)` e `atualizar(id, dados)`. O modelo interno usa `nome`, `sku` e `precoBase`; `listar` retorna `itens`/`total`. O serviço adapta o JSON da API (`name`, `basePrice`, `items`), sem cache de produtos, conversão para centavos ou fallback simulado. As páginas devem tratar erros e descartar seus dados ao serem destruídas/encerrar a sessão. Nenhum serviço foi inventado para anúncios/pedidos enquanto faltam esses contratos.
 
 ## Contrato disponível para o front-end
 
-Contrato extraído das rotas, controllers e services atuais; ainda sem ensaio HTTP com PostgreSQL nesta revisão. As chamadas do Angular devem usar a própria origem com proxy `/api` após FE-01. O navegador gerencia o cookie; não há token JWT no JSON de login.
+Contrato extraído das rotas, controllers e services atuais, posteriormente verificado por HTTP direto com PostgreSQL local. As chamadas do Angular devem usar a própria origem com proxy `/api` após FE-01. O navegador gerencia o cookie; não há token JWT no JSON de login. Verificações de navegador/proxy são separadas do ensaio HTTP direto.
 
 | Operação | Requisição | Sucesso |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ Contrato extraído das rotas, controllers e services atuais; ainda sem ensaio HT
 
 | Tela ou fluxo | O que pode ser feito agora no front-end | O que impede concluir com dados reais | To-dos |
 | --- | --- | --- | --- |
-| Login (RF01) | **Implementado no front:** URL/proxy e confirmação da sessão; verificar com a API atual. | Banco/ambiente da API não preparado nesta cópia; falta ensaio real e visual. | FE-01, BE-02, BE-15 |
+| Login (RF01) | **Implementado e verificado no recorte básico:** API/seed e roteiro no navegador confirmados. | Falta auditoria de acessibilidade e cenários de falha restantes. | FE-01, BE-02, BE-15 |
 | Estrutura interna e navegação | **Implementada em parte:** `/inicio`, menu, usuário por e-mail, guard, expiração/saída e página não encontrada. | Páginas do catálogo e verificação visual pendentes. Nome/loja não vêm da sessão; revogação do JWT segue em BE-03. | FE-02, FE-03, BE-03 |
 | Produtos — listagem (RF03) | **Liberado para integrar:** lista de nome, SKU e preço, paginação e total, estados vazio/erro/carregamento. | Implementação Angular e ensaio real pendentes. Busca, saldo e canais não vêm desse endpoint. | FE-01, FE-03, FE-04, BE-15 |
 | Novo produto (RF02) | **Liberado no recorte básico:** cadastrar nome, SKU e preço pela API. | Não inclui todos os campos do protótipo; confirmar recorte em DEC-02. Não há rejeição de SKU duplicado/controle de versão. | FE-05, BE-05, BE-15, DEC-02 |
@@ -111,7 +111,7 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-01 — Alinhar e integrar o login.**
 
-**Responsável:** Caio. **Situação:** código implementado, aguardando ensaio real/visual. **Dependências:** BE-02/BE-15 para o ensaio; FE-03 para entrada na área interna. **Referência:** RF01.
+**Responsável:** Caio. **Situação:** implementado; HTTP real e roteiro básico no navegador confirmados, aguardando acessibilidade e cenários de falha restantes. **Dependências:** BE-02/BE-15 para o ensaio; FE-03 para entrada na área interna. **Referência:** RF01.
 
 **Requisitos de desenvolvimento**
 
@@ -151,7 +151,7 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-03 — Integrar consulta de sessão, expiração e logout.**
 
-**Responsável:** Caio. **Situação:** código implementado/testado com HTTP simulado; ensaio real/visual pendente. **Dependências:** FE-01; BE-03/BE-15 para homologação. **Referência:** RF01/RNF02.
+**Responsável:** Caio. **Situação:** testes Angular/HTTP real aprovados; usuário confirmou sessão após F5, saída e bloqueio de retorno no navegador. Expiração temporal, acessibilidade e recuperação de indisponibilidade no navegador pendentes. **Dependências:** FE-01; BE-03/BE-15 para homologação. **Referência:** RF01/RNF02.
 
 **Requisitos de desenvolvimento**
 
@@ -395,7 +395,7 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-15 — Executar e registrar o aceite dos fluxos reais.**
 
-**Responsáveis:** Caio e Leticia. **Situação:** planejar agora; execução depende das implementações e do ambiente. **Dependências:** BE-02/BE-03/BE-15; FE-01 a FE-06 no primeiro marco; demais FE/BE para os marcos seguintes.
+**Responsáveis:** Caio e Leticia. **Situação:** em execução; base de acesso conferida no navegador pelo usuário e API real testada, catálogo e demais marcos pendentes. **Dependências:** BE-02/BE-03/BE-15; FE-01 a FE-06 no primeiro marco; demais FE/BE para os marcos seguintes.
 
 **Requisitos de desenvolvimento**
 
@@ -419,7 +419,7 @@ Referência: código de front em `f4013d63`, com API ainda na base `88731577`. O
 
 | Ordem sugerida | O que Caio pode adiantar sem aguardar as páginas de Leticia | O que ainda condiciona a conclusão |
 | --- | --- | --- |
-| 1 | FE-01/FE-03: conferir login, consulta de sessão, expiração, logout e indisponibilidade com a API; preparar/repetir o roteiro dessas operações. | BE-02/BE-03/BE-15 e ambiente local com `.env`/banco corretos. Isso não depende da interface do catálogo. Nesta verificação o `.env` da raiz continua ausente. |
+| 1 | FE-01/FE-03: completar acessibilidade, indisponibilidade no navegador, expiração temporal e persistência após reinício. Login, recarga, saída e bloqueio de retorno foram confirmados pelo usuário no Angular real; 42 cenários HTTP aprovados. | BE-02/BE-03/BE-15 para os cenários restantes. Isso não depende da interface do catálogo. |
 | 2 | FE-02: conferir layout, foco, teclado, página não encontrada e tratamento de indisponibilidade em desktop e 390 px; executar AXE. | Ferramenta/ambiente de navegador utilizáveis. Navegação do catálogo só pode ser conferida depois de FE-04/FE-05/FE-06. |
 | 3 | FE-13: preparar a seção de canais e seus estados e combinar o contrato de conexão com o back-end. Disponibilizar o contrato de ID/e-mail já existente para a seção de conta entregue por Leticia. | BE-08 para conectar/reconectar de verdade; BE-13 para editar conta/preferências. Não depende de a lista de produtos estar pronta. |
 | 4 | FE-07: alinhar contrato e preparar o adaptador HTTP de fotos/tratamento. O componente de seleção/prévia e sua incorporação ao cadastro ficam com Leticia. | Limites e persistência de BE-05/BE-06/DEC-02; os componentes dependem das entregas de Leticia, sem bloqueá-la de começar a prévia isoladamente. |
@@ -481,8 +481,8 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 **Próxima liberação de contratos para o front:** priorizar BE-06/BE-07/BE-08/BE-09 após homologar a base. Em cada item, informar método/caminho, corpo, tipos e obrigatoriedade dos campos, resposta de sucesso, erros e estados; isso permite preparar os adaptadores antes das páginas. Para fotos, incluir formato de envio, limites e identificadores/URLs do original e da versão tratada. Para anúncios, separar revisão aprovada, estado remoto e operação consultável. Para canais, definir início/retorno da autorização, consulta de conexão e capacidades, mantendo tokens no Go. Para IA, definir entrada, sugestão editável, limites e erros/quota. Sem esse acordo, os respectivos serviços HTTP seguem bloqueados; não há endpoints inventados no simulador.
 
 - [x] **BE-01 — Restaurar compilação do login (entregue em `88731577`):** consulta por e-mail restaurada no SQL/sqlc, identificador adequado e `go vet ./...` aprovado em 08/11. Login normaliza o e-mail na entrada; a garantia de normalização dos registros existentes ainda deve ser conferida em BE-15. Não é mais bloqueio de FE-01.
-- [ ] **BE-02 — Carga de desenvolvimento (parcial):** bcrypt e campos de pessoa/usuário já estão no seed; a conta fictícia do guia foi alinhada. Restam confirmar a carga no banco usado pelo grupo e verificar login válido/inválido/e-mail inexistente. O seed contém `samuel@sellerhub.com`, `caio@sellerhub.com` e `vitor@sellerhub.com`, com senha de demonstração `123456`. Não recriar ou sobrescrever um banco existente sem avaliar seus dados. Não bloqueia implementar FE-01; é requisito do ensaio real.
-- [ ] **BE-03 — Sessão (parcial; contrato já liberado para FE-03):** assinatura/expiração, middleware de produtos, consulta de sessão e logout estão implementados. Resta homologar os fluxos e definir com o grupo se a remoção do cookie atende ao recorte local ou se é necessária revogação no servidor; hoje, um JWT previamente copiado continua válido até expirar. Validar também a proteção das operações de escrita no ambiente de uso. Não exigir troca de mecanismo de autenticação nesta fila nem bloquear a integração do comportamento atual por essa decisão.
+- [ ] **BE-02 — Carga de desenvolvimento (parcial):** na cópia local de Caio, banco atual preparado separadamente da PoC; três usuários confirmados por SQL e login HTTP de Caio/Samuel aprovado. Senha incorreta e e-mail inexistente retornaram `401`; e-mail com espaços/maiúsculas foi normalizado. O usuário também confirmou login incorreto/correto no navegador; resta confirmar os ambientes dos demais integrantes. O seed contém `samuel@sellerhub.com`, `caio@sellerhub.com` e `vitor@sellerhub.com`, com senha de demonstração `123456`. Não recriar ou sobrescrever um banco existente sem avaliar seus dados.
+- [ ] **BE-03 — Sessão (parcial; contrato já liberado para FE-03):** assinatura/expiração, middleware de produtos, consulta de sessão e logout estão implementados. HTTP real confirmou cookie HttpOnly/SameSite Strict/Max-Age 28800, `401` sem cookie/adulterado, proteção de escrita e remoção do cookie no logout. Usuário confirmou recarga, saída e bloqueio de retorno no navegador. JWT copiado continuou aceito após logout; definir se é necessária revogação. Indisponibilidade no navegador e expiração temporal seguem pendentes. Não exigir troca de mecanismo nem bloquear o comportamento atual por essa decisão.
 - [x] **BE-04 — Catálogo HTTP básico autenticado (entregue em `88731577`):** GET paginado com total, GET por ID, POST e PUT; usuário obtido do JWT; DTO de preço/IDs identificado; `:execrows` permite responder `404` quando não há linha acessível. Desbloqueia FE-04/FE-05/FE-06. A validação com PostgreSQL segue em BE-15 e o eventual catálogo compartilhado segue em DEC-02. Busca textual e novos campos não fazem parte da API entregue.
 - [ ] **BE-05 — Campos e validações do produto (parcial):** nome/SKU obrigatórios com trim/limites e preço positivo com até duas casas já estão implementados. Restam resolver DEC-02, definir unicidade de SKU no domínio aprovado, controle de edição concorrente e respectivas respostas de conflito. Acrescentar persistência dos campos adicionais aprovados e combinar evolução do schema. Libera somente o cadastro básico; cadastro completo/FE-07 continuam dependentes desses itens.
 - [ ] **BE-06 — Expor fotos e tratamento:** upload, consulta e vínculo ao produto/anúncio, validação de arquivo e retorno de prévia/versão tratada. Definir limites e falhas para o front-end, preservando foto real e aprovação da prévia. Desbloqueia FE-07 e imagens em FE-09.
@@ -494,7 +494,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 - [ ] **BE-12 — Expor indicadores:** definir métricas disponíveis, período, filtros, agregações, origem e atualização; distinguir indisponibilidade de valor zero. Não apresentar o histórico de exemplo como dado obtido dos canais. Desbloqueia FE-12.
 - [ ] **BE-13 — Expor conta e preferências:** a sessão já retorna ID/e-mail, mas faltam perfil completo, edição dos campos aprovados, alteração de senha e preferências suportadas. O campo loja do protótipo não está no schema atual. Não expor hashes/credenciais na resposta. Desbloqueia as partes correspondentes de FE-13.
 - [ ] **BE-14 — Definir recuperação de senha:** emissão/expiração/uso único do mecanismo de recuperação, redefinição e envio de instruções, com erros seguros e verificáveis. Desbloqueia FE-14.
-- [ ] **BE-15 — Contratos e homologação por incremento (parcial):** o contrato atual de sessão/catálogo foi identificado e registrado neste documento; faltam ensaio HTTP com PostgreSQL e documentação do time reconciliada com o código. Verificar login/normalização, cookie e expiração, remoção do cookie no logout, persistência de cadastro/edição, isolamento por usuário, `404`, paginação e limites de entrada. Registrar evidências e incluir testes de comportamento: não há arquivos de teste Go versionados. Confirmar nomes/campos do contrato antes de novas mudanças incompatíveis. As rotas existentes liberam a implementação do front; não declarar integração concluída só com `go vet`.
+- [ ] **BE-15 — Contratos e homologação por incremento (parcial):** 42 cenários HTTP diretos aprovados com PostgreSQL, cobrindo login/normalização, cookie, consulta/saída, CRUD disponível, isolamento, `404`, paginação e entradas inválidas. Cadastro/edição conferidos por HTTP/SQL e roteiro básico Angular confirmado pelo usuário. Restam cenários de falha no navegador, expiração temporal, persistência após reinício e documentação/testes reproduzíveis do time; não há testes Go versionados. Confirmar nomes/campos antes de mudanças incompatíveis. A verificação atual não conclui as páginas de catálogo nem FE-15 integralmente.
 
 ## Decisões que precisam de alinhamento
 
@@ -511,6 +511,12 @@ Começar **FE-01 → FE-02/FE-03 → FE-04 → FE-05/FE-06**, integrando as rota
 Marcar um item como concluído somente após registrar o que foi entregue e sua verificação. Uma tela visualmente pronta pode fechar a parte de interface, mas deve manter a integração pendente com o respectivo ID de back-end. Em cada retomada, conferir arquivos/rotas e atualizar este documento, sem presumir que esta fotografia permanece atual.
 
 ## Verificações
+
+- **Confirmação manual do usuário em 08/11/2026:** com Angular iniciado por `npm.cmd start` e API Go/PostgreSQL reais, todo o roteiro proposto funcionou: senha incorreta rejeitada, senha correta aceita, abertura de `/inicio` com e-mail, F5 preservando o acesso, saída para login e acesso direto a `/inicio` após saída novamente bloqueado. Evidência relatada pelo usuário; sem inspeção automatizada de tela, screenshot ou AXE. Não abrange catálogo, teclado/390 px, indisponibilidade, expiração temporal ou reinício. FE-01/FE-03 e FE-15 mantêm os critérios restantes abertos.
+
+- Ensaio real após preparo local: **42 cenários HTTP diretos aprovados** em `http://localhost:8080`, com Go e PostgreSQL. Verificados login válido/normalizado, senha incorreta/e-mail inexistente, entrada inválida, cookie ausente/adulterado, atributos do cookie, consulta de sessão, paginação/total/vazio, limites de nome/SKU/preço, POST `201`, PUT `200`, nova leitura, `404` e isolamento entre Caio/Samuel. Logout removeu cookie; consulta sem cookie retornou `401` e reuso de JWT copiado retornou `200`, conforme limite conhecido.
+- Produto fictício mantido no banco local: ID **5**, SKU `QA-FE-1794149509740`, nome `QA integracao front - editado`, preço **42,01**. Leitura SQL independente confirmou o registro após POST/PUT. Não há exclusão HTTP; nenhum registro anterior foi editado/removido. API iniciada pelo usuário permanece sob seu controle. Angular ainda não estava acessível na porta 4200 ao concluir essa etapa.
+- Este ensaio não cobriu navegador/proxy Angular, expiração pelo relógio, reinício da API/PostgreSQL, indisponibilidade real ou marketplaces. Não foram alterados Go/schema/seed nem marcadas tarefas FE como integralmente concluídas. Próxima etapa: `npm.cmd start` em `web/` e ensaio de login/recarga/saída no navegador.
 
 - Apoio após `0391ceb0`: **31 testes Angular em 7 arquivos** e **5 testes do simulador aprovados**; build de produção aprovado (260,61 kB iniciais). Novos testes exercitam as rotas reais e a interface da estrutura com HTTP controlado, além de paginação, isolamento, criação/edição, validações e falhas do simulador. Não são testes do Go/PostgreSQL.
 - `api:simulada` e `start:simulado` iniciados pelos comandos documentados; Angular respondeu `200`. Pelo proxy da porta 4200, conferidos login `200`, identificação da simulação, consulta da conta, página 2 com 5/25 registros, criação com ID e saída confirmada. O build de desenvolvimento simulado compilou. Conferência feita por HTTP, sem navegador. Servidores encerrados depois, com portas 4200/8081 sem escuta; `git diff --check` aprovado e arquivos privados ignorados/fora do índice.

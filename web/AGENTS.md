@@ -13,7 +13,7 @@ Prioridade: FE-01 (alinhar URL/proxy), FE-02/FE-03 (estrutura, sessão e saída)
 
 ### Telas que começaremos e prioridade para o back-end
 
-Frente inicial definida em **08/11/2026**. FE-01/FE-02/FE-03 já têm implementação local e testes HTTP simulados; a estrutura usa `/inicio` até o catálogo ser entregue. O serviço/modelo de produtos está pronto para uso nas páginas de Leticia. Integração real, verificação visual e AXE permanecem pendentes; consultar os estados completos em TODO.md antes de marcar qualquer tarefa como concluída.
+Frente inicial definida em **08/11/2026**. FE-01/FE-02/FE-03 têm implementação e testes Angular; a API passou em 42 cenários HTTP reais com PostgreSQL. O usuário confirmou no navegador login incorreto/correto, identificação, F5, saída e bloqueio de retorno. A estrutura usa `/inicio` até o catálogo ser entregue e seu serviço/modelo está pronto para as páginas de Leticia. Acessibilidade/AXE, demais cenários e catálogo completo permanecem pendentes; consultar TODO.md antes de concluir qualquer tarefa.
 
 | Ordem | Página ou fluxo do front-end | Recorte inicial | Prioridade de apoio do back-end |
 | --- | --- | --- | --- |
