@@ -3,7 +3,7 @@
 
 Antes de planejar ou implementar telas, leia [../AGENTS.md](../AGENTS.md) e integralmente [../TODO.md](../TODO.md). Use TODO.md como fila compartilhada, atualizada em 08/11/2026 para `88731577`: FE-01 alinha URL/proxy; FE-02/FE-03 e FE-04/FE-05/FE-06 já podem integrar sessão/saída e catálogo básico. Campos adicionais e demais módulos dependem dos itens BE/DEC; o ensaio real permanece em BE-15/FE-15. Confira o código atual, mantenha simulações explícitas e registre ajustes da API para o time de back-end. Atualize essa fila ao concluir entregas, evitando listas divergentes entre agentes.
 
-Antes de executar uma tarefa FE, consulte seus requisitos, critérios de aceite e responsável proposto em `../TODO.md`. Leticia assume as páginas de catálogo básico e as consultas de anúncios/pedidos (FE-04/FE-05/FE-06/FE-08/FE-10). Caio prepara os serviços HTTP/modelos compartilhados e conduz as demais funcionalidades. Revisão e FE-15 são compartilhadas; detalhamento e coordenação permanecem nessa fila única.
+Antes de executar uma tarefa FE, consulte requisitos, critérios e responsáveis em `../TODO.md`. Leticia assume FE-04/FE-05/FE-06/FE-07/FE-08/FE-10/FE-11/FE-12/FE-14, editor manual/prévia em FE-09 e conta/preferências em FE-13. Caio mantém infraestrutura/autenticação, contratos/serviços/modelos, geração de IA/aprovação/publicação e conexão de canais. Respeitar as fronteiras dos componentes; não implementar as páginas atribuídas à outra pessoa. Revisão e FE-15 são compartilhadas, com detalhamento na fila única.
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 

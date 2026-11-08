@@ -3,6 +3,8 @@
 
 Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). Ele registra a avaliação atualizada em 08/11/2026 do commit `88731577`, telas que podem avançar, bloqueios, decisões pendentes e tarefas FE/BE. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
 
+O README da raiz deve conter apresentação do projeto e instruções gerais de instalação/uso. Não acrescentar nele status de tarefas, divisão de responsáveis, bloqueios locais, resultados de sessões, contagem de testes ou relatos de ferramentas. Manter andamento em TODO.md, detalhes técnicos do front em [README.md](README.md) e orientações de agentes neste arquivo; preservar o contexto privado somente nos arquivos locais destinados a ele.
+
 Prioridade: FE-01 (alinhar URL/proxy), FE-02/FE-03 (estrutura, sessão e saída) e FE-04/FE-05/FE-06 (integrar catálogo básico). As rotas de sessão e produtos já existem; não aguardar novos endpoints para esse recorte. Campos adicionais e demais módulos continuam condicionados aos itens BE/DEC. Liberação técnica não comprova integração com banco/navegador: fechar BE-15/FE-15 antes de declarar o fluxo concluído. Simulação deve ser explícita e separada dos serviços reais. Em tarefas da frente de interface, registre ajustes de API como itens BE para o time responsável.
 
 ### Telas que começaremos e prioridade para o back-end
@@ -25,8 +27,8 @@ Fotos/características, anúncios, canais, IA, vendas, estoque, indicadores, adm
 
 Cada tarefa FE tem requisitos, dependências e critérios de aceite em [TODO.md](TODO.md), junto à proposta de distribuição para duas pessoas. Consultar o item completo antes de implementar; entregar interface simulada não conclui sua integração.
 
-- **Caio:** infraestrutura e serviços HTTP/modelos compartilhados, acesso/navegação/sessão, complementos/fotos, editor/IA/publicação, estoque/indicadores, administração/canais e recuperação de senha.
-- **Leticia:** páginas de listagem, cadastro, detalhe e edição básica de produtos (FE-04/FE-05/FE-06), listagem de anúncios (FE-08) e consulta/detalhe de pedidos (FE-10), consumindo os serviços preparados por Caio. Inclui validações locais, paginação, estados de tela e testes dessas páginas.
+- **Caio:** infraestrutura, acesso/sessão, contratos e serviços HTTP/modelos compartilhados, coordenação da geração de IA/aprovação/publicação e conexão/reconexão de canais. Prepara os adaptadores usados pelos componentes da dupla, sem assumir as páginas atribuídas a Leticia.
+- **Leticia:** catálogo e fotos (FE-04/FE-05/FE-06/FE-07), listagens de anúncios/pedidos (FE-08/FE-10), estoque (FE-11), indicadores (FE-12) e recuperação/redefinição de senha (FE-14). Também entrega editor manual/prévia de anúncio em FE-09 e seções de conta/preferências em FE-13. Inclui componentes, formulários, validações locais, estados e testes, consumindo os serviços compartilhados.
 - **Ambos:** revisão e FE-15, com aceite por marcos de catálogo, publicação e operação. Caio prepara a base e os serviços enquanto Leticia constrói as páginas do catálogo; os detalhes de coordenação e a sequência estão somente na fila compartilhada.
 
 Essa é uma divisão proposta de trabalho futuro, ajustável pela dupla; não atribui autoria anterior nem marca tarefas como iniciadas/concluídas. Ajustes do Go/schema continuam destinados ao time de back-end nos itens BE correspondentes.

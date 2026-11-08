@@ -1,12 +1,8 @@
 # SellerHub
 
-A fila do front-end está em [web/TODO.md](web/TODO.md), com requisitos, critérios de aceite, dependências e divisão entre Caio e Leticia. O incremento local de 08/11/2026 implementa login/proxy, estrutura interna, sessão/logout e serviço de produtos. Páginas do catálogo e demais módulos continuam pendentes. A verificação com Go/PostgreSQL, navegador e AXE ainda precisa ser concluída.
+Hub de integração entre marketplaces desenvolvido como TCC, com foco na centralização de produtos, anúncios, pedidos e estoque e no apoio de IA à preparação de conteúdo.
 
-As páginas da primeira frente e o apoio prioritário do back-end estão registrados nas [instruções compartilhadas dos agentes](web/AGENTS.md): login, estrutura interna/sessão, listagem, cadastro e detalhe/edição de produtos.
-
-Hub de integração entre marketplaces desenvolvido como TCC. O acesso segue **Angular → API REST em Go → PostgreSQL**: a API verifica as credenciais, emite JWT em cookie e permite consultar a sessão. O Angular confirma o acesso e abre `/inicio`, destino provisório enquanto as páginas de produtos são desenvolvidas.
-
-A API protege as rotas de sessão e produtos com validação do cookie; o Angular protege a navegação interna com guard. O menu identifica as áreas ainda indisponíveis. Logout remove o cookie do navegador; o JWT emitido continua válido até expirar.
+A aplicação utiliza **Angular**, **API REST em Go** e **PostgreSQL**. O acesso exige autenticação; a API verifica as credenciais e mantém a sessão em cookie HttpOnly.
 
 ## Organização
 
@@ -189,7 +185,7 @@ web/src/app/
 ├── autenticacao/          guard, interceptor de 401 e recuperação de indisponibilidade
 ├── estrutura/             área interna, início e página não encontrada
 ├── compartilhado/         foco inicial das páginas
-├── produtos/              modelos e serviço HTTP para as futuras páginas do catálogo
+├── produtos/              modelos e serviço HTTP de produtos
 ├── services/
 │   └── auth.service.ts    login, consulta de sessão e saída
 ├── app.config.ts          HTTP, interceptor e rotas
@@ -199,10 +195,6 @@ web/src/app/
 O componente de login usa signals e `OnPush`. Durante a requisição, impede novos envios; ao concluir, limpa a senha. Labels, avisos por campo e regiões de mensagem dão suporte à navegação por teclado e a leitores de tela. A senha não é guardada no navegador, e o token da sessão fica só no cookie `HttpOnly`, fora do alcance do código Angular.
 
 As chamadas usam caminhos relativos (`/api/...`). O `ng serve` repassa esses caminhos para a API conforme `proxy.conf.json`, configurado em `angular.json`.
-
-O estado de autenticação fica em memória. `401` de uma chamada protegida encerra o estado local e retorna ao login; `401` do próprio login continua sendo erro de credenciais. Falha ao consultar sessão não é tratada como senha incorreta. Na saída com falha, a interface informa o problema e mantém a conta; respostas atrasadas de outra sessão não restauram o usuário anterior.
-
-Para as páginas de produtos, injete `ProdutosService`: `listar(pagina, limite)` retorna `itens`/`total`; `consultar(id)` retorna `Produto`; `cadastrar(dados)` retorna o ID; `atualizar(id, dados)` retorna a confirmação. O modelo interno usa `nome`, `sku` e `precoBase`, adaptados para os nomes JSON da API. Preços seguem em valor decimal, sem conversão para centavos. O serviço não armazena catálogo nem utiliza dados simulados como fallback.
 
 ### Executar
 
@@ -214,7 +206,7 @@ npm start
 
 A tela abre em [http://localhost:4200](http://localhost:4200). Para o login funcionar, a API e o banco precisam estar rodando.
 
-Reinicie `npm start` ao alterar o proxy. Na implantação, `/api` precisa ser encaminhado à API na mesma origem pelo servidor escolhido; o proxy de desenvolvimento não é incluído no build de produção. O destino da implantação ainda não foi definido.
+Reinicie `npm start` ao alterar o proxy. Na implantação, `/api` precisa ser encaminhado à API na mesma origem; o proxy de desenvolvimento não é incluído no build de produção.
 
 ### Verificar
 
@@ -224,7 +216,7 @@ npm test -- --watch=false
 npm run build
 ```
 
-Os 26 testes atuais usam HTTP simulado para conferir login, sessão/guard, expiração, logout com falha, respostas atrasadas e contratos de produtos. O build fica em `web/dist/SellerHub`. A conferência visual/AXE e o ensaio com API/PostgreSQL permanecem pendentes; a ferramenta de controle do Chrome interrompeu a tentativa por não conseguir confirmar a URL da janela.
+Os testes de front-end utilizam HTTP simulado. O build fica em `web/dist/SellerHub`. Orientações técnicas estão em [web/README.md](web/README.md).
 
 ## Documentação (LaTeX)
 
