@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { LoginComponent } from './login.component';
 
 describe('Login integrado ao AuthService', () => {
@@ -11,11 +12,12 @@ describe('Login integrado ao AuthService', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     }).compileComponents();
     fixture = TestBed.createComponent(LoginComponent);
     http = TestBed.inject(HttpTestingController);
     tela = fixture.nativeElement as HTMLElement;
+    vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     fixture.detectChanges();
   });
 
@@ -34,25 +36,28 @@ describe('Login integrado ao AuthService', () => {
 
   it('não envia formulário vazio', () => {
     enviar();
-    http.expectNone('http://localhost:8080/login');
+    http.expectNone('/api/login');
     expect(tela.textContent).toContain('Informe um e-mail válido.');
     expect(tela.textContent).toContain('Informe sua senha.');
   });
 
-  it('envia o contrato esperado, impede repetição e apresenta sucesso', () => {
+  it('impede repetição e só navega depois de confirmar a sessão', () => {
     preencher('email', 'teste@email.com');
     preencher('senha', '123456');
     enviar();
     expect(tela.querySelector('button')!.disabled).toBe(true);
     enviar();
-    const requisicao = http.expectOne('http://localhost:8080/login');
+    const requisicao = http.expectOne('/api/login');
     expect(requisicao.request.method).toBe('POST');
     expect(requisicao.request.body).toEqual({ email: 'teste@email.com', password: '123456' });
     requisicao.flush({ success: true, message: 'Login realizado com sucesso' });
     fixture.detectChanges();
-    expect(tela.querySelector('[role="status"]')!.textContent).toContain(
-      'Login realizado com sucesso',
-    );
+    expect(TestBed.inject(Router).navigateByUrl).not.toHaveBeenCalled();
+    http.expectOne('/api/sessao').flush({ id: 2, email: 'teste@email.com' });
+    fixture.detectChanges();
+    expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/inicio', {
+      replaceUrl: true,
+    });
     expect(tela.querySelector<HTMLInputElement>('#senha')!.value).toBe('');
     expect(tela.querySelector('button')!.disabled).toBe(false);
   });
@@ -62,7 +67,7 @@ describe('Login integrado ao AuthService', () => {
     preencher('senha', 'errada');
     enviar();
     http
-      .expectOne('http://localhost:8080/login')
+      .expectOne('/api/login')
       .flush(
         { success: false, message: 'Credenciais inválidas' },
         { status: 401, statusText: 'Unauthorized' },
@@ -76,10 +81,29 @@ describe('Login integrado ao AuthService', () => {
     preencher('email', 'teste@email.com');
     preencher('senha', '123456');
     enviar();
-    http.expectOne('http://localhost:8080/login').error(new ProgressEvent('error'));
+    http.expectOne('/api/login').error(new ProgressEvent('error'));
     fixture.detectChanges();
     expect(tela.querySelector('[role="alert"]')!.textContent).toContain(
       'Verifique se a API está disponível',
     );
+  });
+
+  it('não entra na área interna se a confirmação da sessão falhar com 401', () => {
+    preencher('email', 'teste@email.com');
+    preencher('senha', '123456');
+    enviar();
+    http.expectOne('/api/login').flush({ success: true, message: 'Login realizado' });
+    http.expectOne('/api/sessao').flush({}, { status: 401, statusText: 'Unauthorized' });
+    fixture.detectChanges();
+    expect(TestBed.inject(Router).navigateByUrl).not.toHaveBeenCalled();
+    expect(tela.querySelector('[role="alert"]')!.textContent).toContain('confirmar sua sessão');
+  });
+
+  it('valida o limite em bytes de senha com caracteres acentuados', () => {
+    preencher('email', 'teste@email.com');
+    preencher('senha', 'á'.repeat(37));
+    enviar();
+    http.expectNone('/api/login');
+    expect(tela.querySelector('[role="alert"]')!.textContent).toContain('72 bytes');
   });
 });

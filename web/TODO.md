@@ -1,6 +1,6 @@
 # Front-end — telas, dependências e to-dos
 
-Atualização em **08/11/2026**, após `22f17dc6` (documentação). A base de aplicação permanece em `88731577` (06/11/2026, middleware de sessão e produtos paginados), comparada inicialmente ao seu pai `5449028c`. Substitui a fotografia de 05/11/2026 (`dde6975e`). Este documento concentra a fila compartilhada, o detalhamento das 15 tarefas FE, os pedidos ao back-end e a proposta de distribuição entre Caio e Leticia. A distribuição organiza trabalho futuro; não registra autoria, execução ou aceite já realizados.
+Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d586` (planejamento). A base de back-end permanece em `88731577` (06/11/2026, middleware de sessão e produtos paginados). Este documento concentra a fila compartilhada, o detalhamento das 15 tarefas FE, os pedidos ao back-end, a distribuição entre Caio e Leticia e as verificações realizadas. Os checklists distinguem código implementado de fluxo integralmente validado.
 
 ## Como interpretar o estado
 
@@ -9,7 +9,7 @@ Atualização em **08/11/2026**, após `22f17dc6` (documentação). A base de ap
 - **Pode avançar com simulação:** componentes, formulários e estados usando dados fictícios separados dos serviços HTTP. O contrato continua pendente; simulação não comprova persistência nem integração.
 - **Integração bloqueada:** ainda não há API utilizável para concluir o fluxo real.
 
-**Agora estão liberados para implementar e integrar login, consulta de sessão/saída e catálogo básico de produtos (listar, detalhar, cadastrar e editar).** O front permanece só com a tela de login e a URL antiga; nenhuma integração de negócio foi concluída. A liberação é técnica, limitada aos campos e às operações abaixo. Tabelas, dados de exemplo e imagens de protótipos não equivalem a endpoints disponíveis.
+**Login/proxy, consulta de sessão/saída e estrutura interna já têm implementação local.** O serviço HTTP de produtos está preparado; páginas de catálogo continuam pendentes com Leticia. Nenhuma integração com PostgreSQL foi validada neste incremento. A liberação é limitada aos campos e operações abaixo; tabelas, exemplos e protótipos não equivalem a endpoints disponíveis.
 
 ## O que o commit de aplicação `88731577` desbloqueou
 
@@ -26,8 +26,8 @@ Atualização em **08/11/2026**, após `22f17dc6` (documentação). A base de ap
 
 | Evidência | Consequência para o front-end |
 | --- | --- |
-| [`app.routes.ts`](src/app/app.routes.ts) só carrega o login; [`app.html`](src/app/app.html) contém apenas o outlet. | Não há navegação interna nem telas de negócio implementadas. |
-| [`auth.service.ts`](src/app/services/auth.service.ts) e os testes ainda chamam `http://localhost:8080/login`; [`main.go`](../api/cmd/main.go) registra `POST /api/login` e as novas rotas de sessão/produtos. | Caminho e origem continuam incompatíveis. Não há CORS na API nem `proxy.conf.json` ou `proxyConfig` no Angular, apesar do README. FE-01 é o primeiro ajuste de front para integrar. |
+| [`app.routes.ts`](src/app/app.routes.ts) contém login, tratamento de indisponibilidade, página inicial protegida e página não encontrada, com carregamento sob demanda. | A estrutura está implementada. `/inicio` é o destino provisório até as páginas de catálogo serem entregues; o menu identifica os módulos pendentes. |
+| [`auth.service.ts`](src/app/services/auth.service.ts) usa `/api/login`, `/api/sessao` e `/api/logout`; [`proxy.conf.json`](proxy.conf.json) encaminha `/api/**` para a API local. | A incompatibilidade de URL/origem foi corrigida no código Angular. O proxy foi verificado com resposta de um serviço temporário simulado; não com Go/PostgreSQL. |
 | [`login.go`](../api/internal/service/login.go), [`queries.sql`](../api/internal/db/queries.sql) e sqlc agora usam `GetUserByEmail` e `IDUsuario`. | Bloqueio de compilação resolvido, confirmado por `go vet ./...`. |
 | [`session.go`](../api/internal/service/session.go) valida assinatura HS256/expiração; [`middleware`](../api/internal/controller/session.go) protege sessão e todas as rotas de produto. | Já é possível consultar usuário e tratar `401`. Cookie `sessao` continua HttpOnly/SameSite Strict/8 horas. Não ler o cookie no Angular nem guardar JWT em localStorage. |
 | [`login.go`](../api/internal/controller/login.go) implementa consulta de sessão e logout por remoção de cookie. | FE-03 está liberado para esse comportamento. Um JWT previamente copiado continua válido até expirar; não anunciar revogação no servidor. |
@@ -36,6 +36,17 @@ Atualização em **08/11/2026**, após `22f17dc6` (documentação). A base de ap
 | `CAD_PRODUTO` contém ID, usuário, SKU, nome e preço decimal. | Descrição, categoria, características, fotos, saldo e unicidade de SKU não estão implementados no schema. O protótipo de novo produto pede mais campos que o banco atual. |
 | Existem tabelas de anúncios, marketplaces, auditoria e métricas. | Não há consultas e rotas desses módulos, conectores, OAuth ou chamadas Gemini. Os registros de exemplo não comprovam canais conectados. |
 | Não há saldo de produto, API de estoque nem consulta externa de pedidos. | Estoque e Vendas ainda não têm fonte real de dados. A ausência de tabela de pedidos, isoladamente, não obriga sua persistência; o fluxo precisa ser acordado. |
+
+## Implementação local disponível para a dupla
+
+| Item | Entrega | O que falta para concluir |
+| --- | --- | --- |
+| FE-01 | Login relativo, proxy, validações existentes preservadas e confirmação de sessão antes de navegar. | Ensaio com API/usuário/banco reais, navegador e acessibilidade. |
+| FE-02 | Estrutura responsiva, conta por e-mail, menu, saída, foco inicial e tratamento de rota inexistente. | Integração das páginas FE-04/FE-05/FE-06 e conferência visual/AXE. |
+| FE-03 | Guard, consulta de sessão, recuperação de indisponibilidade, interceptor de `401`, logout e proteção contra respostas atrasadas de outra sessão. | Ensaio real de cookie/expiração/saída e conferência de interface. |
+| Serviço de produtos | [`ProdutosService`](src/app/produtos/produtos.service.ts) e [`modelos`](src/app/produtos/produto.model.ts) para as páginas de Leticia. | Usar nas páginas e verificar persistência com Go/PostgreSQL. Não conclui FE-04/FE-05/FE-06. |
+
+O serviço disponibiliza `listar(pagina, limite)`, `consultar(id)`, `cadastrar(dados)` e `atualizar(id, dados)`. O modelo interno usa `nome`, `sku` e `precoBase`; `listar` retorna `itens`/`total`. O serviço adapta o JSON da API (`name`, `basePrice`, `items`), sem cache de produtos, conversão para centavos ou fallback simulado. As páginas devem tratar erros e descartar seus dados ao serem destruídas/encerrar a sessão. Nenhum serviço foi inventado para anúncios/pedidos enquanto faltam esses contratos.
 
 ## Contrato disponível para o front-end
 
@@ -61,8 +72,8 @@ Contrato extraído das rotas, controllers e services atuais; ainda sem ensaio HT
 
 | Tela ou fluxo | O que pode ser feito agora no front-end | O que impede concluir com dados reais | To-dos |
 | --- | --- | --- | --- |
-| Login (RF01) | **Liberado para integrar:** corrigir URL/proxy/testes e usar a API atual. | Falta FE-01 e preparar/verificar o banco de desenvolvimento. Não há mais bloqueio de compilação. | FE-01, BE-02, BE-15 |
-| Estrutura interna e navegação | **Liberado:** construir menu/rotas e integrar usuário por ID/e-mail, guard, tratamento de expiração e saída. | Nome/loja não vêm da sessão. Logout remove cookie; revogação do JWT continua pendente de decisão. | FE-02, FE-03, BE-03 |
+| Login (RF01) | **Implementado no front:** URL/proxy e confirmação da sessão; verificar com a API atual. | Banco/ambiente da API não preparado nesta cópia; falta ensaio real e visual. | FE-01, BE-02, BE-15 |
+| Estrutura interna e navegação | **Implementada em parte:** `/inicio`, menu, usuário por e-mail, guard, expiração/saída e página não encontrada. | Páginas do catálogo e verificação visual pendentes. Nome/loja não vêm da sessão; revogação do JWT segue em BE-03. | FE-02, FE-03, BE-03 |
 | Produtos — listagem (RF03) | **Liberado para integrar:** lista de nome, SKU e preço, paginação e total, estados vazio/erro/carregamento. | Implementação Angular e ensaio real pendentes. Busca, saldo e canais não vêm desse endpoint. | FE-01, FE-03, FE-04, BE-15 |
 | Novo produto (RF02) | **Liberado no recorte básico:** cadastrar nome, SKU e preço pela API. | Não inclui todos os campos do protótipo; confirmar recorte em DEC-02. Não há rejeição de SKU duplicado/controle de versão. | FE-05, BE-05, BE-15, DEC-02 |
 | Detalhe/edição de produto (RF04) | **Liberado no recorte básico:** consultar por ID e salvar os três campos via PUT, tratando `400`/`401`/`404`/`500`. | Campos adicionais, conflito de versão e SKU único não estão liberados. Validar persistência e isolamento no ensaio. | FE-06, BE-05, BE-15 |
@@ -83,7 +94,7 @@ Não foi identificada uma tela de auditoria nos protótipos/requisitos de interf
 
 ### Regras de desenvolvimento e conclusão
 
-Todas as tarefas FE abaixo permanecem **pendentes**. Cada responsável cuida das entregas indicadas na divisão, das verificações pertinentes e da atualização deste registro. Caio coordena os serviços HTTP e modelos compartilhados; Leticia constrói as páginas de catálogo e as listagens de anúncios/pedidos usando esses contratos. A outra pessoa revisa a entrega; FE-15 reúne o ensaio integrado, mas não concentra todos os testes no fim.
+FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; permanecem abertas até cumprir as verificações de aceite. Demais tarefas continuam pendentes. Cada responsável cuida das entregas indicadas na divisão, das verificações pertinentes e da atualização deste registro. Caio coordena serviços/modelos compartilhados; Leticia constrói catálogo e listagens usando esses contratos. FE-15 reúne o ensaio integrado, sem concentrar todos os testes no fim.
 
 - **Estrutura:** Angular standalone, `OnPush`, signals para estado local, formulários reativos, rotas sob demanda e tipos sem `any`. Criar serviços/componentes compartilhados quando houver uso concreto, sem biblioteca de estado global ou framework de CRUD antecipado.
 - **Interface:** usar os protótipos existentes como referência; contemplar desktop e largura de 390 px, teclado, foco visível, labels, mensagens associadas aos campos e anúncios de carregamento/erro/sucesso. Atender WCAG AA e verificar AXE nas telas alteradas.
@@ -98,7 +109,7 @@ Todas as tarefas FE abaixo permanecem **pendentes**. Cada responsável cuida das
 
 - [ ] **FE-01 — Alinhar e integrar o login.**
 
-**Responsável:** Caio. **Situação:** liberado. **Dependências:** BE-02/BE-15 para o ensaio; FE-03 para entrada na área interna. **Referência:** RF01.
+**Responsável:** Caio. **Situação:** código implementado, aguardando ensaio real/visual. **Dependências:** BE-02/BE-15 para o ensaio; FE-03 para entrada na área interna. **Referência:** RF01.
 
 **Requisitos de desenvolvimento**
 
@@ -118,7 +129,7 @@ Todas as tarefas FE abaixo permanecem **pendentes**. Cada responsável cuida das
 
 - [ ] **FE-02 — Construir a estrutura das páginas internas.**
 
-**Responsável:** Caio. **Situação:** liberado. **Dependências:** FE-03 para acesso autenticado e FE-04 para o destino inicial.
+**Responsável:** Caio. **Situação:** estrutura implementada; integração do catálogo e verificação visual pendentes. **Dependências:** FE-03 para acesso autenticado e FE-04 para o destino definitivo; `/inicio` é o destino provisório.
 
 **Requisitos de desenvolvimento**
 
@@ -138,7 +149,7 @@ Todas as tarefas FE abaixo permanecem **pendentes**. Cada responsável cuida das
 
 - [ ] **FE-03 — Integrar consulta de sessão, expiração e logout.**
 
-**Responsável:** Caio. **Situação:** liberado para o comportamento atual. **Dependências:** FE-01; BE-03/BE-15 para homologação. **Referência:** RF01/RNF02.
+**Responsável:** Caio. **Situação:** código implementado/testado com HTTP simulado; ensaio real/visual pendente. **Dependências:** FE-01; BE-03/BE-15 para homologação. **Referência:** RF01/RNF02.
 
 **Requisitos de desenvolvimento**
 
@@ -458,13 +469,18 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 
 ## Ordem de início definida em 08/11/2026 e critério de conclusão
 
-Primeira frente: **login → estrutura interna/sessão → listagem de produtos → novo produto → detalhe/edição de produto**. O resumo por página e a prioridade de apoio do back-end estão em [AGENTS.md](AGENTS.md), para orientar os integrantes e seus agentes. As tarefas detalhadas e seus estados continuam somente nesta fila; nenhuma tarefa FE foi marcada como iniciada/concluída por essa definição.
+Primeira frente: **login → estrutura interna/sessão → listagem de produtos → novo produto → detalhe/edição de produto**. O resumo por página e a prioridade de apoio do back-end estão em [AGENTS.md](AGENTS.md). FE-01/FE-02/FE-03 e o serviço compartilhado de produtos já têm código local; páginas do catálogo continuam pendentes. Os estados e critérios completos permanecem nesta fila, sem marcar a integração como concluída antes do ensaio real.
 
 Começar **FE-01 → FE-02/FE-03 → FE-04 → FE-05/FE-06**, integrando as rotas já entregues, sem esperar novos endpoints de catálogo. Preparar o ambiente e a homologação em BE-02/BE-15; fechar o fluxo com FE-15. BE-05 e DEC-02 condicionam a ampliação/aceite do cadastro completo, sem impedir a construção do recorte básico. Depois, avançar anúncios e conexão de canal; liberar Vendas, Estoque, Indicadores e Administração conforme os contratos correspondentes. A ordem entre módulos posteriores pode mudar por decisão do grupo.
 
 Marcar um item como concluído somente após registrar o que foi entregue e sua verificação. Uma tela visualmente pronta pode fechar a parte de interface, mas deve manter a integração pendente com o respectivo ID de back-end. Em cada retomada, conferir arquivos/rotas e atualizar este documento, sem presumir que esta fotografia permanece atual.
 
-## Verificações desta avaliação
+## Verificações
+
+- Incremento local após `5e17d586`: `npm.cmd test -- --watch=false` **aprovado com 26 testes em 6 arquivos**; `npm.cmd run build` **aprovado**, com 260,19 kB iniciais. Cobertos login/limite de senha, confirmação de sessão, guard, indisponibilidade, logout com falha, consultas simultâneas/respostas atrasadas, `401` concorrentes e DTOs/paginação de produtos. Os testes usam HTTP simulado.
+- Servidor Angular respondeu `200`; `/api/qa/cenario` chegou pelo proxy a um servidor descartável simulado. Essa verificação prova o encaminhamento local, não autenticação Go/PostgreSQL. API de QA e Angular foram encerrados depois; nenhum fallback foi adicionado ao produto.
+- Conferência visual **não realizada**: o controle nativo do Chrome foi interrompido pela ferramenta por não conseguir confirmar a URL da janela com segurança. Nenhum screenshot ou resultado AXE foi obtido. AXE foi apenas baixado em `web/tmp/a11y` (ignorado), sem alterar dependências do projeto; permanece pendente executar a auditoria.
+- API real não foi iniciada: `.env` da raiz está ausente. Não foram criados credenciais, banco, schema ou dados para contornar BE-02/BE-15. Nenhum teste de persistência/marketplace foi realizado. Nenhuma tarefa FE foi marcada como concluída neste incremento.
 
 - Revisão de 08/11: leitura do diff completo de `88731577` contra seu pai, dos 11 arquivos de API/seed alterados, do schema e dos arquivos atuais de autenticação/rotas/configuração Angular. A árvore estava limpa antes da avaliação; não houve busca de alterações remotas.
 - `go vet ./...` em `api/`: **aprovado em 08/11/2026**. Confirma a correção do bloqueio de compilação relatado em 05/11; não verifica banco, comportamento HTTP ou integração Angular.

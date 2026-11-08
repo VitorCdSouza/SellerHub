@@ -12,3 +12,70 @@ body {
     'Segoe UI',
     sans-serif;
 }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #244bc1;
+  outline-offset: 3px;
+}
+.pagina-de-estado {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.cartao-de-estado {
+  width: 100%;
+  max-width: 540px;
+  background: #fff;
+  padding: 2rem;
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+}
+.cartao-de-estado h1 {
+  margin: 0;
+  font-size: 1.65rem;
+  letter-spacing: -0.025em;
+}
+.cartao-de-estado p {
+  color: #526075;
+  line-height: 1.65;
+}
+.marca-estado {
+  color: #244bc1 !important;
+  font-weight: 750;
+  margin: 0 0 1.75rem;
+}
+.acao-principal {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 46px;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 7px;
+  background: #244bc1;
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+.acao-principal:disabled {
+  cursor: wait;
+}
+.acao-secundaria {
+  display: block;
+  width: fit-content;
+  margin-top: 1.25rem;
+  padding: 0.5rem 0;
+  color: #244bc1;
+}
+.cartao-de-estado .aviso-erro {
+  color: #8d1b29;
+  background: #fff0f1;
+  border-radius: 6px;
+  padding: 0.75rem;
+}

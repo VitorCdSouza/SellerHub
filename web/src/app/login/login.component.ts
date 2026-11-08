@@ -10,12 +10,15 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EMPTY, finalize, switchMap } from 'rxjs';
+import { destinoAposLogin } from '../autenticacao/destino-login';
+import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FocoPaginaDirective],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +27,9 @@ export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly rota = inject(ActivatedRoute);
+  private navegando = false;
   private readonly campoEmail = viewChild.required<ElementRef<HTMLInputElement>>('campoEmail');
   private readonly campoSenha = viewChild.required<ElementRef<HTMLInputElement>>('campoSenha');
 
@@ -33,7 +39,11 @@ export class LoginComponent {
   });
   protected readonly enviando = signal(false);
   protected readonly sucesso = signal('');
-  protected readonly erro = signal('');
+  protected readonly erro = signal(
+    this.rota.snapshot.queryParamMap.get('motivo') === 'expirada'
+      ? 'Sua sessão expirou. Entre novamente para continuar.'
+      : '',
+  );
 
   protected entrar(): void {
     if (this.enviando()) return;
@@ -61,18 +71,37 @@ export class LoginComponent {
     this.auth
       .entrar(email, senha)
       .pipe(
+        switchMap((resposta) => {
+          if (!resposta.success) {
+            this.erro.set(resposta.message);
+            return EMPTY;
+          }
+          this.sucesso.set('Credenciais confirmadas. Verificando seu acesso...');
+          return this.auth.consultarSessao();
+        }),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.enviando.set(false);
           this.formulario.enable();
           this.formulario.controls.senha.reset();
-          if (!this.destroyRef.destroyed) this.campoSenha().nativeElement.focus();
+          if (!this.destroyRef.destroyed && !this.navegando)
+            this.campoSenha().nativeElement.focus();
         }),
       )
       .subscribe({
-        next: (resposta) => {
-          if (resposta.success) this.sucesso.set(resposta.message);
-          else this.erro.set(resposta.message);
+        next: (estado) => {
+          this.sucesso.set('');
+          const retorno = destinoAposLogin(this.rota.snapshot.queryParamMap.get('retorno'));
+          if (estado === 'autenticada') {
+            this.navegando = true;
+            void this.router.navigateByUrl(retorno, { replaceUrl: true });
+          } else if (estado === 'indisponivel') {
+            this.navegando = true;
+            void this.router.navigate(['/sessao-indisponivel'], {
+              queryParams: { retorno },
+              replaceUrl: true,
+            });
+          } else this.erro.set('Não foi possível confirmar sua sessão. Entre novamente.');
         },
         error: (falha: unknown) => {
           if (falha instanceof HttpErrorResponse && falha.status === 401) {

@@ -1,7 +1,7 @@
 <main class="pagina">
   <section class="cartao" aria-labelledby="titulo-login">
     <p class="marca">SellerHub</p>
-    <h1 id="titulo-login">Entre na sua conta</h1>
+    <h1 id="titulo-login" appFocoPagina>Entre na sua conta</h1>
     <p class="introducao">Informe suas credenciais para continuar.</p>
 
     <form [formGroup]="formulario" (ngSubmit)="entrar()" [attr.aria-busy]="enviando()" novalidate>
@@ -68,6 +68,6 @@
         <p class="mensagem sucesso">{{ sucesso() }}</p>
       }
     </div>
-    <p class="nota">Demonstração acadêmica de login.</p>
+    <p class="nota">Acesse sua área de trabalho.</p>
   </section>
 </main>

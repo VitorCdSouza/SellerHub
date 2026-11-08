@@ -1,12 +1,12 @@
 # SellerHub
 
-A avaliação das telas e a fila de trabalho do front-end estão em [web/TODO.md](web/TODO.md), com requisitos, critérios de aceite das 15 tarefas, dependências separadas para o back-end e divisão proposta entre Caio e Leticia. Planejamento atualizado em 08/11/2026 após `22f17dc6`; a base de aplicação segue em `88731577`. Sessão/saída e catálogo básico já têm rotas para integração. As instruções abaixo ainda precisam ser reconciliadas com o código, inclusive proxy ausente no Angular, usuários atuais do seed e proteção das rotas.
+A fila do front-end está em [web/TODO.md](web/TODO.md), com requisitos, critérios de aceite, dependências e divisão entre Caio e Leticia. O incremento local de 08/11/2026 implementa login/proxy, estrutura interna, sessão/logout e serviço de produtos. Páginas do catálogo e demais módulos continuam pendentes. A verificação com Go/PostgreSQL, navegador e AXE ainda precisa ser concluída.
 
 As páginas da primeira frente e o apoio prioritário do back-end estão registrados nas [instruções compartilhadas dos agentes](web/AGENTS.md): login, estrutura interna/sessão, listagem, cadastro e detalhe/edição de produtos.
 
-Hub de integração entre marketplaces desenvolvido como TCC. No estado atual, o sistema tem apenas o fluxo de login: **Angular → API REST em Go → PostgreSQL**. O usuário informa e-mail e senha, a API consulta o banco e, se as credenciais conferem, abre uma sessão com um JWT gravado em cookie.
+Hub de integração entre marketplaces desenvolvido como TCC. O acesso segue **Angular → API REST em Go → PostgreSQL**: a API verifica as credenciais, emite JWT em cookie e permite consultar a sessão. O Angular confirma o acesso e abre `/inicio`, destino provisório enquanto as páginas de produtos são desenvolvidas.
 
-Ainda não há rota protegida: a verificação do cookie entra junto da primeira tela que exigir login.
+A API protege as rotas de sessão e produtos com validação do cookie; o Angular protege a navegação interna com guard. O menu identifica as áreas ainda indisponíveis. Logout remove o cookie do navegador; o JWT emitido continua válido até expirar.
 
 ## Organização
 
@@ -30,7 +30,7 @@ Fluxo do login:
 3. O service normaliza o e-mail (minúsculas, sem espaços nas pontas), valida os dados e busca o hash com a consulta gerada pelo sqlc.
 4. `bcrypt.CompareHashAndPassword` compara a senha com o hash.
 5. Se a senha confere, o controller gera um JWT com o id do usuário e o grava no cookie `sessao`.
-6. O controller responde com o status HTTP e o JSON; o Angular exibe a mensagem.
+6. O Angular consulta `GET /api/sessao` e só navega após a confirmação. Ausência de sessão retorna ao login; indisponibilidade tem uma página própria com nova tentativa.
 
 ## Pré-requisitos
 
@@ -90,7 +90,7 @@ psql -h localhost -U sellerhub -d sellerhub -v ON_ERROR_STOP=1 -f db/estrutura.s
 psql -h localhost -U sellerhub -d sellerhub -v ON_ERROR_STOP=1 -f db/dados.sql
 ```
 
-Para mudar o schema, edite `db/estrutura.sql` e recrie o banco. Não há ferramenta de migrations, e o banco não deve ser alterado manualmente. A tabela `CAD_USUARIO` garante a normalização do e-mail com a constraint `email_normalizado`.
+Não há ferramenta de migrations. Os scripts atuais preparam um banco de desenvolvimento vazio; antes de aplicar mudanças em um banco com dados, combine sua preservação com o time de back-end. O login normaliza o e-mail de entrada; o schema atual não contém a constraint `email_normalizado`.
 
 ## Executar tudo
 
@@ -103,8 +103,10 @@ Abra [http://localhost:4200](http://localhost:4200) e entre com o usuário de de
 
 | Campo  | Valor             |
 | ------ | ----------------- |
-| E-mail | `teste@email.com` |
+| E-mail | `caio@sellerhub.com` |
 | Senha  | `123456`          |
+
+Esses dados são fictícios e estão no seed atual. Um banco antigo pode ainda não ter recebido essa carga.
 
 ## API (Go)
 
@@ -136,7 +138,7 @@ A API carrega o `.env` da raiz (`../.env`, relativo a `api/`) sem substituir var
 ```bash
 curl -i -X POST http://localhost:8080/api/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"teste@email.com","password":"123456"}'
+  -d '{"email":"caio@sellerhub.com","password":"123456"}'
 ```
 
 ```json
@@ -183,16 +185,24 @@ go vet ./...
 
 ```text
 web/src/app/
-├── login/                 formulário, validação, carregamento e mensagens
+├── login/                 formulário, validação e confirmação de acesso
+├── autenticacao/          guard, interceptor de 401 e recuperação de indisponibilidade
+├── estrutura/             área interna, início e página não encontrada
+├── compartilhado/         foco inicial das páginas
+├── produtos/              modelos e serviço HTTP para as futuras páginas do catálogo
 ├── services/
-│   └── auth.service.ts    envia e-mail e senha para POST /api/login
-├── app.config.ts          configuração de HTTP e rotas
-└── app.routes.ts          carrega a tela de login sob demanda
+│   └── auth.service.ts    login, consulta de sessão e saída
+├── app.config.ts          HTTP, interceptor e rotas
+└── app.routes.ts          rotas carregadas sob demanda
 ```
 
 O componente de login usa signals e `OnPush`. Durante a requisição, impede novos envios; ao concluir, limpa a senha. Labels, avisos por campo e regiões de mensagem dão suporte à navegação por teclado e a leitores de tela. A senha não é guardada no navegador, e o token da sessão fica só no cookie `HttpOnly`, fora do alcance do código Angular.
 
 As chamadas usam caminhos relativos (`/api/...`). O `ng serve` repassa esses caminhos para a API conforme `proxy.conf.json`, configurado em `angular.json`.
+
+O estado de autenticação fica em memória. `401` de uma chamada protegida encerra o estado local e retorna ao login; `401` do próprio login continua sendo erro de credenciais. Falha ao consultar sessão não é tratada como senha incorreta. Na saída com falha, a interface informa o problema e mantém a conta; respostas atrasadas de outra sessão não restauram o usuário anterior.
+
+Para as páginas de produtos, injete `ProdutosService`: `listar(pagina, limite)` retorna `itens`/`total`; `consultar(id)` retorna `Produto`; `cadastrar(dados)` retorna o ID; `atualizar(id, dados)` retorna a confirmação. O modelo interno usa `nome`, `sku` e `precoBase`, adaptados para os nomes JSON da API. Preços seguem em valor decimal, sem conversão para centavos. O serviço não armazena catálogo nem utiliza dados simulados como fallback.
 
 ### Executar
 
@@ -204,6 +214,8 @@ npm start
 
 A tela abre em [http://localhost:4200](http://localhost:4200). Para o login funcionar, a API e o banco precisam estar rodando.
 
+Reinicie `npm start` ao alterar o proxy. Na implantação, `/api` precisa ser encaminhado à API na mesma origem pelo servidor escolhido; o proxy de desenvolvimento não é incluído no build de produção. O destino da implantação ainda não foi definido.
+
 ### Verificar
 
 ```bash
@@ -212,7 +224,7 @@ npm test -- --watch=false
 npm run build
 ```
 
-Os testes usam HTTP simulado para conferir o formulário, o contrato do `AuthService`, o sucesso, as credenciais inválidas e a indisponibilidade da API. O build fica em `web/dist/SellerHub`.
+Os 26 testes atuais usam HTTP simulado para conferir login, sessão/guard, expiração, logout com falha, respostas atrasadas e contratos de produtos. O build fica em `web/dist/SellerHub`. A conferência visual/AXE e o ensaio com API/PostgreSQL permanecem pendentes; a ferramenta de controle do Chrome interrompeu a tentativa por não conseguir confirmar a URL da janela.
 
 ## Documentação (LaTeX)
 

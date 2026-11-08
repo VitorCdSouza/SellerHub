@@ -7,7 +7,7 @@ Prioridade: FE-01 (alinhar URL/proxy), FE-02/FE-03 (estrutura, sessão e saída)
 
 ### Telas que começaremos e prioridade para o back-end
 
-Frente inicial definida em **08/11/2026**. As páginas abaixo são as próximas a desenvolver/integrar; este registro não significa que sua implementação já começou ou foi concluída.
+Frente inicial definida em **08/11/2026**. FE-01/FE-02/FE-03 já têm implementação local e testes HTTP simulados; a estrutura usa `/inicio` até o catálogo ser entregue. O serviço/modelo de produtos está pronto para uso nas páginas de Leticia. Integração real, verificação visual e AXE permanecem pendentes; consultar os estados completos em TODO.md antes de marcar qualquer tarefa como concluída.
 
 | Ordem | Página ou fluxo do front-end | Recorte inicial | Prioridade de apoio do back-end |
 | --- | --- | --- | --- |

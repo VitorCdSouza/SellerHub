@@ -1,0 +1,166 @@
+:host {
+  display: block;
+}
+.estrutura {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+.lateral {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.25rem;
+  background: #fff;
+  border-right: 1px solid #dce2ea;
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  color: #182335;
+  text-decoration: none;
+  font-size: 1.45rem;
+  font-weight: 750;
+}
+.simbolo {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #244bc1;
+  color: #fff;
+}
+nav {
+  display: grid;
+  gap: 0.4rem;
+}
+nav > a,
+.modulo-pendente {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 46px;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+nav > a {
+  text-decoration: none;
+  color: #244bc1;
+}
+.ativo {
+  background: #edf2ff;
+}
+.modulo-pendente {
+  color: #526075;
+}
+.modulo-pendente span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nota-lateral {
+  margin: auto 0 0;
+  padding-top: 2rem;
+  color: #526075;
+  font-size: 0.8rem;
+}
+.cabecalho {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 2.5rem;
+  background: #fff;
+  border-bottom: 1px solid #dce2ea;
+}
+.conta {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.rotulo-conta {
+  color: #526075;
+  font-size: 0.8rem;
+}
+.email {
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.botao-saida {
+  min-height: 44px;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid #8290a4;
+  border-radius: 7px;
+  background: #fff;
+  color: #182335;
+  font: inherit;
+  cursor: pointer;
+}
+.botao-saida:disabled {
+  cursor: wait;
+}
+main {
+  max-width: 1200px;
+  padding: 2.5rem;
+}
+.erro-saida {
+  margin: 1rem 2.5rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+  background: #fff0f1;
+  color: #8d1b29;
+}
+.pular-conteudo {
+  position: fixed;
+  top: -100px;
+  left: 1rem;
+  z-index: 10;
+  padding: 1rem;
+  border-radius: 6px;
+  color: #fff;
+  background: #244bc1;
+}
+.pular-conteudo:focus {
+  top: 1rem;
+}
+@media (max-width: 760px) {
+  .estrutura {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lateral {
+    padding: 1rem;
+    border-right: 0;
+    border-bottom: 1px solid #dce2ea;
+  }
+  .marca {
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
+  }
+  nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.2rem;
+  }
+  nav > a,
+  .modulo-pendente {
+    padding: 0.55rem;
+    font-size: 0.85rem;
+  }
+  .nota-lateral {
+    display: none;
+  }
+  .cabecalho {
+    padding: 1rem;
+  }
+  main {
+    padding: 1.5rem 1rem;
+  }
+  .erro-saida {
+    margin: 1rem 1rem 0;
+  }
+}
