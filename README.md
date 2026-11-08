@@ -1,6 +1,6 @@
 # SellerHub
 
-A avaliação das telas e a fila de trabalho do front-end estão em [web/TODO.md](web/TODO.md), atualizadas em 08/11/2026 para `88731577`, com dependências separadas para o back-end. Sessão/saída e catálogo básico já têm rotas para integração. As instruções abaixo ainda precisam ser reconciliadas com o código, inclusive proxy ausente no Angular, usuários atuais do seed e proteção das rotas.
+A avaliação das telas e a fila de trabalho do front-end estão em [web/TODO.md](web/TODO.md), com requisitos, critérios de aceite das 15 tarefas, dependências separadas para o back-end e divisão proposta entre Caio e Leticia. Planejamento atualizado em 08/11/2026 após `22f17dc6`; a base de aplicação segue em `88731577`. Sessão/saída e catálogo básico já têm rotas para integração. As instruções abaixo ainda precisam ser reconciliadas com o código, inclusive proxy ausente no Angular, usuários atuais do seed e proteção das rotas.
 
 As páginas da primeira frente e o apoio prioritário do back-end estão registrados nas [instruções compartilhadas dos agentes](web/AGENTS.md): login, estrutura interna/sessão, listagem, cadastro e detalhe/edição de produtos.
 

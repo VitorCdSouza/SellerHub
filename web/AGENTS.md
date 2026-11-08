@@ -21,6 +21,16 @@ Frente inicial definida em **08/11/2026**. As páginas abaixo são as próximas 
 
 Fotos/características, anúncios, canais, IA, vendas, estoque, indicadores, administração completa e recuperação de senha ficam para os incrementos seguintes, conforme liberação. Suas pendências permanecem em [TODO.md](TODO.md), que continua sendo a única lista detalhada de execução para as duas frentes.
 
+### Detalhamento e divisão da dupla de front-end
+
+Cada tarefa FE tem requisitos, dependências e critérios de aceite em [TODO.md](TODO.md), junto à proposta de distribuição para duas pessoas. Consultar o item completo antes de implementar; entregar interface simulada não conclui sua integração.
+
+- **Caio:** infraestrutura e serviços HTTP/modelos compartilhados, acesso/navegação/sessão, complementos/fotos, editor/IA/publicação, estoque/indicadores, administração/canais e recuperação de senha.
+- **Leticia:** páginas de listagem, cadastro, detalhe e edição básica de produtos (FE-04/FE-05/FE-06), listagem de anúncios (FE-08) e consulta/detalhe de pedidos (FE-10), consumindo os serviços preparados por Caio. Inclui validações locais, paginação, estados de tela e testes dessas páginas.
+- **Ambos:** revisão e FE-15, com aceite por marcos de catálogo, publicação e operação. Caio prepara a base e os serviços enquanto Leticia constrói as páginas do catálogo; os detalhes de coordenação e a sequência estão somente na fila compartilhada.
+
+Essa é uma divisão proposta de trabalho futuro, ajustável pela dupla; não atribui autoria anterior nem marca tarefas como iniciadas/concluídas. Ajustes do Go/schema continuam destinados ao time de back-end nos itens BE correspondentes.
+
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
