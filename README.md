@@ -1,6 +1,8 @@
 # SellerHub
 
-A avaliação das telas e a fila de trabalho do front-end estão em [web/TODO.md](web/TODO.md), com dependências separadas para o back-end. Consulte os bloqueios registrados em 05/11/2026: as instruções de login/proxy abaixo ainda precisam ser reconciliadas com o código atual.
+A avaliação das telas e a fila de trabalho do front-end estão em [web/TODO.md](web/TODO.md), atualizadas em 08/11/2026 para `88731577`, com dependências separadas para o back-end. Sessão/saída e catálogo básico já têm rotas para integração. As instruções abaixo ainda precisam ser reconciliadas com o código, inclusive proxy ausente no Angular, usuários atuais do seed e proteção das rotas.
+
+As páginas da primeira frente e o apoio prioritário do back-end estão registrados nas [instruções compartilhadas dos agentes](web/AGENTS.md): login, estrutura interna/sessão, listagem, cadastro e detalhe/edição de produtos.
 
 Hub de integração entre marketplaces desenvolvido como TCC. No estado atual, o sistema tem apenas o fluxo de login: **Angular → API REST em Go → PostgreSQL**. O usuário informa e-mail e senha, a API consulta o banco e, se as credenciais conferem, abre uma sessão com um JWT gravado em cookie.
 

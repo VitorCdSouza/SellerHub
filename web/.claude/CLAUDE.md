@@ -1,7 +1,7 @@
 
 ## SellerHub — planejamento do front-end
 
-Antes de planejar ou implementar telas, leia [../AGENTS.md](../AGENTS.md) e integralmente [../TODO.md](../TODO.md). Use TODO.md como fila compartilhada: prioridades FE-01/FE-02 e interfaces FE-04/FE-05/FE-06, com integração condicionada aos itens BE. Confira o código atual, mantenha simulações explícitas e registre ajustes da API para o time de back-end. Atualize essa fila ao concluir entregas, evitando listas divergentes entre agentes.
+Antes de planejar ou implementar telas, leia [../AGENTS.md](../AGENTS.md) e integralmente [../TODO.md](../TODO.md). Use TODO.md como fila compartilhada, atualizada em 08/11/2026 para `88731577`: FE-01 alinha URL/proxy; FE-02/FE-03 e FE-04/FE-05/FE-06 já podem integrar sessão/saída e catálogo básico. Campos adicionais e demais módulos dependem dos itens BE/DEC; o ensaio real permanece em BE-15/FE-15. Confira o código atual, mantenha simulações explícitas e registre ajustes da API para o time de back-end. Atualize essa fila ao concluir entregas, evitando listas divergentes entre agentes.
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 

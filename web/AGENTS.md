@@ -1,9 +1,25 @@
 
 ## SellerHub — planejamento do front-end
 
-Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). Ele registra a avaliação de 05/11/2026, telas que podem avançar, bloqueios, decisões pendentes e tarefas FE/BE. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
+Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). Ele registra a avaliação atualizada em 08/11/2026 do commit `88731577`, telas que podem avançar, bloqueios, decisões pendentes e tarefas FE/BE. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
 
-Prioridade inicial: FE-01 (alinhar login), FE-02 (estrutura interna) e FE-04/FE-05/FE-06 (interfaces de produtos). A integração depende das tarefas de back-end indicadas. Simulação deve ser explícita e separada dos serviços reais; SQL ou tabela existente não comprova endpoint pronto. Em tarefas da frente de interface, registre ajustes de API como itens BE para o time responsável.
+Prioridade: FE-01 (alinhar URL/proxy), FE-02/FE-03 (estrutura, sessão e saída) e FE-04/FE-05/FE-06 (integrar catálogo básico). As rotas de sessão e produtos já existem; não aguardar novos endpoints para esse recorte. Campos adicionais e demais módulos continuam condicionados aos itens BE/DEC. Liberação técnica não comprova integração com banco/navegador: fechar BE-15/FE-15 antes de declarar o fluxo concluído. Simulação deve ser explícita e separada dos serviços reais. Em tarefas da frente de interface, registre ajustes de API como itens BE para o time responsável.
+
+### Telas que começaremos e prioridade para o back-end
+
+Frente inicial definida em **08/11/2026**. As páginas abaixo são as próximas a desenvolver/integrar; este registro não significa que sua implementação já começou ou foi concluída.
+
+| Ordem | Página ou fluxo do front-end | Recorte inicial | Prioridade de apoio do back-end |
+| --- | --- | --- | --- |
+| 1 | Login — FE-01 | Ajustar a tela existente para `/api/login` e configurar proxy. | BE-02/BE-15: confirmar usuário de desenvolvimento com bcrypt no banco usado pela equipe e verificar sucesso, senha incorreta e e-mail inexistente; alinhar README ao seed. |
+| 2 | Estrutura interna e sessão — FE-02/FE-03 | Menu, rotas, identificação por e-mail, acesso autenticado, expiração e saída. | BE-03/BE-15: verificar consulta de sessão, `401`, cookie e logout; explicitar que o logout atual remove o cookie sem revogar o JWT. |
+| 3 | Produtos — listagem — FE-04 | Nome, SKU, preço base, paginação, total e estados vazio/erro/carregamento. | BE-15: validar listagem com PostgreSQL, paginação e isolamento pelo usuário. A rota básica já existe; preservar o contrato de `items`/`total`. |
+| 4 | Novo produto — FE-05 | Formulário de nome, SKU e preço base, envio real e retorno do ID. | BE-05/BE-15 e DEC-02: validar criação/persistência e limites; alinhar unicidade do SKU, campos do primeiro incremento e eventual compartilhamento do catálogo. O formulário básico pode avançar com o contrato atual. |
+| 5 | Detalhe e edição de produto — FE-06 | Carregar por ID, editar os três campos e salvar via PUT. | BE-05/BE-15: verificar persistência e `404` para inexistente/outro usuário; definir resposta para conflito de edição antes de prometer esse controle na interface. |
+
+**Prioridade imediata do back-end:** estabilizar e verificar login/sessão e catálogo básico com banco real (BE-02, BE-03 e BE-15), apoiando o ensaio FE-15. Em seguida, concluir os alinhamentos de produto em BE-05/DEC-02. BE-01 e a base HTTP de BE-04 já foram entregues; não recriar essas rotas. Combinar mudanças no contrato com a dupla de front-end antes de alterá-lo.
+
+Fotos/características, anúncios, canais, IA, vendas, estoque, indicadores, administração completa e recuperação de senha ficam para os incrementos seguintes, conforme liberação. Suas pendências permanecem em [TODO.md](TODO.md), que continua sendo a única lista detalhada de execução para as duas frentes.
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
