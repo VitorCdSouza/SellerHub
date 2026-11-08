@@ -31,10 +31,57 @@ O serviço adapta o modelo interno para os nomes JSON `name`, `basePrice` e `ite
 
 Não há cache de catálogo nem fallback simulado nesse serviço. A página deve tratar carregamento, vazio, erro e nova tentativa, cancelar/desconsiderar respostas após destruição e descartar dados de uma sessão encerrada. Uma API indisponível não deve ser substituída silenciosamente por exemplos.
 
+## Desenvolvimento sem API ou banco
+
+O simulador é uma ferramenta do front-end que responde somente ao contrato atual de login, sessão, saída e produtos. Não usa Go, PostgreSQL, JWT, Gemini ou marketplaces. Os registros ficam em memória e são descartados ao reiniciar o simulador. Não usar dados reais nesse ambiente.
+
+Na pasta `web`, abrir dois terminais:
+
+```bash
+# Terminal 1: respostas HTTP fictícias na porta 8081
+npm run api:simulada
+```
+
+```bash
+# Terminal 2: Angular com proxy exclusivo para o simulador
+npm run start:simulado
+```
+
+Abrir `http://localhost:4200`. O aviso **Ambiente simulado** permanece visível em todas as páginas. As contas fictícias `catalogo@exemplo.test` e `outra@exemplo.test` usam a senha de demonstração `123456`. A primeira começa com 25 produtos, suficientes para duas páginas de 20; a segunda começa vazia e mantém catálogo separado. Cadastro/edição ficam disponíveis durante a execução, inclusive após recarregar o Angular.
+
+O comando habitual `npm start` continua usando a API real na porta 8080; `npm run build` continua gerando a configuração de produção sem habilitar a simulação. Não há troca automática de fonte em falha. Para mudar entre os ambientes, encerrar o Angular e iniciá-lo com o comando correspondente. Encerrar os dois terminais com `Ctrl+C` ao terminar.
+
+### Cenários para desenvolver e verificar estados
+
+Reiniciar apenas o simulador com as opções desejadas; o Angular pode continuar aberto:
+
+| Comando | Resultado esperado |
+| --- | --- |
+| `npm run api:simulada -- --cenario=vazio` | Catálogos vazios; criação continua disponível. |
+| `npm run api:simulada -- --cenario=falha-produtos` | Login/sessão funcionam; operações de produtos retornam `500`. |
+| `npm run api:simulada -- --cenario=falha-sessao` | Login confirma credenciais; consulta de sessão retorna `500`, permitindo testar a recuperação de acesso. |
+| `npm run api:simulada -- --cenario=falha-saida` | Saída retorna `500`; a interface deve manter a conta e permitir tentar novamente. |
+| `npm run api:simulada -- --atraso=800` | Atraso de 800 ms em cada chamada para observar carregamento e bloquear repetição. |
+| `npm run api:simulada -- --atraso=12000` | Respostas após o timeout de 10 segundos dos serviços Angular. |
+| `npm run api:simulada -- --duracao-sessao=30` | Sessão simulada expira após 30 segundos; próxima chamada protegida retorna `401`. |
+
+Opções podem ser combinadas. O cenário padrão é `catalogo`. Reiniciar restaura os dados e elimina as sessões simuladas: entrar novamente antes de continuar. Para testar recuperação de uma falha, reiniciar no cenário padrão; a sessão anterior deixa de existir, então a recuperação pode pedir novo login. `404` pode ser exercitado consultando um ID inexistente ou de outra conta. Parar o simulador permite testar indisponibilidade de rede pelo proxy.
+
+O cookie `sellerhub_simulada` é separado do cookie real e serve apenas à simulação local. Validações e DTOs acompanham o recorte identificado em `api/internal/controller/product.go` e `api/internal/service/product.go`; manter a ferramenta alinhada quando o contrato mudar. A ordenação usa nome/ID e comparação PT-BR em JavaScript; não comprova a collation do PostgreSQL. Não há controle de SKU duplicado, versão, busca, exclusão nem APIs de módulos ainda bloqueados. Simulação não atende ao aceite de persistência, segurança ou integração real.
+
+## Consumo pelas páginas do catálogo
+
+Usar os mesmos métodos de `ProdutosService` nos dois ambientes, sem condições de simulação nos componentes. `listar(2, 20)`, por exemplo, retorna `{ itens, total }`; a resposta não traz página/limite. A página mantém esses parâmetros e permite avançar somente se `pagina * limite < total`.
+
+Ao carregar a página ou trocar o ID, usar `switchMap` para cancelar a leitura anterior, e `takeUntilDestroyed` para encerrar a assinatura ao destruir o componente. Tratar o erro dentro da leitura para que uma falha não encerre futuras tentativas. Não usar nova tentativa automática em POST/PUT; bloqueio de clique repetido e preservação dos campos ficam no formulário. Os testes de navegação em `src/app/autenticacao/navegacao.spec.ts` demonstram o uso da estrutura real com respostas HTTP controladas.
+
+Rotas previstas na fila: `/produtos`, `/produtos/novo`, `/produtos/:id` e `/produtos/:id/editar`. Registro sob o pai protegido, título e ativação do menu devem acompanhar a entrega de cada página; não criar rotas vazias para satisfazer links. `appFocoPagina` pode ser aplicado ao título da página para o foco inicial. Catálogo não precisa consultar sessão novamente nem enviar identificador de usuário.
+
 ## Verificação
 
 ```bash
 npm test -- --watch=false
+npm run test:simulador
 npm run build
 ```
 

@@ -1,3 +1,11 @@
+.aviso-simulacao {
+  padding: 0.8rem 1rem;
+  background: #fff3cd;
+  color: #594300;
+  text-align: center;
+  font-weight: 600;
+}
+
 .consulta-sessao {
   padding: 0.8rem 1rem;
   background: #edf2ff;

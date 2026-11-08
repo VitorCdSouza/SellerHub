@@ -5,6 +5,10 @@ Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). E
 
 O README da raiz deve conter apresentação do projeto e instruções gerais de instalação/uso. Não acrescentar nele status de tarefas, divisão de responsáveis, bloqueios locais, resultados de sessões, contagem de testes ou relatos de ferramentas. Manter andamento em TODO.md, detalhes técnicos do front em [README.md](README.md) e orientações de agentes neste arquivo; preservar o contexto privado somente nos arquivos locais destinados a ele.
 
+Ao concluir uma entrega, sugerir mensagens de commit em Conventional Commits, com descrição concreta em português e escopo coerente com os arquivos alterados. A sugestão não autoriza executar commit ou push.
+
+Para desenvolvimento do catálogo sem banco, usar os comandos e cenários de simulação descritos em [README.md](README.md). O modo é explícito (`start:simulado`), tem aviso permanente e não substitui a homologação real. Não acrescentar endpoints simulados para módulos cujo contrato ainda não foi combinado.
+
 Prioridade: FE-01 (alinhar URL/proxy), FE-02/FE-03 (estrutura, sessão e saída) e FE-04/FE-05/FE-06 (integrar catálogo básico). As rotas de sessão e produtos já existem; não aguardar novos endpoints para esse recorte. Campos adicionais e demais módulos continuam condicionados aos itens BE/DEC. Liberação técnica não comprova integração com banco/navegador: fechar BE-15/FE-15 antes de declarar o fluxo concluído. Simulação deve ser explícita e separada dos serviços reais. Em tarefas da frente de interface, registre ajustes de API como itens BE para o time responsável.
 
 ### Telas que começaremos e prioridade para o back-end

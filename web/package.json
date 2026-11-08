@@ -4,6 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:simulado": "ng serve --configuration simulado",
+    "api:simulada": "node ferramentas/api-simulada.mjs",
+    "test:simulador": "node --test ferramentas/api-simulada.test.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

@@ -28,6 +28,14 @@
             "styles": ["src/styles.css"]
           },
           "configurations": {
+            "simulado": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/ambiente.ts",
+                  "with": "src/environments/ambiente.simulado.ts"
+                }
+              ]
+            },
             "production": {
               "budgets": [
                 {
@@ -57,6 +65,10 @@
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
+            "simulado": {
+              "buildTarget": "SellerHub:build:development,simulado",
+              "proxyConfig": "proxy.simulado.conf.json"
+            },
             "production": {
               "buildTarget": "SellerHub:build:production"
             },
