@@ -3,6 +3,8 @@
 
 Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). A revisão de 09/11/2026 cruza os commits de Leticia `47ee5b7b`, `51898427`, `7f0be9c0` e `da81eb35` com os critérios FE/BE; a API continua em `88731577`. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
 
+**Antes de alterar pedidos, estoque ou escopo do MVP:** consultar o [guia de contribuição](../CONTRIBUTING.md) e o [registro central de DEC-01/RF11](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque), que abrange front-end, back-end, banco e documentação. A proposta foi aprovada por Caio e ainda depende da deliberação do grupo. Não remover RF11, marcá-lo concluído ou implementar botões de escrita por essa aprovação individual. Justificativa e deliberação ficam no documento central; a fila mantém as consequências para as tarefas.
+
 O README da raiz deve conter apresentação do projeto e instruções gerais de instalação/uso. Não acrescentar nele status de tarefas, divisão de responsáveis, bloqueios locais, resultados de sessões, contagem de testes ou relatos de ferramentas. Manter andamento em TODO.md, detalhes técnicos do front em [README.md](README.md) e orientações de agentes neste arquivo; preservar o contexto privado somente nos arquivos locais destinados a ele.
 
 Ao concluir uma entrega, sugerir mensagens de commit em Conventional Commits, com descrição concreta em português e escopo coerente com os arquivos alterados. A sugestão não autoriza executar commit ou push.

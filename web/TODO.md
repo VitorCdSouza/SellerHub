@@ -2,6 +2,10 @@
 
 Atualização em **09/11/2026**, após revisão dos quatro commits de Leticia de `47ee5b7b` a `da81eb35`. `git fetch origin` confirmou HEAD alinhado a `origin/main`; a base de back-end permanece em `88731577` (06/11/2026). Este documento concentra a fila compartilhada, as 15 tarefas FE, dependências BE/DEC, responsáveis e evidências. Checklists de implementação concluída são separados do aceite integral de cada tarefa.
 
+## Aprovação conjunta pendente — DEC-01 / RF11
+
+**Decisão transversal ao projeto:** a proposta de manter pedidos consultáveis e adiar o comando manual de RF11, sua justificativa, os impactos FE/BE/banco e a deliberação estão no [registro central de DEC-01](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque). Caio aprovou o encaminhamento; a aprovação conjunta do grupo continua pendente. RF11 permanece aberto. Atualizar a decisão no documento central; esta fila registra sua consequência nas tarefas.
+
 ## Como interpretar o estado
 
 - **Pode avançar agora:** implementação visual e comportamento local independentes da API.
@@ -376,7 +380,7 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 
 - [ ] **FE-10 — Construir listagem e detalhe de pedidos para consulta.**
 
-**Responsável:** Leticia, usando o serviço e o modelo de pedidos preparados por Caio. **Situação:** interface com simulação possível; integração bloqueada. **Dependências:** FE-03, BE-10 e DEC-01 para qualquer escrita. **Referência:** RF07; RF11 permanece em decisão.
+**Responsável:** Leticia, usando o serviço e o modelo de pedidos preparados por Caio. **Situação:** interface com simulação possível; integração bloqueada. **Dependências:** FE-03, BE-10 e DEC-01 para qualquer escrita. **Referência:** RF07; RF11 permanece em decisão conjunta, conforme o [registro central](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque).
 
 **Requisitos de desenvolvimento**
 
@@ -597,7 +601,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 
 ## Decisões que precisam de alinhamento
 
-- [ ] **DEC-01 — Vendas e estoque:** RF11 e o capítulo 4 preveem marcar pedido como cancelado e repor saldo; há orientação local de pedidos somente para consulta no MVP. O capítulo 4 também admite reposição repetida, e o registro de entrada aparece no protótipo sem requisito confirmado. Alinhar o recorte com o grupo antes de implementar botões de escrita; se houver reposição, definir controle contra duplicidade no servidor. Esta revisão não escolhe persistência de pedidos nem algoritmo de sincronização.
+- [ ] **DEC-01 — Vendas e estoque — aprovação conjunta pendente:** consultar e atualizar o [registro central de decisão](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque), compartilhado por todas as frentes. RF11 continua aberto. FE-10/FE-11 podem avançar como consulta/acompanhamento; comandos manuais dependem da deliberação e dos contratos seguros de BE-10/BE-11. Após a decisão, atualizar aqui apenas as consequências para execução e aceite.
 - [ ] **DEC-02 — Produto mínimo e vínculo ao usuário:** protótipo inclui descrição, categoria e características; API só persiste nome, SKU e preço, vinculados ao usuário do JWT. Já é possível construir/integrar esse recorte técnico; confirmar se ele atende à primeira entrega e quais campos devem ser acrescentados. A implementação isola produtos por usuário; confirmar se a conta única precisa de catálogo compartilhado. Não tratar o comportamento atual como aprovação automática de uma regra de produto.
 - [ ] **DEC-03 — Canais e anúncios:** o protótipo impede selecionar canal já anunciado; o banco não garante anúncio único por produto/canal. Confirmar essa regra antes de bloquear na interface. Acordar campos obrigatórios e capacidades reais de cada canal; não assumir que os três do protótipo já serão integrados.
 
