@@ -2,24 +2,21 @@
 <div class="estrutura">
   <aside class="lateral" aria-label="Área de trabalho">
     <a routerLink="/inicio" class="marca" aria-label="SellerHub — início">
-      <span class="simbolo" aria-hidden="true">S</span> SellerHub
+      <img src="/logo-sellerhub.png" class="logo" alt="" aria-hidden="true" />
+      SellerHub
     </a>
     <nav aria-label="Menu principal">
       <a routerLink="/inicio" routerLinkActive="ativo" ariaCurrentWhenActive="page">Início</a>
       @for (modulo of modulos; track modulo) {
-        @if (modulo === 'Produtos') {
-          <a
-            routerLink="/produtos"
-            routerLinkActive="ativo"
-            ariaCurrentWhenActive="page"
-            >
-            {{ modulo }}
-          </a>
-        } @else {
-          <span class="modulo-pendente">
-            {{ modulo }} <span>Em breve</span>
-          </span>
-        }
+      @if (modulo === 'Produtos') {
+      <a routerLink="/produtos" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+        {{ modulo }}
+      </a>
+      } @else {
+      <span class="modulo-pendente">
+        {{ modulo }} <span>Em breve</span>
+      </span>
+      }
       }
     </nav>
     <p class="nota-lateral">Seu negócio, em um só lugar.</p>
@@ -36,7 +33,7 @@
     </header>
     <div role="alert" aria-atomic="true">
       @if (erroSaida()) {
-        <p class="erro-saida">{{ erroSaida() }}</p>
+      <p class="erro-saida">{{ erroSaida() }}</p>
       }
     </div>
     <main id="conteudo-principal" tabindex="-1"><router-outlet /></main>
