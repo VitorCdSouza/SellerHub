@@ -1,0 +1,73 @@
+
+<main class="pagina-detalhe">
+  <header class="cabecalho">
+    <div>
+      <a routerLink="/produtos" class="link-voltar">
+        Voltar para produtos
+      </a>
+
+      <h1>Detalhes do produto</h1>
+      <p>Consulte as informações cadastradas no seu catálogo.</p>
+    </div>
+  </header>
+
+  @if (carregando()) {
+    <section class="cartao estado" role="status">
+      Carregando informações do produto...
+    </section>
+  } @else if (erro()) {
+    <section class="cartao estado erro" role="alert">
+      <h2>Não foi possível consultar o produto</h2>
+      <p>{{ erro() }}</p>
+
+      <div class="acoes">
+        <button
+          type="button"
+          class="botao-secundario"
+          (click)="tentarNovamente()"
+        >
+          Tentar novamente
+        </button>
+
+        <a routerLink="/produtos" class="acao-principal">
+          Voltar para produtos
+        </a>
+      </div>
+    </section>
+  } @else if (produto(); as item) {
+    <section class="cartao" aria-labelledby="titulo-informacoes">
+      <div class="cabecalho-cartao">
+        <div>
+          <h2 id="titulo-informacoes">{{ item.nome }}</h2>
+          <span class="identificador">Código: {{ item.id }}</span>
+        </div>
+
+        <a
+          class="acao-principal"
+          [routerLink]="['/produtos', item.id, 'editar']"
+        >
+          Editar produto
+        </a>
+      </div>
+
+      <div class="informacoes">
+        <div class="campo">
+          <span>Nome do produto</span>
+          <strong>{{ item.nome }}</strong>
+        </div>
+
+        <div class="campo">
+          <span>SKU</span>
+          <strong>{{ item.sku }}</strong>
+        </div>
+
+        <div class="campo">
+          <span>Preço base</span>
+          <strong>
+            {{ item.precoBase | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+          </strong>
+        </div>
+      </div>
+    </section>
+  }
+</main>

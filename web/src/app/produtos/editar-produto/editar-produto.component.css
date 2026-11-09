@@ -1,0 +1,56 @@
+.pagina-editar {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.cabecalho {
+  margin-bottom: 28px;
+}
+
+.cabecalho h1 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.cabecalho p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.mensagem {
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+  color: #333;
+}
+
+.mensagem.erro {
+  background-color: #fff1f0;
+  color: #a12622;
+}
+
+.mensagem a {
+  display: inline-block;
+  margin-top: 12px;
+  color: #2457a7;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mensagem a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .pagina-editar {
+    padding: 24px 16px;
+  }
+
+  .cabecalho h1 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,24 @@
+<section class="pagina-editar">
+  <header class="cabecalho">
+    <h1>Editar produto</h1>
+    <p>Atualize as informações do produto cadastrado.</p>
+  </header>
+
+  @if (carregando()) {
+    <p class="mensagem">Carregando produto...</p>
+  } @else if (erroCarregamento()) {
+    <div class="mensagem erro">
+      <p>{{ erroCarregamento() }}</p>
+
+      <a routerLink="/produtos">Voltar para produtos</a>
+    </div>
+  } @else if (dadosIniciais()) {
+    <app-produto-formulario
+      [dadosIniciais]="dadosIniciais()"
+      [enviando]="enviando()"
+      [erroEnvio]="erroEnvio()"
+      (salvar)="salvar($event)"
+      (cancelar)="cancelar()"
+    />
+  }
+</section>
