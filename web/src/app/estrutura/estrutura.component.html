@@ -7,7 +7,19 @@
     <nav aria-label="Menu principal">
       <a routerLink="/inicio" routerLinkActive="ativo" ariaCurrentWhenActive="page">Início</a>
       @for (modulo of modulos; track modulo) {
-        <span class="modulo-pendente">{{ modulo }} <span>Em breve</span></span>
+        @if (modulo === 'Produtos') {
+          <a
+            routerLink="/produtos"
+            routerLinkActive="ativo"
+            ariaCurrentWhenActive="page"
+            >
+            {{ modulo }}
+          </a>
+        } @else {
+          <span class="modulo-pendente">
+            {{ modulo }} <span>Em breve</span>
+          </span>
+        }
       }
     </nav>
     <p class="nota-lateral">Seu negócio, em um só lugar.</p>

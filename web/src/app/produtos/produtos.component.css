@@ -1,0 +1,155 @@
+
+:host {
+  display: block;
+}
+
+.pagina-produtos {
+  width: 100%;
+}
+
+.cabecalho-produtos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cabecalho-produtos h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  letter-spacing: -0.025em;
+}
+
+.cabecalho-produtos p {
+  margin: 0.5rem 0 0;
+  color: #526075;
+}
+
+.acao-principal {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.7rem 1rem;
+  border-radius: 7px;
+  background: #244bc1;
+  color: #fff;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tabela-container {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #dce2ea;
+}
+
+th {
+  color: #526075;
+  font-size: 0.85rem;
+}
+
+td {
+  font-size: 0.9rem;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+td a {
+  color: #244bc1;
+  font-weight: 600;
+}
+
+.paginacao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  color: #526075;
+  font-size: 0.9rem;
+}
+
+.acoes-paginacao {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.botao-secundario {
+  min-height: 40px;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #8290a4;
+  border-radius: 7px;
+  background: #fff;
+  color: #182335;
+  font: inherit;
+  cursor: pointer;
+}
+
+.botao-secundario:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.estado {
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 10px;
+}
+
+.vazio {
+  text-align: center;
+}
+
+.vazio h2 {
+  margin-top: 0;
+}
+
+.vazio p {
+  margin-bottom: 1.5rem;
+  color: #526075;
+}
+
+.erro {
+  color: #8d1b29;
+}
+
+.erro p {
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .cabecalho-produtos {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .paginacao {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
+    white-space: nowrap;
+  }
+}

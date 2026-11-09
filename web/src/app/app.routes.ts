@@ -28,6 +28,14 @@ export const routes: Routes = [
           import('./estrutura/inicio.component').then((modulo) => modulo.InicioComponent),
         title: 'Início | SellerHub',
       },
+      {
+        path: 'produtos',
+        loadComponent: () =>
+          import('./produtos/produtos.component').then(
+            (m) => m.ProdutosComponent
+          ),
+        title: 'Produtos | SellerHub',
+      },
     ],
   },
   {
