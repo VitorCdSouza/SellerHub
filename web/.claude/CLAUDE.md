@@ -5,6 +5,8 @@ Antes de planejar ou implementar telas, leia [../AGENTS.md](../AGENTS.md) e inte
 
 Após `49d1f358`, Caio atualizou o início e preparou testes de integração da estrutura e `npm run test:api-real`. Consultar o README do front para executar o comando; o modo padrão não altera produtos e `--gravar` deixa um registro QA no banco. O aceite visual/acessibilidade do catálogo e ajustes das páginas continuam pendentes na fila, separados das verificações HTTP.
 
+Automação Playwright/AXE disponível em `e2e/`: `test:e2e` consulta sem alterar produtos, com 22 aprovações/6 falhas de foco/acessibilidade registradas no TODO. Capturas desktop/390 px inspecionadas. `test:e2e:gravar` é separado e cria um QA, salvo retomada explícita do ID; QA ID 7 foi cadastrado e teve edição/recarga/isolamento conferidos. Ler README antes de executar; relatórios/traces são locais ignorados e podem conter cookies. Leticia mantém as correções das páginas; Caio mantém automação/estrutura. Não excluir regras ou marcar o catálogo integralmente aceito enquanto houver falhas.
+
 Antes de executar uma tarefa FE, consulte requisitos, critérios e responsáveis em `../TODO.md`. Leticia assume FE-04/FE-05/FE-06/FE-07/FE-08/FE-10/FE-11/FE-12/FE-14, editor manual/prévia em FE-09 e conta/preferências em FE-13. Caio mantém infraestrutura/autenticação, contratos/serviços/modelos, geração de IA/aprovação/publicação e conexão de canais. Respeitar as fronteiras dos componentes; não implementar as páginas atribuídas à outra pessoa. Revisão e FE-15 são compartilhadas, com detalhamento na fila única.
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.

@@ -113,6 +113,48 @@ Essa opção **cria um produto fictício QA por execução e o mantém no banco*
 
 O verificador aceita apenas origens HTTP locais, rejeita respostas identificadas pelo simulador e encerra com erro se a API/proxy falhar. O cookie recebido é gerenciado pelo próprio comando; isso não comprova a política de cookies do navegador nem revogação de JWT no servidor. Não substitui o ensaio de interface e acessibilidade.
 
+### Testes automatizados no navegador — Playwright e AXE
+
+Instalar as dependências **na pasta `web`** e preparar o Chromium:
+
+```bash
+npm ci
+npx playwright install chromium
+```
+
+Manter PostgreSQL e a API Go em execução conforme o guia da aplicação e iniciar o Angular com `npm start` em outro terminal. A configuração usa `http://localhost:4200` e o proxy real para Go/8080. Não precisa de extensão de navegador nem de “Share with Agent”. O teste não inicia, encerra ou reinicia esses serviços; a preparação falha com diagnóstico se não estiverem disponíveis ou se o proxy identificar o simulador.
+
+Executar em `web`:
+
+```bash
+npm run test:e2e:tipos
+npm run test:e2e
+npm run test:e2e:relatorio
+```
+
+A suíte padrão usa Chromium em **1440 × 900 e 390 × 844**, com contexto/cookies isolados por teste, locale PT-BR, um worker e nenhuma repetição automática. Usa as contas fictícias do seed e exige ao menos um produto de `caio@sellerhub.com` para as consultas. Não altera os produtos existentes. Login, navegação, recarga, saída, isolamento e recuperação de destino usam a API real. Os testes identificados como **falha controlada** interceptam somente a chamada indicada para provocar erro de rede/`500`; a recuperação consulta a API real. Remover o cookie testa perda de sessão, sem comprovar expiração temporal do JWT no Go.
+
+Os arquivos ficam em `e2e/`, separados dos testes Angular em `src/`. Para executar apenas os testes funcionais, usar `npm run test:e2e -- acesso-catalogo.spec.ts`. A auditoria roda AXE sem excluir regras e verifica foco inicial e ausência de rolagem horizontal na página; uma tabela pode ter rolagem interna. AXE não substitui toda a avaliação por teclado/leitor de tela.
+
+Capturas das seis páginas, laudos `axe.json`, resumo JSON e evidências de falha ficam em `test-results/`; o relatório HTML fica em `playwright-report/`. Esses diretórios são ignorados pelo Git. Traces de falha podem conter dados de requisições e cookies: manter os artefatos locais e revisar antes de compartilhar. São capturas para inspeção; não há comparação com imagens de referência aprovada. Resultados e correções ficam em [TODO.md](TODO.md), sem desabilitar verificações para contornar falhas das páginas.
+
+Para testar cadastro/edição reais pela interface, habilitar a configuração separada:
+
+```bash
+npm run test:e2e:gravar
+```
+
+Esse comando **cria um produto `QA-E2E-*` por execução**, edita somente esse registro e verifica a persistência após recarga e o bloqueio de outra conta. O ID/SKU aparece no terminal e no relatório; o produto permanece no banco porque não há exclusão HTTP. Usar somente o banco de desenvolvimento. Não repetir cegamente após uma falha: conferir o ID/SKU registrado antes. Evidências ficam em `test-results/gravacao/` e `playwright-report/gravacao/`; para abri-las, usar `npx playwright show-report playwright-report/gravacao`. Uma nova execução da suíte padrão substitui os artefatos anteriores, inclusive os da gravação.
+
+Para retomar a edição de um QA já criado, definir `E2E_PRODUTO_QA` com seu ID. A suíte exige SKU `QA-E2E-*` e nome no padrão da ferramenta antes de permitir a alteração. Exemplo no PowerShell, substituindo `ID_DO_QA` pelo número informado na execução anterior:
+
+```powershell
+$env:E2E_PRODUTO_QA = 'ID_DO_QA'
+try { npm.cmd run test:e2e:gravar } finally { Remove-Item Env:E2E_PRODUTO_QA }
+```
+
+Esse modo não executa novo cadastro; comprova somente a retomada/edição e as verificações seguintes. Apagar a variável ao terminar restabelece o comportamento de criar um QA na próxima execução explícita de gravação.
+
 ### Roteiro integrado no navegador
 
 Com a configuração real, seguir a ordem abaixo usando as contas fictícias de desenvolvimento. O destino inicial continua `/inicio`, com acesso à lista e ao cadastro.

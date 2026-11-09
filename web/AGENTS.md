@@ -13,7 +13,7 @@ Prioridade imediata: corrigir/homologar o catálogo implementado (FE-02/FE-04/FE
 
 ### Entregas revisadas e próxima frente
 
-Em **09/11/2026**, Leticia entregou catálogo e identidade visual. No incremento local após `49d1f358`, Caio atualizou `/inicio`, acrescentou 10 testes de integração de rotas e o comando `test:api-real`. **67 testes Angular/12 arquivos e build passaram**; verificações HTTP via proxy e persistência após reinício da API também passaram. Os testes Angular usam HTTP controlado e o comando não automatiza navegador; aceite visual/AXE e correções das páginas permanecem abertos em TODO.md. Não marcar FE-15 integralmente concluída com essas evidências parciais.
+Em **09/11/2026**, catálogo/identidade visual de Leticia e início/integração/QA HTTP de Caio estão em `df05afe7`. Caio acrescentou Playwright/AXE em `e2e/`, separado do Angular. **67 testes Angular/12 arquivos e build passaram; E2E padrão: 22 aprovações/6 falhas de foco/acessibilidade**. Capturas desktop/390 px inspecionadas e QA ID 7 cadastrado/edição retomada com persistência e isolamento conferidos. Correções de Leticia e cenários restantes estão em TODO.md; não concluir FE-15. Antes de executar, consultar README do front: `test:e2e` não grava produtos e `test:e2e:gravar` cria um QA, salvo retomada explícita. Artefatos locais ignorados podem conter cookies e não devem ser publicados sem revisão.
 
 | Ordem | Página ou fluxo do front-end | Estado e próximo trabalho | Prioridade de apoio do back-end |
 | --- | --- | --- | --- |
