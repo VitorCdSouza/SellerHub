@@ -2,9 +2,13 @@
 
 Atualização em **09/11/2026**, após revisão dos quatro commits de Leticia de `47ee5b7b` a `da81eb35`. `git fetch origin` confirmou HEAD alinhado a `origin/main`; a base de back-end permanece em `88731577` (06/11/2026). Este documento concentra a fila compartilhada, as 15 tarefas FE, dependências BE/DEC, responsáveis e evidências. Checklists de implementação concluída são separados do aceite integral de cada tarefa.
 
-## Aprovação conjunta pendente — DEC-01 / RF11
+## Primeira entrega — demonstração em ambiente de testes
 
-**Decisão transversal ao projeto:** a proposta de manter pedidos consultáveis e adiar o comando manual de RF11, sua justificativa, os impactos FE/BE/banco e a deliberação estão no [registro central de DEC-01](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque). Caio aprovou o encaminhamento; a aprovação conjunta do grupo continua pendente. RF11 permanece aberto. Atualizar a decisão no documento central; esta fila registra sua consequência nas tarefas.
+**Esclarecimento de Caio em 09/11/2026:** o primeiro MVP demonstra cadastrar produto → criar/preparar anúncio → aprovar → enviar chamada a um destino de teste → apresentar o resultado. Integração real e comando manual RF11 ficam para uma entrega futura, com os controles necessários. O [registro central de DEC-01](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque) substitui a pendência anterior sobre RF11 bloquear esta demonstração.
+
+**Prioridade atual:** fechar catálogo FE-04/05/06 e o editor/envio de FE-08/09 com serviços de Caio e componentes de Leticia; homologação FE-15. Samuel/Vitor priorizam BE-07/BE-08 para o contrato do anúncio, destino e retorno do envio, com BE-15 para a prova do fluxo. A escolha do destino ainda está aberta: marketplace próprio de teste é alternativa em avaliação. Não criar novos endpoints simulados sem acordo.
+
+**Aceite desta entrega:** produto persistido e reaberto; anúncio preparado e aprovado; recebimento da requisição no destino escolhido e resposta visível no front, inclusive erro. Identificar ambiente/destino e simulação. Uma chamada disparada não comprova sucesso nem publicação real. Os critérios de Mercado Livre real, operação e módulos restantes abaixo pertencem à evolução do produto completo; não bloqueiam este recorte e não são marcados concluídos por ele.
 
 ## Como interpretar o estado
 
@@ -374,13 +378,13 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 2. Testes de IA mostram sugestão editável e preservação do texto manual em falha/regeneração; nenhuma geração dispara publicação.
 3. Testes de aprovação cobrem alteração posterior e clique duplo; a operação referencia a revisão efetivamente mostrada e aprovada, conforme contrato de BE-07.
 4. Uma resposta de processamento não exibe sucesso final; falha/resultado desconhecido mantém caminho de consulta e recuperação sem duplicar envio.
-5. Conclusão exige publicação real autorizada no Mercado Livre com ID externo verificável, além de sugestão Gemini revisável e fotos suportadas. Subentregas de editor, IA e publicação devem ser registradas separadamente até esse fluxo completo existir.
+5. Aceite da primeira entrega: anúncio preparado/aprovado, chamada recebida no destino de teste escolhido e resultado apresentado. Aceite da integração real futura: publicação autorizada no canal com ID externo verificável, IA/fotos conforme os incrementos acordados. Registrar as subentregas separadamente; teste não conclui a integração real nem os recursos ainda ausentes.
 
 ### FE-10 — Consulta de vendas e pedidos
 
 - [ ] **FE-10 — Construir listagem e detalhe de pedidos para consulta.**
 
-**Responsável:** Leticia, usando o serviço e o modelo de pedidos preparados por Caio. **Situação:** interface com simulação possível; integração bloqueada. **Dependências:** FE-03, BE-10 e DEC-01 para qualquer escrita. **Referência:** RF07; RF11 permanece em decisão conjunta, conforme o [registro central](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque).
+**Responsável:** Leticia, usando o serviço e o modelo de pedidos preparados por Caio. **Situação:** evolução após a primeira demonstração; integração bloqueada. **Dependências:** FE-03, BE-10 e DEC-01 para qualquer escrita. **Referência:** RF07; comando manual RF11 pertence à entrega futura com os controles necessários, conforme o [registro central](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque).
 
 **Requisitos de desenvolvimento**
 
@@ -505,7 +509,7 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 1. Cada marco pode ser repetido pela outra pessoa a partir do roteiro, com persistência e respostas esperadas. Falhas impedem concluir apenas o marco afetado, com pendência registrada.
 2. Testes pertinentes e build passam; verificações de acessibilidade têm evidência e correções necessárias. Não substituir teste real de API/banco por testes de frontend simulados.
 3. Bloqueios de API geram ou atualizam o item BE correspondente; operações externas só são executadas dentro de autorização e ambiente combinados com o parceiro.
-4. A fila registra os marcos concluídos e os restantes; FE-15 permanece aberta enquanto houver marco de entrega pendente. Não declarar o MVP completo com apenas catálogo ou conector simulado.
+4. Registrar separadamente o aceite da primeira demonstração e os marcos futuros. O recorte produto → anúncio → envio em testes pode ser aceito sem integração real; isso não conclui o produto completo ou toda a FE-15. Identificar simulação e não declarar publicação comercial com base em resultado de teste.
 
 ## Próximos passos de Caio e dependências entre as frentes
 
@@ -524,9 +528,9 @@ Referência em 09/11: catálogo entregue de `47ee5b7b` a `7f0be9c0`, identidade 
 - **Ainda depende do back-end:** persistência dos campos/fotos, rascunho e operação de publicação, autorização/conector, Gemini e APIs de operação/administração/recuperação. Esses adaptadores não estão liberados só porque o catálogo foi entregue.
 - **Ainda depende do grupo:** DEC-01/DEC-02/DEC-03. Confirmar regras antes de botões de escrita de pedidos/estoque, campos extras, compartilhamento do catálogo e bloqueio de anúncio por canal.
 
-## Caminho para completar o MVP — prioridades de 09/11/2026
+## Evolução do produto após a primeira demonstração — roadmap anterior
 
-Ordem de dependência, sem novos prazos ou redução de escopo aprovada. O cadastro básico é a base do MVP; sua entrega isolada não conclui o produto. A autorização do marketplace deve avançar em paralelo ao fechamento do catálogo, pois depende de acesso externo.
+O esclarecimento no início desta fila define o aceite da primeira demonstração. A tabela abaixo preserva os marcos de evolução, sem exigir que todos sejam concluídos agora ou inferir prazos. Mercado Livre real, operação de estoque/pedidos e demais requisitos continuam pendentes para entregas futuras.
 
 | Prioridade e marco | Entrega de front e responsáveis | Apoio específico do back-end / decisão | Evidência para encerrar |
 | --- | --- | --- | --- |
@@ -580,7 +584,7 @@ Essa sequência não aprova retirada de indicadores ou recuperação de senha do
 
 Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `[x]` registra entrega de código confirmada por leitura e `go vet`; homologação integrada é separada em BE-15/FE-15. Itens parciais permanecem abertos com o restante explícito. Não houve implementação de back-end nesta revisão.
 
-**Prioridade para Samuel/Vitor em 09/11:** apoiar o aceite do catálogo existente em BE-15 e, em paralelo, iniciar/liberar BE-08 (autorização/conexão/conector) e combinar BE-05/BE-06/BE-07/BE-09 para fotos/rascunho/publicação/IA. Não aguardar acabamento/AXE do catálogo para tratar acesso externo. Em cada contrato, informar método/caminho, corpo, tipos/obrigatoriedade, sucesso, erros e estados. Fotos precisam de formato/limites/identificadores das versões; anúncios precisam de revisão aprovada e operação consultável; canais precisam de autorização/retorno, capacidades e consulta sem tokens; IA precisa de sugestão editável/limites/quota. BE-10/BE-11 vêm na frente operacional e BE-12/BE-13/BE-14 completam os requisitos. Sem contrato, os adaptadores seguem bloqueados; o front não implementará esses ajustes no Go/schema.
+**Prioridade para Samuel/Vitor no recorte esclarecido em 09/11:** apoiar o catálogo em BE-15 e combinar BE-07/BE-08 para anúncio, destino de teste, envio pelo Go e retorno verificável. Definir método/caminho, dados, sucesso, falhas e acompanhamento da operação. Escolher o destino antes de construir receptor ou novo simulador. Autorização/conector real, fotos/IA e BE-10 a BE-14 continuam planejados nos incrementos correspondentes; não são todos pré-requisitos do envio mínimo desta demonstração. Sem contrato, os adaptadores dependentes não devem inventar endpoints. O front não implementará ajustes no Go/schema.
 
 - [x] **BE-01 — Restaurar compilação do login (entregue em `88731577`):** consulta por e-mail restaurada no SQL/sqlc, identificador adequado e `go vet ./...` aprovado em 08/11. Login normaliza o e-mail na entrada; a garantia de normalização dos registros existentes ainda deve ser conferida em BE-15. Não é mais bloqueio de FE-01.
 - [ ] **BE-02 — Carga de desenvolvimento (parcial):** na cópia local de Caio, banco atual preparado separadamente da PoC; três usuários confirmados por SQL e login HTTP de Caio/Samuel aprovado. Senha incorreta e e-mail inexistente retornaram `401`; e-mail com espaços/maiúsculas foi normalizado. O usuário também confirmou login incorreto/correto no navegador; resta confirmar os ambientes dos demais integrantes. O seed contém `samuel@sellerhub.com`, `caio@sellerhub.com` e `vitor@sellerhub.com`, com senha de demonstração `123456`. Não recriar ou sobrescrever um banco existente sem avaliar seus dados.
@@ -590,7 +594,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 - [ ] **BE-05 — Campos e validações do produto (parcial):** nome/SKU obrigatórios com trim/limites e preço positivo com até duas casas já estão implementados. Restam resolver DEC-02, definir unicidade de SKU no domínio aprovado, controle de edição concorrente e respectivas respostas de conflito. Acrescentar persistência dos campos adicionais aprovados e combinar evolução do schema. Libera somente o cadastro básico; cadastro completo/FE-07 continuam dependentes desses itens.
 - [ ] **BE-06 — Expor fotos e tratamento:** upload, consulta e vínculo ao produto/anúncio, validação de arquivo e retorno de prévia/versão tratada. Definir limites e falhas para o front-end, preservando foto real e aprovação da prévia. Desbloqueia FE-07 e imagens em FE-09.
 - [ ] **BE-07 — Expor anúncios:** listar/consultar/criar/editar rascunhos, dados de produto/canal e situações; fornecer requisitos de categoria/canal e erros por campo. Implementar aprovação do conteúdo exato e retorno consultável da publicação, com proteção contra repetição. A tabela atual sozinha não implementa esses fluxos. Desbloqueia FE-08/FE-09.
-- [ ] **BE-08 — Disponibilizar conexão e conector de marketplace:** fluxo de autorização, situação da conexão, reconexão e publicação/atualização autorizada, com resultado e falhas consultáveis. Informar capacidades por canal; ter Mercado Livre, Shopee e Amazon na tabela não implica suporte real. Desbloqueia publicação em FE-09 e canais em FE-13.
+- [ ] **BE-08 — Disponibilizar conexão e conector de marketplace:** para a primeira demonstração, acordar destino de teste, contrato e envio pelo Go com resultado/falhas verificáveis. Construir receptor próprio ainda depende de escolher essa alternativa. Para a integração real futura: autorização, conexão/reconexão e publicação/atualização autorizada, com capacidades por canal. Cadastro de marketplace não implica suporte real; resultado simulado não é publicação comercial. Desbloqueia as subentregas correspondentes de FE-09/FE-13, sem fechar o item inteiro ao demonstrar somente testes.
 - [ ] **BE-09 — Expor geração assistida:** contrato de título/descrição, limites, falha/quota e retorno sempre como sugestão editável. Credenciais e chamadas ao provedor ficam na API. Desbloqueia a parte de IA de FE-09.
 - [ ] **BE-10 — Expor consulta de vendas/pedidos:** paginação, filtros, itens, vínculo com produto, situações padronizadas e informação de atualização/falha por canal. Acordar os dados devolvidos à interface e resolver DEC-01 antes de qualquer comando de reposição. Desbloqueia FE-10.
 - [ ] **BE-11 — Expor estoque e sincronização:** disponibilizar saldo por produto, situação por canal, divergências, última execução e pendências/falhas; combinar ações realmente suportadas e suas respostas. Garantir consistência e tratamento de repetição no servidor; não delegar cálculo do saldo ao Angular. Resolver DEC-01 para ajustes/reposições. Desbloqueia FE-11 e preferências de FE-13.
@@ -601,7 +605,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 
 ## Decisões que precisam de alinhamento
 
-- [ ] **DEC-01 — Vendas e estoque — aprovação conjunta pendente:** consultar e atualizar o [registro central de decisão](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque), compartilhado por todas as frentes. RF11 continua aberto. FE-10/FE-11 podem avançar como consulta/acompanhamento; comandos manuais dependem da deliberação e dos contratos seguros de BE-10/BE-11. Após a decisão, atualizar aqui apenas as consequências para execução e aceite.
+- [ ] **DEC-01 — Vendas e estoque — recorte inicial esclarecido; operação futura pendente:** consultar o [registro central](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque). RF11 não bloqueia a primeira demonstração de produto/anúncio/envio em testes e continua aberto para a entrega futura. Antes de movimentos reais, detalhar fonte/estados e contratos seguros de BE-10/BE-11. Destino de teste ainda precisa ser escolhido. Não marcar controles operacionais ou integração real como concluídos por este esclarecimento.
 - [ ] **DEC-02 — Produto mínimo e vínculo ao usuário:** protótipo inclui descrição, categoria e características; API só persiste nome, SKU e preço, vinculados ao usuário do JWT. Já é possível construir/integrar esse recorte técnico; confirmar se ele atende à primeira entrega e quais campos devem ser acrescentados. A implementação isola produtos por usuário; confirmar se a conta única precisa de catálogo compartilhado. Não tratar o comportamento atual como aprovação automática de uma regra de produto.
 - [ ] **DEC-03 — Canais e anúncios:** o protótipo impede selecionar canal já anunciado; o banco não garante anúncio único por produto/canal. Confirmar essa regra antes de bloquear na interface. Acordar campos obrigatórios e capacidades reais de cada canal; não assumir que os três do protótipo já serão integrados.
 
@@ -609,7 +613,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 
 A primeira frente **login → estrutura/sessão → listagem → cadastro → detalhe/edição** já tem código entregue. A revisão atual passa de construir páginas básicas para corrigir/homologar o fluxo. O resumo e a prioridade de apoio estão em [AGENTS.md](AGENTS.md); detalhes e checklists permanecem somente nesta fila.
 
-Fechar os ajustes imediatos de FE-02/FE-04/FE-05/FE-06 e o marco de catálogo FE-15. Em paralelo, preparar fotos, anúncios e conexão de canal conforme o caminho do MVP acima. BE-05/DEC-02 condicionam ampliar o cadastro, sem exigir novo endpoint para os três campos atuais. Vendas, Estoque, Indicadores, Administração e Recuperação seguem pendentes, sem exclusão ou adiamento aprovado.
+Fechar os critérios restantes do catálogo e preparar anúncio/envio ao destino de teste conforme o recorte no início da fila. BE-05/DEC-02 condicionam ampliar o cadastro, sem exigir novos campos para os três existentes. Vendas, Estoque, Indicadores, Administração e Recuperação seguem no produto completo; não são condições de aceite da primeira demonstração esclarecida por Caio.
 
 Marcar um item como concluído somente após registrar o que foi entregue e sua verificação. Uma tela visualmente pronta pode fechar a parte de interface, mas deve manter a integração pendente com o respectivo ID de back-end. Em cada retomada, conferir arquivos/rotas e atualizar este documento, sem presumir que esta fotografia permanece atual.
 
