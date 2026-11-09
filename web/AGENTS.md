@@ -7,13 +7,15 @@ O README da raiz deve conter apresentação do projeto e instruções gerais de 
 
 Ao concluir uma entrega, sugerir mensagens de commit em Conventional Commits, com descrição concreta em português e escopo coerente com os arquivos alterados. A sugestão não autoriza executar commit ou push.
 
+Antes de entregar alterações de código/configuração/testes, executar `npm run test:qualidade` com ambiente real e conferir [QUALIDADE.md](QUALIDADE.md). Corrigir falhas com regressão e repetir até aprovação do conteúdo atual; ambiente ou dependência externa exige bloqueio identificado. `test:qualidade:conferir` só valida a prova em cache. Não reduzir testes/AXE nem usar gravação automática. O README do front documenta os estados e a impressão do código; manter logs/traces locais ignorados.
+
 Para desenvolvimento do catálogo sem banco, usar os comandos e cenários de simulação descritos em [README.md](README.md). O modo é explícito (`start:simulado`), tem aviso permanente e não substitui a homologação real. Não acrescentar endpoints simulados para módulos cujo contrato ainda não foi combinado.
 
 Prioridade imediata: corrigir/homologar o catálogo implementado (FE-02/FE-04/FE-05/FE-06/FE-15), incluindo testes da listagem e acessibilidade. Não reconstruir essas páginas nem esperar novos endpoints para os três campos existentes. Fotos/anúncios/canais/IA são a próxima frente, com contratos BE-05/BE-06/BE-07/BE-08/BE-09 e decisões pertinentes; começar autorização de canal em paralelo ao aceite do catálogo. Simulação continua explícita e separada do HTTP real. Necessidades de Go/schema são to-dos do time de back-end.
 
 ### Entregas revisadas e próxima frente
 
-Em **09/11/2026**, catálogo/identidade visual de Leticia e início/integração/QA HTTP de Caio estão em `df05afe7`. Caio acrescentou Playwright/AXE em `e2e/`, separado do Angular. **67 testes Angular/12 arquivos e build passaram; E2E padrão: 22 aprovações/6 falhas de foco/acessibilidade**. Capturas desktop/390 px inspecionadas e QA ID 7 cadastrado/edição retomada com persistência e isolamento conferidos. Correções de Leticia e cenários restantes estão em TODO.md; não concluir FE-15. Antes de executar, consultar README do front: `test:e2e` não grava produtos e `test:e2e:gravar` cria um QA, salvo retomada explícita. Artefatos locais ignorados podem conter cookies e não devem ser publicados sem revisão.
+Base de catálogo/navegação em `df05afe7` e Playwright/AXE em `143596f5`. A revisão de qualidade corrige foco/landmarks/contraste, recuperação de páginas vazias, limites Unicode e concorrência na edição; acrescenta regressões e o comando único de verificação. O resultado atual está em [QUALIDADE.md](QUALIDADE.md) e os critérios restantes em TODO.md; suíte aprovada não conclui FE-15 ou o MVP. `test:e2e` não grava produtos; `test:e2e:gravar` cria um QA, salvo retomada explícita. Artefatos locais podem conter cookies e não devem ser publicados sem revisão.
 
 | Ordem | Página ou fluxo do front-end | Estado e próximo trabalho | Prioridade de apoio do back-end |
 | --- | --- | --- | --- |

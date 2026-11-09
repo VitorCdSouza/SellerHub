@@ -1,4 +1,3 @@
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProdutoFormularioComponent } from './produto-formulario.component';
 
@@ -17,9 +16,7 @@ describe('Formulário de produto', () => {
   });
 
   function preencherCampo(id: string, valor: string): void {
-    const campo = fixture.nativeElement.querySelector(
-      `#${id}`,
-    ) as HTMLInputElement;
+    const campo = fixture.nativeElement.querySelector(`#${id}`) as HTMLInputElement;
 
     campo.value = valor;
     campo.dispatchEvent(new Event('input'));
@@ -151,4 +148,20 @@ describe('Formulário de produto', () => {
     expect(sku.value).toBe('P-2');
     expect(preco.value).toBe('49,9');
   });
+
+  it.each([
+    { caso: 'espaços nas pontas', nome: ` ${'A'.repeat(255)} `, sku: ` ${'B'.repeat(100)} ` },
+    { caso: 'caracteres Unicode fora do BMP', nome: '🔧'.repeat(255), sku: '🔩'.repeat(100) },
+  ])(
+    'aceita os limites do contrato após trim e contagem por caracteres: $caso',
+    ({ nome, sku }) => {
+      const salvar = vi.fn();
+      component.salvar.subscribe(salvar);
+      preencherCampo('nome', nome);
+      preencherCampo('sku', sku);
+      preencherCampo('precoBase', '10,00');
+      enviarFormulario();
+      expect(salvar).toHaveBeenCalledWith({ nome: nome.trim(), sku: sku.trim(), precoBase: 10 });
+    },
+  );
 });

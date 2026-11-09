@@ -66,6 +66,8 @@ import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
       align-items: center;
       justify-content: center;
       min-height: 44px;
+      width: auto;
+      margin: 0;
       padding: 0.7rem 1rem;
       border: 1px solid #244bc1;
       border-radius: 7px;

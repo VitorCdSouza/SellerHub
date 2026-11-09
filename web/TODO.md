@@ -10,7 +10,26 @@ Atualização em **09/11/2026**, após revisão dos quatro commits de Leticia de
 - **Integração bloqueada:** ainda não há API utilizável para concluir o fluxo real.
 - **Implementação entregue, aceite pendente:** componentes e chamadas existem e podem ser revisados/testados; não exige reconstruir a tela. Ajustes e verificações restantes ficam no próprio item FE, que permanece aberto até cumprir todos os critérios.
 
-**Login, sessão, estrutura e catálogo básico têm implementação entregue.** Leticia entregou as páginas/menu e a marca; Caio atualizou início, testes de integração e automação Playwright/AXE. **67 testes Angular/12 arquivos e build passaram**. Agora há execução de navegador com Go/PostgreSQL: **22 testes E2E aprovados e 6 falhas de acessibilidade/foco**, detalhadas abaixo. A homologação ainda depende das correções e cenários restantes de FE-15. Campos adicionais, fotos e demais módulos continuam sem API liberada.
+**Login, sessão, estrutura e catálogo básico têm implementação entregue.** As correções de acessibilidade, recuperação e concorrência abaixo foram revalidadas: **80 testes Angular/13 arquivos, 8 do verificador, 5 do simulador, 19 verificações HTTP reais e 28 E2E aprovados**, além de tipos e build. Resultado atual em [QUALIDADE.md](QUALIDADE.md). Os marcos FE/BE/DEC ainda não cobertos permanecem abertos; fotos e demais módulos continuam sem API liberada.
+
+## Revisão de qualidade e regressões — 09/11/2026
+
+Base `143596f5`. O comando `test:qualidade` reúne a verificação das entregas e registra prova vinculada à impressão do código. A execução atual está aprovada, com histórico técnico local em `tmp/qualidade/`; consultar o relatório para hash/data/plano, sem confundir esse resultado com aceite completo do MVP.
+
+| Defeito | Correção entregue | Evidência |
+| --- | --- | --- |
+| QA-001 — foco ao abrir página | Cadastro, detalhe e edição usam `appFocoPagina` no título. | E2E em desktop/390 px. |
+| QA-002 — principal duplicado | Cadastro/detalhe usam seções dentro do único main da estrutura. | AXE sem regras excluídas. |
+| QA-003 — contraste | Texto introdutório de cadastro/detalhe com contraste ajustado. | 12 laudos AXE sem violações nos estados auditados. |
+| QA-004 — página vazia com total positivo | Diferencia página sem itens de catálogo vazio; mantém paginação e oferece nova tentativa, inclusive na primeira página. | 7 testes próprios da lista; a revisão reproduziu e corrigiu também o caso de página 1 sem navegação anterior. |
+| QA-005 — limites de texto | Nome/SKU contam caracteres Unicode após trim; removido maxlength HTML que barrava valores aceitos pelo contrato. | Regressões de espaços nas pontas e caracteres fora do BMP. |
+| QA-006/007 — erro de leitura na edição | Nova tentativa do GET atual, erro com role alert e carregamento com role status. | Testes da edição com falha/recuperação. |
+| QA-008 — resposta de PUT anterior | Confirmação/erro/finalização de gravação antiga não alteram o estado nem navegam para o ID anterior. | Regressão de troca de ID durante PUT; bloqueio de envio duplicado preservado. |
+| QA-009 — ações do início | Margem/largura locais alinhadas, sem herdar diferenças da ação secundária global. | Capturas desktop/390 px revisadas. |
+
+A revisão acrescentou **13 regressões Angular** e testes do verificador. A primeira rodada reproduziu as falhas, uma segunda revisão reabriu QA-004, e a verificação completa posterior passou sem skips/flaky. Nenhum teste ou regra AXE foi removido para obter aprovação. Nenhum produto foi gravado, nem Go/schema/seed alterado; serviços existentes preservados.
+
+**Próximos passos:** completar os critérios restantes FE-15 e os testes de confirmação/estados ainda indicados em FE-05/FE-06. Em paralelo, Leticia avança seleção/prévia de fotos e editor/lista; Caio prepara serviços após contratos; Samuel/Vitor priorizam BE-08 e contratos BE-05/06/07/09. BE-02 (acentuação), BE/DEC restantes e marcos de publicação/operação continuam pendentes. As contagens e falhas nos registros anteriores abaixo descrevem as execuções históricas.
 
 ## Automação do navegador — resultado de 09/11/2026
 
@@ -68,12 +87,12 @@ Nenhuma das três tarefas de catálogo é marcada integralmente concluída só p
 | Item | Entrega | O que falta para concluir |
 | --- | --- | --- |
 | FE-01 | Login relativo, proxy, validações preservadas, confirmação de sessão e ensaio real básico no navegador confirmado pelo usuário. | Auditoria de acessibilidade e cenários de falha restantes. |
-| FE-02 | Estrutura, menu/rotas de catálogo, início com ações para lista/cadastro, conta e logo/favicon. Navegação entre páginas coberta por integração Angular. | Foco/landmarks das páginas de Leticia, teclado/390 px e AXE. |
+| FE-02 | Estrutura, menu, início, foco e landmarks corrigidos; navegação/AXE em desktop/390 px aprovados nos estados auditados. | Completar teclado e estados adicionais de FE-15; acabamento da marca. |
 | FE-03 | Guard, consulta de sessão, indisponibilidade, interceptor de `401`, logout e proteção contra respostas atrasadas; acesso/recarga/saída básicos confirmados. | Expiração temporal, falha/recuperação no navegador e auditoria de acessibilidade. |
-| FE-04/FE-05/FE-06 | Páginas listagem/cadastro/detalhe/edição integradas ao serviço, com formulário reutilizado e testes de cadastro/formulário/detalhe/edição. | Ajustes específicos abaixo, testes da listagem e marco de catálogo em FE-15. |
+| FE-04/FE-05/FE-06 | Catálogo integrado, testes próprios da lista, limites de texto corrigidos e recuperação/concorrência da edição cobertas. | Critérios restantes de confirmação/estados e marco de catálogo em FE-15. |
 | Serviço de produtos | Listar, consultar, cadastrar e atualizar. Cadastro agora retorna HttpResponse, com `status` e `body?.id`. | Consumidores devem usar o contrato atualizado; homologar o fluxo completo com banco real. |
 | Ambiente de desenvolvimento sem banco | Simulador HTTP isolado, comandos próprios, aviso permanente e cenários de catálogo/vazio/falhas/atraso/expiração; instruções em [README.md](README.md). | As páginas continuam com Leticia. O simulador apoia o desenvolvimento; não conclui integração ou homologação real. |
-| Verificação da base | Testes Angular/HTTP e Playwright/AXE com Go/PostgreSQL; capturas desktop/390 px e cadastro/edição do QA ID 7. | Corrigir as seis falhas E2E; ampliar teclado/estados, expiração temporal e aceite do catálogo completo. Falhas de rede/500 na interface foram controladas pelo teste. |
+| Verificação da base | Verificador completo aprovado; histórico e prova por impressão; Angular/HTTP real/Playwright/AXE sem falhas atuais. | Ampliar teclado/estados, expiração temporal e aceite do catálogo completo. Falhas de rede/500 na interface foram controladas pelo teste. |
 
 O serviço disponibiliza `listar(pagina, limite)`, `consultar(id)`, `cadastrar(dados)` e `atualizar(id, dados)`. O modelo interno usa `nome`, `sku` e `precoBase`; `listar` retorna `itens`/`total`. O serviço adapta o JSON da API (`name`, `basePrice`, `items`), sem cache de produtos, conversão para centavos ou fallback simulado. As páginas devem tratar erros e descartar seus dados ao serem destruídas/encerrar a sessão. Nenhum serviço foi inventado para anúncios/pedidos enquanto faltam esses contratos.
 
@@ -165,9 +184,9 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 - [x] Registrar as quatro rotas protegidas de catálogo e ativar Produtos no menu (Leticia).
 - [x] Adicionar logo e favicon (Leticia, `da81eb35`).
 - [x] **Caio:** atualizar `/inicio` com Ver produtos/Cadastrar produto e remover o aviso de catálogo indisponível; conferir composição da navegação lista/cadastro/detalhe/edição com rotas e serviços Angular reais, usando HTTP controlado. Aceite visual separado em FE-15.
-- [ ] **Leticia, com revisão de Caio — imediato:** aplicar `appFocoPagina` aos títulos de cadastro/detalhe/edição e remover `<main>` internos de cadastro/detalhe. Playwright confirmou ausência de foco nas três páginas em desktop/390 px; AXE confirmou `landmark-main-is-top-level`, `landmark-no-duplicate-main` e `landmark-unique` nas duas páginas com `<main>` aninhado. Reexecutar `npm run test:e2e` sem excluir regras.
-- [ ] **Leticia — imediato:** aumentar o contraste dos parágrafos introdutórios de cadastro/detalhe (`#687385` sobre `#f4f6fa`, 4,43:1) para pelo menos 4,5:1, conforme laudos AXE. Conferir também carregamento/erro da edição e completar teclado/estados além das capturas já inspecionadas.
-- [ ] **Caio — acabamento visual do início:** isolar `.acoes-catalogo a` da margem superior/largura globais de `.acao-secundaria`; capturas mostram ações desalinhadas no desktop e larguras diferentes em 390 px. Preservar os destinos e rever ambas as larguras após o ajuste.
+- [x] Aplicar `appFocoPagina` aos títulos de cadastro/detalhe/edição e remover `<main>` internos de cadastro/detalhe. Revalidado por Playwright/AXE em desktop/390 px (QA-001/002).
+- [x] Corrigir contraste introdutório de cadastro/detalhe e semântica de carregamento/erro da edição. Laudos AXE dos estados auditados sem violações; cenários adicionais de teclado/erro permanecem FE-15 (QA-003/007).
+- [x] Isolar margem/largura de `.acoes-catalogo a` das regras globais e revisar as ações do início nas duas larguras (QA-009).
 - [ ] **Leticia — acabamento:** reduzir o PNG de 1.088.280 bytes usado em logo de 42 px e favicon, preparar favicon apropriado e aplicar NgOptimizedImage à imagem estática conforme as convenções. Este acabamento não deve atrasar contratos/publicação.
 
 **Requisitos de desenvolvimento**
@@ -214,8 +233,8 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 **Implementação entregue e fechamento**
 
 - [x] Implementar tabela, preço BRL, total/paginação, vazio/erro/nova tentativa, switchMap e menu/rota.
-- [ ] **Imediato:** criar testes de ProdutosComponent — não há spec dessa página — cobrindo vazio, total/limites da navegação, `500`/recuperação, cancelamento de leitura anterior e destruição do componente. Os testes do serviço não cobrem esses comportamentos da página.
-- [ ] **Revisão de robustez:** se `itens` vier vazio com `total > 0`, preservar recuperação para página válida; hoje o ramo vazio afirma que o catálogo não tem produtos e esconde a paginação. Testar a diferença entre catálogo vazio e página sem itens.
+- [x] Criar `produtos.component.spec.ts` com 7 testes da página/serviço HTTP controlado: vazio, paginação/limites, erro/recuperação, cancelamento e destruição.
+- [x] Diferenciar `itens=[]` com `total > 0` de catálogo vazio e oferecer recuperação da consulta/paginação, inclusive na primeira página (QA-004).
 - [ ] **Com Caio:** cumprir FE-15 com API/banco reais, desktop/390 px e acessibilidade antes de fechar a tarefa integral.
 
 **Requisitos de desenvolvimento**
@@ -241,7 +260,7 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 **Implementação entregue e fechamento**
 
 - [x] Criar formulário reutilizável de nome/SKU/preço, validações monetárias, POST com HttpResponse/`201`, bloqueio de repetição, erro/cancelamento e testes.
-- [ ] **Imediato:** alinhar limites de nome/SKU após trim e por caracteres Unicode com o Go. Hoje `Validators.maxLength`/`maxlength` usam o texto bruto e unidades UTF-16; a API remove espaços antes de contar caracteres. Cobrir texto no limite com espaços nas pontas e caracteres fora do BMP, sem rejeitar valores que a API aceita.
+- [x] Alinhar limites de nome/SKU após trim e por caracteres Unicode com o Go; remover bloqueio HTML por unidades UTF-16 e cobrir espaços/caracteres fora do BMP (QA-005).
 - [ ] **Imediato:** complementar testes com `200` sem criação/`201` sem ID, falha preservando valores realmente digitados e mensagens/estado inválido/foco dos campos; seguir os ajustes de acessibilidade em FE-02.
 - [ ] **Com Caio:** conferir cadastro real → lista → detalhe → F5, e identificação do recorte básico. Não prometer SKU único/campos completos.
 
@@ -269,9 +288,10 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 **Implementação entregue e fechamento**
 
 - [x] Implementar GET por ID, detalhe, erro/`404`/nova tentativa no detalhe, PUT com formulário reutilizado, cancelamento, retorno ao detalhe e testes de componentes.
-- [ ] **Imediato:** oferecer nova tentativa de leitura na edição após falha transitória; hoje a tela recomenda tentar novamente, mas só oferece voltar à lista. Conferir foco e anúncio dos estados conforme FE-02.
+- [x] Oferecer nova tentativa de leitura na edição após falha transitória, com foco e estados alert/status (QA-001/006/007).
 - [ ] **Imediato:** fortalecer o teste de preservação após falha: editar os controles reais do formulário e verificar que o texto digitado continua após `500`. O teste atual chama `salvar` diretamente e compara `dadosIniciais`, sem comprovar a preservação da edição.
-- [ ] **Revisão:** testar duplo PUT durante envio, ID inválido na edição, troca de ID com GET anterior pendente e recuperação de erros. Verificar que resposta de gravação atrasada não navega para um produto anterior após mudança de rota.
+- [x] Testar bloqueio de PUT duplicado e impedir que gravação atrasada navegue/afete o ID atual após troca de rota (QA-008).
+- [ ] **Revisão restante:** ampliar ID inválido na edição e troca de ID com GET anterior pendente, além dos cenários de recuperação já cobertos.
 - [ ] **Com Caio:** homologar edição → detalhe → lista → F5 e `404` de outra conta pelo fluxo Angular. A verificação HTTP da API em 08/11 não substitui esse roteiro.
 
 **Requisitos de desenvolvimento**
@@ -465,7 +485,8 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 - [x] **Caio:** configurar Playwright/AXE e comandos separados de leitura/gravação, capturas desktop/390 px, relatórios ignorados e checagem TypeScript independente do Angular. Suíte padrão com 22 aprovações/6 falhas reais de foco/acessibilidade; ver resultado no início da fila.
 - [x] Executar cadastro real do QA ID 7 e retomar sua edição após corrigir espera do teste: PUT, recarga, consulta dos valores, logout e bloqueio por outra conta aprovados. Nenhum outro QA criado; não substituir essa evidência pela alegação de um novo fluxo completo aprovado em uma única execução.
 - [x] Verificar perda do cookie com `401` real, retorno após login e falhas controladas de sessão/lista/PUT com recuperação/preservação dos campos. Cenários controlados não equivalem a desligar a API.
-- [ ] **Leticia e Caio:** corrigir os achados FE-02/FE-04/FE-05/FE-06 e repetir a suíte completa até passar. Completar teclado/leitor de tela, estados de erro/validação no AXE, paginação real com mais de 20 itens e catálogo vazio, falha de logout, parada real da API na interface e expiração temporal. Não criar registros em massa para paginação nem alterar a duração do JWT no front.
+- [x] Corrigir QA-001 a QA-009, reabrir/corrigir o caso adicional de QA-004 na revisão e aprovar o verificador completo sobre a mesma impressão. Resultado atual em QUALIDADE.md; registro por rodada preservado localmente.
+- [ ] **Leticia e Caio:** completar teclado/leitor de tela, estados de erro/validação no AXE, paginação real com mais de 20 itens e catálogo vazio, falha de logout, parada real da API na interface e expiração temporal. Não criar registros em massa para paginação nem alterar a duração do JWT no front.
 - [ ] Validar demais marcos de publicação/operação conforme os contratos. Serviços de fotos/anúncios/canais/IA continuam bloqueados nos respectivos BE; não foram inventados endpoints.
 
 **Requisitos de desenvolvimento**
@@ -488,7 +509,7 @@ Referência em 09/11: catálogo entregue de `47ee5b7b` a `7f0be9c0`, identidade 
 
 | Frente imediata | Caio | Leticia | Condição de encerramento |
 | --- | --- | --- | --- |
-| Revisar e fechar catálogo | Automação Playwright/AXE disponível; revisar entregas, ajustar apresentação das ações do início e repetir testes após correções. | Corrigir foco/landmarks/contraste confirmados por E2E e pendências FE-04/FE-05/FE-06. | Eliminar as seis falhas da suíte e cumprir os critérios restantes FE-15, sem dados de outra conta ou perda de edição. |
+| Revisar e fechar catálogo | Manter verificação de cada entrega e serviços/integração; ações do início já corrigidas. | Completar testes de confirmação/estados ainda indicados em FE-05/FE-06 e o aceite FE-15. | Suíte atual aprovada; completar critérios restantes, sem dados de outra conta ou perda de edição. |
 | Preparar publicação em paralelo | Combinar DTOs com Samuel/Vitor e preparar adaptadores de fotos, anúncios, IA e canais assim que definidos. | Começar prévia local de fotos (FE-07) e editor manual/prévia (FE-09); lista de anúncios (FE-08) conforme contrato. | Componente e serviço com entradas/saídas combinadas, simulação explícita; operação real só depois do endpoint. |
 | Preparar consultas e formulários posteriores | Coordenar contratos de pedidos, estoque, indicadores, conta/preferências e recuperação. | Manter essas páginas atribuídas a ela e começar cada incremento com campos/estados acordados. Conta ID/e-mail em leitura já pode avançar. | BE-10 a BE-14 liberam os serviços; aprovação dos critérios de cada FE, sem inventar endpoints ou regras. |
 
@@ -589,6 +610,8 @@ Fechar os ajustes imediatos de FE-02/FE-04/FE-05/FE-06 e o marco de catálogo FE
 Marcar um item como concluído somente após registrar o que foi entregue e sua verificação. Uma tela visualmente pronta pode fechar a parte de interface, mas deve manter a integração pendente com o respectivo ID de back-end. Em cada retomada, conferir arquivos/rotas e atualizar este documento, sem presumir que esta fotografia permanece atual.
 
 ## Verificações
+
+- **Revisão regressiva de 09/11 após `143596f5`:** `npm.cmd run test:qualidade` aprovado em todos os sete checks: 80 Angular/13 arquivos, 8 do executor, 5 do simulador, tipos, build, 19 HTTP reais e 28 E2E. Sem skips/flaky; 12 laudos AXE sem violações nos estados auditados. Prova atual, hash e ambiente em QUALIDADE.md. Foram corrigidos QA-001 a QA-009 e o caso adicional de recuperação na primeira página; sem gravação de produtos ou mudanças Go/schema/seed. `:conferir` confirmou a mesma impressão após a revisão documental. Os registros seguintes são históricos.
 
 - **Incremento de Caio após `49d1f358` em 09/11:** início atualizado sem mudar as páginas de Leticia; acrescentados 10 testes de integração da estrutura/catálogo e comando de QA HTTP local. Suíte Angular **67 testes/12 arquivos aprovada**, build aprovado com **275,25 kB iniciais**. Testes Angular continuam com respostas controladas.
 - `npm.cmd run test:api-real -- --origem=http://127.0.0.1:4200 --gravar`: **28 verificações aprovadas**, contra Go/PostgreSQL através do proxy real. Produto fictício ID **6**, SKU `QA-FE-1794252298978`, nome `Produto QA de integracao - editado`, preço **42,01** mantido no banco; a API não oferece exclusão. Modo padrão sem `--gravar` não altera produtos.

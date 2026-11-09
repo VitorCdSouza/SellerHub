@@ -1,29 +1,16 @@
 import { CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  EMPTY,
-  Subject,
-  catchError,
-  combineLatest,
-  finalize,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { EMPTY, Subject, catchError, combineLatest, finalize, startWith, switchMap } from 'rxjs';
 import { Produto } from '../produto.model';
 import { ProdutosService } from '../produtos.service';
+import { FocoPaginaDirective } from '../../compartilhado/foco-pagina.directive';
 
 @Component({
   selector: 'app-produto-detalhe',
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, CurrencyPipe, FocoPaginaDirective],
   templateUrl: './produto-detalhe.component.html',
   styleUrl: './produto-detalhe.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,10 +27,7 @@ export class ProdutoDetalheComponent {
   protected readonly erro = signal('');
 
   constructor() {
-    combineLatest([
-      this.route.paramMap,
-      this.recarregar.pipe(startWith(undefined)),
-    ])
+    combineLatest([this.route.paramMap, this.recarregar.pipe(startWith(undefined))])
       .pipe(
         switchMap(([parametros]) => {
           const idTexto = parametros.get('id');
@@ -67,9 +51,7 @@ export class ProdutoDetalheComponent {
                 } else if (erro.status === 401) {
                   this.erro.set('Sua sessão expirou. Faça login novamente.');
                 } else {
-                  this.erro.set(
-                    'Não foi possível carregar o produto. Tente novamente.',
-                  );
+                  this.erro.set('Não foi possível carregar o produto. Tente novamente.');
                 }
               } else {
                 this.erro.set('Ocorreu um erro inesperado.');

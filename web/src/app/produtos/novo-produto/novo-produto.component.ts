@@ -1,11 +1,5 @@
 import { RouterLink } from '@angular/router';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,10 +7,11 @@ import { finalize } from 'rxjs';
 import { DadosProduto } from '../produto.model';
 import { ProdutosService } from '../produtos.service';
 import { ProdutoFormularioComponent } from '../produto-formulario/produto-formulario.component';
+import { FocoPaginaDirective } from '../../compartilhado/foco-pagina.directive';
 
 @Component({
   selector: 'app-novo-produto',
-  imports: [ProdutoFormularioComponent, RouterLink],
+  imports: [ProdutoFormularioComponent, RouterLink, FocoPaginaDirective],
   templateUrl: './novo-produto.component.html',
   styleUrl: './novo-produto.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,16 +40,18 @@ export class NovoProdutoComponent {
       )
       .subscribe({
         next: (resposta) => {
-            if (resposta.status === 201 && resposta.body?.id) {
-                this.router.navigate(['/produtos']);
-            } else {
-                this.erro.set('O cadastro não foi confirmado pela API. Tente novamente.');
-            }
+          if (resposta.status === 201 && resposta.body?.id) {
+            this.router.navigate(['/produtos']);
+          } else {
+            this.erro.set('O cadastro não foi confirmado pela API. Tente novamente.');
+          }
         },
         error: (erro: unknown) => {
           if (erro instanceof HttpErrorResponse) {
             if (erro.status === 400) {
-              this.erro.set('Os dados informados são inválidos. Confira os campos e tente novamente.');
+              this.erro.set(
+                'Os dados informados são inválidos. Confira os campos e tente novamente.',
+              );
             } else if (erro.status === 401) {
               this.erro.set('Sua sessão expirou. Faça login novamente.');
             } else {

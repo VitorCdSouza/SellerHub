@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
@@ -14,19 +13,20 @@ import {
   FormGroup,
   ReactiveFormsModule,
   ValidationErrors,
-  Validators,
 } from '@angular/forms';
 import { DadosProduto } from '../produto.model';
 
-function textoObrigatorioAparado(
-  control: AbstractControl<string>,
-): ValidationErrors | null {
-  return control.value.trim().length > 0 ? null : { required: true };
+function textoValido(limite: number) {
+  return (control: AbstractControl<string>): ValidationErrors | null => {
+    const tamanho = Array.from(control.value.trim()).length;
+    if (tamanho === 0) return { required: true };
+    return tamanho > limite
+      ? { maxlength: { requiredLength: limite, actualLength: tamanho } }
+      : null;
+  };
 }
 
-function precoValido(
-  control: AbstractControl<string>,
-): ValidationErrors | null {
+function precoValido(control: AbstractControl<string>): ValidationErrors | null {
   const valor = control.value.trim();
 
   if (!valor) {
@@ -68,19 +68,11 @@ export class ProdutoFormularioComponent {
   protected readonly formulario = new FormGroup({
     nome: new FormControl('', {
       nonNullable: true,
-      validators: [
-        Validators.required,
-        textoObrigatorioAparado,
-        Validators.maxLength(255),
-      ],
+      validators: [textoValido(255)],
     }),
     sku: new FormControl('', {
       nonNullable: true,
-      validators: [
-        Validators.required,
-        textoObrigatorioAparado,
-        Validators.maxLength(100),
-      ],
+      validators: [textoValido(100)],
     }),
     precoBase: new FormControl('', {
       nonNullable: true,

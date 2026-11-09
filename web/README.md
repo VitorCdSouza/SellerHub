@@ -87,6 +87,30 @@ npm run build
 
 No PowerShell, usar `npm.cmd` se `npm.ps1` estiver bloqueado. Testes HTTP simulados verificam componentes e contratos; a integração exige API e banco reais. Registrar resultados, auditoria AXE e impedimentos em TODO.md, distinguindo os tipos de evidência.
 
+### Verificação de cada entrega
+
+Com Angular, Go e PostgreSQL reais em execução, usar:
+
+```bash
+npm run test:qualidade
+npm run test:qualidade:conferir
+```
+
+O primeiro comando executa, em sequência, os testes do verificador, a suíte Angular (unitários e integração com HTTP controlado), o simulador, a checagem de tipos E2E, o build, as consultas HTTP reais pelo proxy e o Playwright/AXE. Não grava produtos, não inicia/encerra serviços e não cria commits. Corrigir os defeitos indicados, acrescentar regressões pertinentes e repetir a verificação; dependência de API/decisão deve permanecer identificada no TODO.
+
+O resultado sanitizado fica em [QUALIDADE.md](QUALIDADE.md). Logs, resultados JSON e cópias das evidências são preservados por rodada em `tmp/qualidade/`, ignorado pelo Git. O verificador serializa execuções para não sobrescrever uma suíte Playwright em andamento; não rodar Playwright separadamente em paralelo.
+
+Cada aprovação tem uma impressão SHA-256 dos arquivos relevantes de fontes, testes, configurações, assets e contratos Go/SQL, incluindo arquivos novos ainda não versionados. Alterações posteriores invalidam a prova; alteração durante o teste gera **DESATUALIZADO**. O comando `:conferir` apenas compara a última prova com o conteúdo atual, sem repetir testes. Dados privados, documentação e artefatos não entram nessa impressão.
+
+| Estado | Significado | Código de saída |
+| --- | --- | --- |
+| APROVADO | Todos os checks obrigatórios passaram para a mesma impressão, sem testes ignorados/instáveis. | 0 |
+| FALHOU | Há falha de teste/build/checagem. | 1 |
+| BLOQUEADO | Falta ambiente, há execução concorrente ou algum check não pôde ser executado. | 2 |
+| DESATUALIZADO | Não há prova atual, mudou o plano de checks ou o código mudou. | 3 |
+
+A prova corresponde à árvore de trabalho. Para usá-la antes de um commit, o conjunto preparado precisa corresponder ao código testado, incluindo arquivos novos; um índice parcial diferente exige isolar e revalidar a alteração. Aprovação dos checks atuais não conclui todos os critérios do catálogo nem o MVP. A gravação real continua sendo uma verificação explícita separada.
+
 ### Verificação HTTP da API real
 
 Com Go e PostgreSQL de desenvolvimento rodando, executar na pasta `web`:

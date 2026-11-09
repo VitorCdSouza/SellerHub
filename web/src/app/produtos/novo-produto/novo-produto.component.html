@@ -1,12 +1,9 @@
-
-<main class="pagina-cadastro">
+<section class="pagina-cadastro" aria-labelledby="titulo-cadastro">
   <header class="cabecalho">
     <div>
-      <a routerLink="/produtos" class="link-voltar">
-        Voltar para produtos
-      </a>
+      <a routerLink="/produtos" class="link-voltar"> Voltar para produtos </a>
 
-      <h1>Novo produto</h1>
+      <h1 id="titulo-cadastro" appFocoPagina>Novo produto</h1>
       <p>Preencha os dados abaixo para cadastrar um produto no SellerHub.</p>
     </div>
   </header>
@@ -21,4 +18,4 @@
       (cancelar)="cancelar()"
     />
   </section>
-</main>
+</section>

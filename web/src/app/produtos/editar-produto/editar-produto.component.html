@@ -1,15 +1,18 @@
 <section class="pagina-editar">
   <header class="cabecalho">
-    <h1>Editar produto</h1>
+    <h1 appFocoPagina>Editar produto</h1>
     <p>Atualize as informações do produto cadastrado.</p>
   </header>
 
   @if (carregando()) {
-    <p class="mensagem">Carregando produto...</p>
+    <p class="mensagem" role="status">Carregando produto...</p>
   } @else if (erroCarregamento()) {
-    <div class="mensagem erro">
+    <div class="mensagem erro" role="alert">
       <p>{{ erroCarregamento() }}</p>
 
+      <button type="button" class="acao-principal" (click)="tentarNovamente()">
+        Tentar novamente
+      </button>
       <a routerLink="/produtos">Voltar para produtos</a>
     </div>
   } @else if (dadosIniciais()) {

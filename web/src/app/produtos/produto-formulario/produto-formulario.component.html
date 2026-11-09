@@ -1,4 +1,3 @@
-
 <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
   <div class="campo">
     <label for="nome">Nome do produto</label>
@@ -6,15 +5,11 @@
       id="nome"
       type="text"
       formControlName="nome"
-      maxlength="255"
       autocomplete="off"
       aria-describedby="erro-nome"
     />
 
-    @if (
-      formulario.controls.nome.invalid &&
-      (formulario.controls.nome.touched || submetido())
-    ) {
+    @if (formulario.controls.nome.invalid && (formulario.controls.nome.touched || submetido())) {
       <small id="erro-nome" class="mensagem-erro">
         @if (formulario.controls.nome.hasError('required')) {
           Informe o nome do produto.
@@ -31,15 +26,11 @@
       id="sku"
       type="text"
       formControlName="sku"
-      maxlength="100"
       autocomplete="off"
       aria-describedby="erro-sku"
     />
 
-    @if (
-      formulario.controls.sku.invalid &&
-      (formulario.controls.sku.touched || submetido())
-    ) {
+    @if (formulario.controls.sku.invalid && (formulario.controls.sku.touched || submetido())) {
       <small id="erro-sku" class="mensagem-erro">
         @if (formulario.controls.sku.hasError('required')) {
           Informe o SKU do produto.
@@ -87,20 +78,11 @@
   }
 
   <div class="acoes">
-    <button
-      type="button"
-      class="botao-cancelar"
-      [disabled]="enviando()"
-      (click)="cancelar.emit()"
-    >
+    <button type="button" class="botao-cancelar" [disabled]="enviando()" (click)="cancelar.emit()">
       Cancelar
     </button>
 
-    <button
-      type="submit"
-      class="botao-salvar"
-      [disabled]="formulario.invalid || enviando()"
-    >
+    <button type="submit" class="botao-salvar" [disabled]="formulario.invalid || enviando()">
       {{ enviando() ? 'Salvando...' : tituloBotao() }}
     </button>
   </div>

@@ -12,6 +12,8 @@
     "test:e2e:gravar": "playwright test --config=playwright.gravacao.config.ts",
     "test:e2e:relatorio": "playwright show-report",
     "test:e2e:tipos": "tsc -p e2e/tsconfig.json",
+    "test:qualidade": "node ferramentas/verificar-qualidade.mjs",
+    "test:qualidade:conferir": "node ferramentas/verificar-qualidade.mjs --conferir",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

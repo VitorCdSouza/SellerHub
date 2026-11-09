@@ -1,4 +1,3 @@
-
 <section class="pagina-produtos" aria-labelledby="titulo-produtos">
   <header class="cabecalho-produtos">
     <div>
@@ -6,15 +5,11 @@
       <p>Consulte e gerencie os produtos do seu catálogo.</p>
     </div>
 
-    <a class="acao-principal" routerLink="/produtos/novo">
-      Novo produto
-    </a>
+    <a class="acao-principal" routerLink="/produtos/novo"> Novo produto </a>
   </header>
 
   @if (carregando()) {
-    <div class="estado" role="status">
-      Carregando produtos...
-    </div>
+    <div class="estado" role="status">Carregando produtos...</div>
   } @else if (erro()) {
     <div class="estado erro" role="alert">
       <p>{{ erro() }}</p>
@@ -22,50 +17,58 @@
         Tentar novamente
       </button>
     </div>
-  } @else if (produtos().length === 0) {
+  } @else if (produtos().length === 0 && total() === 0) {
     <div class="estado vazio">
       <h2>Nenhum produto encontrado</h2>
       <p>Seu catálogo ainda não possui produtos cadastrados.</p>
-      <a class="acao-principal" routerLink="/produtos/novo">
-        Cadastrar primeiro produto
-      </a>
+      <a class="acao-principal" routerLink="/produtos/novo"> Cadastrar primeiro produto </a>
     </div>
   } @else {
-    <div class="tabela-container">
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Produto</th>
-            <th scope="col">SKU</th>
-            <th scope="col">Preço base</th>
-            <th scope="col">Ações</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          @for (produto of produtos(); track produto.id) {
+    @if (produtos().length === 0) {
+      <div class="estado" role="status">
+        <h2>Nenhum produto nesta página</h2>
+        <p>O catálogo mudou. Consulte esta página novamente ou use a navegação disponível.</p>
+        <button type="button" class="botao-secundario" (click)="tentarNovamente()">
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <div class="tabela-container">
+        <table>
+          <thead>
             <tr>
-              <td>{{ produto.nome }}</td>
-              <td>{{ produto.sku }}</td>
-              <td>{{ produto.precoBase | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
-              <td>
-                <a [routerLink]="['/produtos', produto.id]">
-                  Ver detalhes
-                </a>
-                <span aria-hidden="true"> | </span>
-                <a [routerLink]="['/produtos', produto.id, 'editar']">
-                  Editar
-                </a>
-              </td>
+              <th scope="col">Produto</th>
+              <th scope="col">SKU</th>
+              <th scope="col">Preço base</th>
+              <th scope="col">Ações</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          </thead>
+
+          <tbody>
+            @for (produto of produtos(); track produto.id) {
+              <tr>
+                <td>{{ produto.nome }}</td>
+                <td>{{ produto.sku }}</td>
+                <td>{{ produto.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
+                <td>
+                  <a [routerLink]="['/produtos', produto.id]"> Ver detalhes </a>
+                  <span aria-hidden="true"> | </span>
+                  <a [routerLink]="['/produtos', produto.id, 'editar']"> Editar </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
 
     <nav class="paginacao" aria-label="Paginação de produtos">
       <span>
-        Página {{ paginaAtual() }} de {{ totalPaginas() }}
+        @if (paginaAtual() > totalPaginas()) {
+          Página {{ paginaAtual() }} sem itens
+        } @else {
+          Página {{ paginaAtual() }} de {{ totalPaginas() }}
+        }
         ({{ total() }} produtos)
       </span>
 
