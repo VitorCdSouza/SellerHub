@@ -86,3 +86,44 @@ npm run build
 ```
 
 No PowerShell, usar `npm.cmd` se `npm.ps1` estiver bloqueado. Testes HTTP simulados verificam componentes e contratos; a integração exige API e banco reais. Registrar resultados, auditoria AXE e impedimentos em TODO.md, distinguindo os tipos de evidência.
+
+### Verificação HTTP da API real
+
+Com Go e PostgreSQL de desenvolvimento rodando, executar na pasta `web`:
+
+```bash
+npm run test:api-real
+```
+
+O comando usa `http://localhost:8080`, verifica autenticação/sessão, paginação, erros e isolamento entre as contas fictícias do seed atual. Mantém os cookies somente em memória e solicita logout ao terminar. Por padrão, não cria nem edita produtos. Se o catálogo estiver vazio, informa que a consulta de produto de outra conta não foi exercitada. Senhas reais, JWT_SECRET e configuração do banco não são lidos pelo script.
+
+Para verificar também o proxy, iniciar Angular com `npm start` e executar:
+
+```bash
+npm run test:api-real -- --origem=http://localhost:4200
+```
+
+Para incluir cadastro/edição e tentativa de alteração por outra conta, habilitar explicitamente a gravação:
+
+```bash
+npm run test:api-real -- --origem=http://localhost:4200 --gravar
+```
+
+Essa opção **cria um produto fictício QA por execução e o mantém no banco**, exibindo ID/SKU ao final. A API não tem exclusão; o comando não limpa registros anteriores. Usar somente o banco de desenvolvimento. Não usar repetição automática em caso de timeout de gravação: consultar o banco/API antes de executar novamente.
+
+O verificador aceita apenas origens HTTP locais, rejeita respostas identificadas pelo simulador e encerra com erro se a API/proxy falhar. O cookie recebido é gerenciado pelo próprio comando; isso não comprova a política de cookies do navegador nem revogação de JWT no servidor. Não substitui o ensaio de interface e acessibilidade.
+
+### Roteiro integrado no navegador
+
+Com a configuração real, seguir a ordem abaixo usando as contas fictícias de desenvolvimento. O destino inicial continua `/inicio`, com acesso à lista e ao cadastro.
+
+| Passo | Resultado esperado |
+| --- | --- |
+| Login → Ver produtos → Novo produto | Rotas protegidas, conta correta e formulário básico disponíveis. |
+| Preencher nome/SKU e preço `35,50`; salvar uma vez | Retornar à lista com o novo registro e preço em reais. |
+| Abrir detalhe e recarregar | Mesmo ID e dados persistidos; sem formulário de cadastro vazio. |
+| Abrir edição, alterar nome/preço, salvar e voltar à lista | Detalhe/lista mostram a gravação; nova recarga mantém os valores. |
+| Sair, tentar voltar e entrar com outra conta | Login exigido após saída e dados da conta anterior ausentes. O ID da outra conta retorna não encontrado. |
+| Navegar por teclado e em 390 px | Ações legíveis/operáveis, foco coerente e erros associados; executar AXE nos estados principais. |
+
+Testes de rotas/componentes com HttpTestingController cobrem a composição da estrutura sem banco. O arquivo `src/app/estrutura/catalogo-integracao.spec.ts` usa as rotas, configuração, componentes e serviço reais do Angular com respostas controladas; não equivale à execução desse roteiro no navegador.

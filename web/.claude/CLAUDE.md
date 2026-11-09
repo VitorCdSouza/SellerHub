@@ -3,6 +3,8 @@
 
 Antes de planejar ou implementar telas, leia [../AGENTS.md](../AGENTS.md) e integralmente [../TODO.md](../TODO.md). A revisão de 09/11/2026 reconhece as implementações FE-04/FE-05/FE-06 e logo/favicon de Leticia (`47ee5b7b` a `da81eb35`), com correções/testes/homologação pendentes; não reconstruir essas páginas. A API segue em `88731577`. Usar a fila para fechar catálogo/FE-15 e preparar fotos/anúncios/canal/IA, mantendo dependências BE/DEC e autoria das entregas. Simulações não concluem integração; ajustes de API pertencem ao back-end. Não duplicar a fila neste arquivo.
 
+Após `49d1f358`, Caio atualizou o início e preparou testes de integração da estrutura e `npm run test:api-real`. Consultar o README do front para executar o comando; o modo padrão não altera produtos e `--gravar` deixa um registro QA no banco. O aceite visual/acessibilidade do catálogo e ajustes das páginas continuam pendentes na fila, separados das verificações HTTP.
+
 Antes de executar uma tarefa FE, consulte requisitos, critérios e responsáveis em `../TODO.md`. Leticia assume FE-04/FE-05/FE-06/FE-07/FE-08/FE-10/FE-11/FE-12/FE-14, editor manual/prévia em FE-09 e conta/preferências em FE-13. Caio mantém infraestrutura/autenticação, contratos/serviços/modelos, geração de IA/aprovação/publicação e conexão de canais. Respeitar as fronteiras dos componentes; não implementar as páginas atribuídas à outra pessoa. Revisão e FE-15 são compartilhadas, com detalhamento na fila única.
 
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.

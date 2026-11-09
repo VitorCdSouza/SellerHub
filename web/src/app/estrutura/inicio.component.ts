@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
 
 @Component({
   selector: 'app-inicio',
-  imports: [FocoPaginaDirective],
+  imports: [FocoPaginaDirective, RouterLink],
   template: `
     <p class="sobretitulo">ÁREA DE TRABALHO</p>
     <h1 appFocoPagina>Bem-vindo ao SellerHub</h1>
@@ -11,10 +12,12 @@ import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
       Um espaço para organizar seus produtos e acompanhar seus canais de venda.
     </p>
     <section class="cartao-inicial" aria-labelledby="titulo-catalogo">
-      <span class="situacao">Em desenvolvimento</span>
       <h2 id="titulo-catalogo">Seu catálogo de produtos</h2>
-      <p>O cadastro, a consulta e a edição de produtos estarão disponíveis aqui em breve.</p>
-      <p>As demais áreas serão liberadas conforme forem concluídas.</p>
+      <p>Consulte seus produtos ou cadastre um novo item com nome, SKU e preço base.</p>
+      <div class="acoes-catalogo">
+        <a class="acao-principal" routerLink="/produtos">Ver produtos</a>
+        <a class="acao-secundaria" routerLink="/produtos/novo">Cadastrar produto</a>
+      </div>
     </section>
   `,
   styles: `
@@ -43,23 +46,44 @@ import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
       background: #fff;
       max-width: 740px;
     }
-    .situacao {
-      display: inline-block;
-      color: #244bc1;
-      background: #edf2ff;
-      border-radius: 5px;
-      padding: 0.35rem 0.6rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
     h2 {
-      margin: 1.25rem 0 0.75rem;
+      margin: 0 0 0.75rem;
       font-size: 1.3rem;
     }
     .cartao-inicial p {
       color: #526075;
       line-height: 1.7;
       margin: 0.5rem 0;
+    }
+    .acoes-catalogo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .acoes-catalogo a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0.7rem 1rem;
+      border: 1px solid #244bc1;
+      border-radius: 7px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .acao-principal {
+      background: #244bc1;
+      color: #fff;
+    }
+    .acao-secundaria {
+      color: #244bc1;
+      background: #fff;
+    }
+    @media (max-width: 480px) {
+      .acoes-catalogo {
+        flex-direction: column;
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

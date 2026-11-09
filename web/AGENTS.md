@@ -13,11 +13,11 @@ Prioridade imediata: corrigir/homologar o catálogo implementado (FE-02/FE-04/FE
 
 ### Entregas revisadas e próxima frente
 
-Em **09/11/2026**, listagem, cadastro, detalhe e edição estão entregues no código de Leticia, com menu/rotas protegidas, formulário reutilizado, logo e favicon. **57 testes Angular/11 arquivos e build passaram.** Reconhecer as implementações concluídas nos subitens da fila, mantendo o aceite integral aberto pelos ajustes/testes restantes. Os 42 cenários HTTP reais e o roteiro de acesso confirmado pelo usuário em 08/11 antecedem as páginas novas; não usar essa evidência como homologação do catálogo no navegador.
+Em **09/11/2026**, Leticia entregou catálogo e identidade visual. No incremento local após `49d1f358`, Caio atualizou `/inicio`, acrescentou 10 testes de integração de rotas e o comando `test:api-real`. **67 testes Angular/12 arquivos e build passaram**; verificações HTTP via proxy e persistência após reinício da API também passaram. Os testes Angular usam HTTP controlado e o comando não automatiza navegador; aceite visual/AXE e correções das páginas permanecem abertos em TODO.md. Não marcar FE-15 integralmente concluída com essas evidências parciais.
 
 | Ordem | Página ou fluxo do front-end | Estado e próximo trabalho | Prioridade de apoio do back-end |
 | --- | --- | --- | --- |
-| 1 | Base e catálogo — FE-01 a FE-06 | Implementados. Caio atualiza início/revisa integração; Leticia fecha correções/testes das páginas. Ambos executam FE-15 com banco real, teclado/390 px/AXE. | BE-15 apoia ensaio do contrato atual; BE-03 mantém decisão sobre revogação. Não recriar endpoints entregues. |
+| 1 | Base e catálogo — FE-01 a FE-06 | Início e integração de rotas entregues por Caio; Leticia fecha correções/testes das páginas. Ambos concluem roteiro visual/390 px/AXE. Comando de QA real documentado no README do front. | BE-15 apoia cenários restantes; BE-03 mantém decisão sobre revogação/expiração. Não recriar endpoints entregues. |
 | 2 | Fotos — FE-07 e canais — FE-13 | Leticia entrega seleção/prévia; Caio prepara serviço de fotos e conexão/reconexão após contrato. | BE-05/BE-06/DEC-02 liberam campos/fotos. BE-08 libera autorização/retorno e situação real de conexão. |
 | 3 | Anúncios/editor/IA/publicação — FE-08/FE-09 | Leticia entrega lista/editor manual/prévia; Caio entrega serviços e coordenação de geração, revisão e publicação. | BE-07/BE-08/BE-09 e DEC-03: rascunho/revisão, operação consultável, conector e sugestão editável. |
 
