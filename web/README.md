@@ -24,7 +24,7 @@ Injetar `ProdutosService` de `src/app/produtos/produtos.service.ts`. Os modelos 
 | --- | --- |
 | `listar(pagina = 1, limite = 20)` | `PaginaProdutos`: `itens` e `total`. |
 | `consultar(id)` | `Produto`: `id`, `nome`, `sku`, `precoBase`. |
-| `cadastrar(dados)` | Identificador criado: `{ id }`. |
+| `cadastrar(dados)` | `HttpResponse<{ id: number }>`: confirmar `status === 201` e consultar `body?.id`. |
 | `atualizar(id, dados)` | Confirmação: `{ success, message }`. |
 
 O serviço adapta o modelo interno para os nomes JSON `name`, `basePrice` e `items`. Preço é número decimal em reais, sem conversão para centavos. O usuário é obtido pela API a partir da sessão; não enviar `id_usuario` nos formulários.
@@ -75,7 +75,7 @@ Usar os mesmos métodos de `ProdutosService` nos dois ambientes, sem condições
 
 Ao carregar a página ou trocar o ID, usar `switchMap` para cancelar a leitura anterior, e `takeUntilDestroyed` para encerrar a assinatura ao destruir o componente. Tratar o erro dentro da leitura para que uma falha não encerre futuras tentativas. Não usar nova tentativa automática em POST/PUT; bloqueio de clique repetido e preservação dos campos ficam no formulário. Os testes de navegação em `src/app/autenticacao/navegacao.spec.ts` demonstram o uso da estrutura real com respostas HTTP controladas.
 
-Rotas previstas na fila: `/produtos`, `/produtos/novo`, `/produtos/:id` e `/produtos/:id/editar`. Registro sob o pai protegido, título e ativação do menu devem acompanhar a entrega de cada página; não criar rotas vazias para satisfazer links. `appFocoPagina` pode ser aplicado ao título da página para o foco inicial. Catálogo não precisa consultar sessão novamente nem enviar identificador de usuário.
+Rotas do catálogo: `/produtos`, `/produtos/novo`, `/produtos/:id` e `/produtos/:id/editar`, registradas sob o pai protegido. Produtos está ativo no menu; o login ainda direciona a `/inicio`. Usar `appFocoPagina` no título para foco inicial e manter somente o `<main>` fornecido pela estrutura. Catálogo não precisa consultar sessão novamente nem enviar identificador de usuário. O formulário de nome/SKU/preço é compartilhado por cadastro e edição.
 
 ## Verificação
 

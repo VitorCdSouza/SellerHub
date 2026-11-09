@@ -1,7 +1,7 @@
 
 ## SellerHub — planejamento do front-end
 
-Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). Ele registra a avaliação atualizada em 08/11/2026 do commit `88731577`, telas que podem avançar, bloqueios, decisões pendentes e tarefas FE/BE. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
+Antes de planejar ou implementar telas, leia integralmente [TODO.md](TODO.md). A revisão de 09/11/2026 cruza os commits de Leticia `47ee5b7b`, `51898427`, `7f0be9c0` e `da81eb35` com os critérios FE/BE; a API continua em `88731577`. Reconfira o código ao retomar e atualize a fila conforme houver entregas.
 
 O README da raiz deve conter apresentação do projeto e instruções gerais de instalação/uso. Não acrescentar nele status de tarefas, divisão de responsáveis, bloqueios locais, resultados de sessões, contagem de testes ou relatos de ferramentas. Manter andamento em TODO.md, detalhes técnicos do front em [README.md](README.md) e orientações de agentes neste arquivo; preservar o contexto privado somente nos arquivos locais destinados a ele.
 
@@ -9,23 +9,21 @@ Ao concluir uma entrega, sugerir mensagens de commit em Conventional Commits, co
 
 Para desenvolvimento do catálogo sem banco, usar os comandos e cenários de simulação descritos em [README.md](README.md). O modo é explícito (`start:simulado`), tem aviso permanente e não substitui a homologação real. Não acrescentar endpoints simulados para módulos cujo contrato ainda não foi combinado.
 
-Prioridade: FE-01 (alinhar URL/proxy), FE-02/FE-03 (estrutura, sessão e saída) e FE-04/FE-05/FE-06 (integrar catálogo básico). As rotas de sessão e produtos já existem; não aguardar novos endpoints para esse recorte. Campos adicionais e demais módulos continuam condicionados aos itens BE/DEC. Liberação técnica não comprova integração com banco/navegador: fechar BE-15/FE-15 antes de declarar o fluxo concluído. Simulação deve ser explícita e separada dos serviços reais. Em tarefas da frente de interface, registre ajustes de API como itens BE para o time responsável.
+Prioridade imediata: corrigir/homologar o catálogo implementado (FE-02/FE-04/FE-05/FE-06/FE-15), incluindo testes da listagem e acessibilidade. Não reconstruir essas páginas nem esperar novos endpoints para os três campos existentes. Fotos/anúncios/canais/IA são a próxima frente, com contratos BE-05/BE-06/BE-07/BE-08/BE-09 e decisões pertinentes; começar autorização de canal em paralelo ao aceite do catálogo. Simulação continua explícita e separada do HTTP real. Necessidades de Go/schema são to-dos do time de back-end.
 
-### Telas que começaremos e prioridade para o back-end
+### Entregas revisadas e próxima frente
 
-Frente inicial definida em **08/11/2026**. FE-01/FE-02/FE-03 têm implementação e testes Angular; a API passou em 42 cenários HTTP reais com PostgreSQL. O usuário confirmou no navegador login incorreto/correto, identificação, F5, saída e bloqueio de retorno. A estrutura usa `/inicio` até o catálogo ser entregue e seu serviço/modelo está pronto para as páginas de Leticia. Acessibilidade/AXE, demais cenários e catálogo completo permanecem pendentes; consultar TODO.md antes de concluir qualquer tarefa.
+Em **09/11/2026**, listagem, cadastro, detalhe e edição estão entregues no código de Leticia, com menu/rotas protegidas, formulário reutilizado, logo e favicon. **57 testes Angular/11 arquivos e build passaram.** Reconhecer as implementações concluídas nos subitens da fila, mantendo o aceite integral aberto pelos ajustes/testes restantes. Os 42 cenários HTTP reais e o roteiro de acesso confirmado pelo usuário em 08/11 antecedem as páginas novas; não usar essa evidência como homologação do catálogo no navegador.
 
-| Ordem | Página ou fluxo do front-end | Recorte inicial | Prioridade de apoio do back-end |
+| Ordem | Página ou fluxo do front-end | Estado e próximo trabalho | Prioridade de apoio do back-end |
 | --- | --- | --- | --- |
-| 1 | Login — FE-01 | Ajustar a tela existente para `/api/login` e configurar proxy. | BE-02/BE-15: confirmar usuário de desenvolvimento com bcrypt no banco usado pela equipe e verificar sucesso, senha incorreta e e-mail inexistente; alinhar README ao seed. |
-| 2 | Estrutura interna e sessão — FE-02/FE-03 | Menu, rotas, identificação por e-mail, acesso autenticado, expiração e saída. | BE-03/BE-15: verificar consulta de sessão, `401`, cookie e logout; explicitar que o logout atual remove o cookie sem revogar o JWT. |
-| 3 | Produtos — listagem — FE-04 | Nome, SKU, preço base, paginação, total e estados vazio/erro/carregamento. | BE-15: validar listagem com PostgreSQL, paginação e isolamento pelo usuário. A rota básica já existe; preservar o contrato de `items`/`total`. |
-| 4 | Novo produto — FE-05 | Formulário de nome, SKU e preço base, envio real e retorno do ID. | BE-05/BE-15 e DEC-02: validar criação/persistência e limites; alinhar unicidade do SKU, campos do primeiro incremento e eventual compartilhamento do catálogo. O formulário básico pode avançar com o contrato atual. |
-| 5 | Detalhe e edição de produto — FE-06 | Carregar por ID, editar os três campos e salvar via PUT. | BE-05/BE-15: verificar persistência e `404` para inexistente/outro usuário; definir resposta para conflito de edição antes de prometer esse controle na interface. |
+| 1 | Base e catálogo — FE-01 a FE-06 | Implementados. Caio atualiza início/revisa integração; Leticia fecha correções/testes das páginas. Ambos executam FE-15 com banco real, teclado/390 px/AXE. | BE-15 apoia ensaio do contrato atual; BE-03 mantém decisão sobre revogação. Não recriar endpoints entregues. |
+| 2 | Fotos — FE-07 e canais — FE-13 | Leticia entrega seleção/prévia; Caio prepara serviço de fotos e conexão/reconexão após contrato. | BE-05/BE-06/DEC-02 liberam campos/fotos. BE-08 libera autorização/retorno e situação real de conexão. |
+| 3 | Anúncios/editor/IA/publicação — FE-08/FE-09 | Leticia entrega lista/editor manual/prévia; Caio entrega serviços e coordenação de geração, revisão e publicação. | BE-07/BE-08/BE-09 e DEC-03: rascunho/revisão, operação consultável, conector e sugestão editável. |
 
-**Prioridade imediata do back-end:** estabilizar e verificar login/sessão e catálogo básico com banco real (BE-02, BE-03 e BE-15), apoiando o ensaio FE-15. Em seguida, concluir os alinhamentos de produto em BE-05/DEC-02. BE-01 e a base HTTP de BE-04 já foram entregues; não recriar essas rotas. Combinar mudanças no contrato com a dupla de front-end antes de alterá-lo.
+**Prioridade do back-end:** apoiar FE-15 do catálogo e liberar os contratos de fotos, anúncios, canal e IA em paralelo. Iniciar a autorização do Mercado Livre cedo; não esperar acabamento do catálogo para tratar dependências externas. Depois, BE-10/BE-11 liberam pedidos/estoque e BE-12/BE-13/BE-14 completam os requisitos. Critérios, correções específicas e caminho completo do MVP ficam apenas em TODO.md.
 
-Fotos/características, anúncios, canais, IA, vendas, estoque, indicadores, administração completa e recuperação de senha ficam para os incrementos seguintes, conforme liberação. Suas pendências permanecem em [TODO.md](TODO.md), que continua sendo a única lista detalhada de execução para as duas frentes.
+Fotos/características, anúncios, canais, IA, vendas, estoque, indicadores, administração completa e recuperação continuam pendentes conforme API/decisões. Prioridade menor ou simulação não retira requisitos do MVP. Preservar a aprovação humana de conteúdo/publicação e a distinção entre operação aceita e publicação confirmada.
 
 ### Detalhamento e divisão da dupla de front-end
 

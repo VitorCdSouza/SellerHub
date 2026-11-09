@@ -1,6 +1,6 @@
 # Front-end — telas, dependências e to-dos
 
-Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d586` (planejamento). A base de back-end permanece em `88731577` (06/11/2026, middleware de sessão e produtos paginados). Este documento concentra a fila compartilhada, o detalhamento das 15 tarefas FE, os pedidos ao back-end, a distribuição entre Caio e Leticia e as verificações realizadas. Os checklists distinguem código implementado de fluxo integralmente validado.
+Atualização em **09/11/2026**, após revisão dos quatro commits de Leticia de `47ee5b7b` a `da81eb35`. `git fetch origin` confirmou HEAD alinhado a `origin/main`; a base de back-end permanece em `88731577` (06/11/2026). Este documento concentra a fila compartilhada, as 15 tarefas FE, dependências BE/DEC, responsáveis e evidências. Checklists de implementação concluída são separados do aceite integral de cada tarefa.
 
 ## Como interpretar o estado
 
@@ -8,15 +8,27 @@ Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d
 - **Liberado para implementar e integrar:** há endpoint e contrato identificáveis no código, e `go vet` passou. O front pode começar a integração após alinhar URL/proxy; isso não comprova funcionamento com o banco e o navegador.
 - **Pode avançar com simulação:** componentes, formulários e estados usando dados fictícios separados dos serviços HTTP. O contrato continua pendente; simulação não comprova persistência nem integração.
 - **Integração bloqueada:** ainda não há API utilizável para concluir o fluxo real.
+- **Implementação entregue, aceite pendente:** componentes e chamadas existem e podem ser revisados/testados; não exige reconstruir a tela. Ajustes e verificações restantes ficam no próprio item FE, que permanece aberto até cumprir todos os critérios.
 
-**Login/proxy, consulta de sessão/saída e estrutura interna já têm implementação local.** O serviço HTTP de produtos está preparado; páginas de catálogo continuam pendentes com Leticia. O ensaio HTTP com Go/PostgreSQL passou em 42 cenários e o produto criado/editado foi conferido por SQL. O usuário confirmou no navegador senha incorreta/correta, entrada em `/inicio`, identificação, recarga, saída e bloqueio de acesso após sair. Acessibilidade, demais cenários e fluxo completo do catálogo continuam pendentes. A liberação é limitada aos campos e operações abaixo; tabelas, exemplos e protótipos não equivalem a endpoints disponíveis.
+**Login, sessão, estrutura e catálogo básico têm implementação entregue.** Leticia implementou listagem, cadastro, detalhe e edição usando ProdutosService, com rotas protegidas e menu ativo; também adicionou logo/favicon. Em 09/11, **57 testes Angular/11 arquivos e build passaram**. A homologação das páginas do catálogo ainda depende dos ajustes e do roteiro FE-15 abaixo. Os 42 cenários HTTP reais e a confirmação manual de acesso em 08/11 continuam como evidência da API/base, sem provar o fluxo das páginas novas. Campos adicionais, fotos e demais módulos continuam sem API liberada.
+
+## Revisão das entregas de Leticia — 09/11/2026
+
+| Commit | Entrega confirmada por leitura | Tarefa e conclusão possível |
+| --- | --- | --- |
+| `47ee5b7b` — listagem | Tabela com preço em BRL, total/paginação, vazio/erro/nova tentativa, cancelamento de leituras via switchMap, rota `/produtos` e menu. | **FE-04: implementação entregue.** Faltam testes próprios, tratamento de página vazia com total positivo e homologação/acessibilidade. |
+| `51898427` — cadastro | Formulário reutilizável, três campos, validação de preço, POST com confirmação de `201`, bloqueio de repetição e retorno à lista; locale PT-BR e testes. | **FE-05: implementação entregue.** Faltam alinhar limites de texto após trim/Unicode, ajustes de acessibilidade e ensaio real da página. |
+| `7f0be9c0` — detalhe/edição | GET por ID, validação de ID, estados/`404`, troca de ID no detalhe, formulário reaproveitado, PUT e retorno ao detalhe; testes de componentes. | **FE-06: implementação entregue.** Faltam ampliar testes de formulário/concorrência, recuperação de leitura na edição e homologação/acessibilidade. |
+| `da81eb35` — identidade visual | PNG local, logo na estrutura e favicon no documento. | **FE-02: identidade visual entregue.** Otimização do arquivo e uso de NgOptimizedImage seguem como acabamento; não liberam os demais módulos. |
+
+Nenhuma das três tarefas de catálogo é marcada integralmente concluída só pelo título dos commits ou pelo build. Os subitens `[x]` em FE-02/FE-04/FE-05/FE-06 reconhecem as implementações efetivamente entregues; os `[ ]` identificam o trabalho restante. Não foi apresentado novo ensaio dessas páginas com API/banco reais ou AXE nesta revisão. Nenhuma página foi reimplementada por Caio.
 
 ## O que o commit de aplicação `88731577` desbloqueou
 
 | Pendência anterior | Entrega em `88731577` | Situação após a revisão |
 | --- | --- | --- |
 | BE-01: API não compilava | Consulta de usuário restaurada, sqlc atualizado e identificador corrigido para `IDUsuario`/`int32`. | Resolvido; `go vet ./...` passou em 08/11. |
-| BE-02: hashes fictícios no seed | Três usuários de desenvolvimento passaram a usar bcrypt; senha documentada no seed. | Carga e login HTTP real verificados nesta cópia; ambientes dos demais integrantes e ensaio pelo navegador seguem pendentes. |
+| BE-02: hashes fictícios no seed | Três usuários de desenvolvimento passaram a usar bcrypt; senha documentada no seed. | Carga/login real verificados nesta cópia, inclusive acesso básico no navegador. Ambientes dos demais integrantes e fluxo do catálogo novo seguem pendentes. |
 | BE-03: só emissão de JWT | Validação HS256/expiração, middleware, `GET /api/sessao` e `POST /api/logout`. | Libera FE-03; logout remove cookie, sem revogar JWT. Homologação e decisão sobre revogação permanecem pendentes. |
 | BE-04: produtos só no SQL | Controller/service/rotas HTTP autenticadas, paginação/total e atualização com contagem de linhas. | Base HTTP entregue; libera FE-04/FE-05/FE-06 para o cadastro básico. |
 | BE-05: validações do produto | Nome/SKU obrigatórios com limites e preço positivo com até duas casas. | Parcial: sem unicidade de SKU, controle de versão ou campos adicionais do protótipo. |
@@ -26,8 +38,8 @@ Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d
 
 | Evidência | Consequência para o front-end |
 | --- | --- |
-| [`app.routes.ts`](src/app/app.routes.ts) contém login, tratamento de indisponibilidade, página inicial protegida e página não encontrada, com carregamento sob demanda. | A estrutura está implementada. `/inicio` é o destino provisório até as páginas de catálogo serem entregues; o menu identifica os módulos pendentes. |
-| [`auth.service.ts`](src/app/services/auth.service.ts) usa `/api/login`, `/api/sessao` e `/api/logout`; [`proxy.conf.json`](proxy.conf.json) encaminha `/api/**` para a API local. | A incompatibilidade de URL/origem foi corrigida no código Angular. O proxy foi verificado com resposta de um serviço temporário simulado; não com Go/PostgreSQL. |
+| [`app.routes.ts`](src/app/app.routes.ts) contém login, indisponibilidade, início, lista/novo/detalhe/edição de produtos e página não encontrada, com carregamento sob demanda. | As quatro rotas do catálogo estão sob o guard da estrutura e Produtos está ativo no menu. `/inicio` ainda é a entrada; seu aviso de catálogo indisponível ficou desatualizado. |
+| [`auth.service.ts`](src/app/services/auth.service.ts) usa caminhos `/api`; [`proxy.conf.json`](proxy.conf.json) encaminha para Go/8080. | Acesso/recarga/saída no Angular real foram confirmados pelo usuário em 08/11. Essa evidência antecede as páginas do catálogo; repetir agora o fluxo completo. |
 | [`login.go`](../api/internal/service/login.go), [`queries.sql`](../api/internal/db/queries.sql) e sqlc agora usam `GetUserByEmail` e `IDUsuario`. | Bloqueio de compilação resolvido, confirmado por `go vet ./...`. |
 | [`session.go`](../api/internal/service/session.go) valida assinatura HS256/expiração; [`middleware`](../api/internal/controller/session.go) protege sessão e todas as rotas de produto. | Já é possível consultar usuário e tratar `401`. Cookie `sessao` continua HttpOnly/SameSite Strict/8 horas. Não ler o cookie no Angular nem guardar JWT em localStorage. |
 | [`login.go`](../api/internal/controller/login.go) implementa consulta de sessão e logout por remoção de cookie. | FE-03 está liberado para esse comportamento. Um JWT previamente copiado continua válido até expirar; não anunciar revogação no servidor. |
@@ -42,9 +54,10 @@ Atualização em **08/11/2026**, com desenvolvimento local iniciado após `5e17d
 | Item | Entrega | O que falta para concluir |
 | --- | --- | --- |
 | FE-01 | Login relativo, proxy, validações preservadas, confirmação de sessão e ensaio real básico no navegador confirmado pelo usuário. | Auditoria de acessibilidade e cenários de falha restantes. |
-| FE-02 | Estrutura responsiva, conta por e-mail, menu, saída, foco inicial e tratamento de rota inexistente. | Integração das páginas FE-04/FE-05/FE-06 e conferência visual/AXE. |
-| FE-03 | Guard, consulta de sessão, recuperação de indisponibilidade, interceptor de `401`, logout e proteção contra respostas atrasadas de outra sessão. | Ensaio real de cookie/expiração/saída e conferência de interface. |
-| Serviço de produtos | [`ProdutosService`](src/app/produtos/produtos.service.ts) e [`modelos`](src/app/produtos/produto.model.ts) para as páginas de Leticia. | Usar nas páginas e verificar persistência com Go/PostgreSQL. Não conclui FE-04/FE-05/FE-06. |
+| FE-02 | Estrutura, menu Produtos ativo, quatro rotas de catálogo, conta, saída e logo/favicon. | Atualizar `/inicio`, conferir foco/landmarks das páginas novas, teclado/390 px e AXE. |
+| FE-03 | Guard, consulta de sessão, indisponibilidade, interceptor de `401`, logout e proteção contra respostas atrasadas; acesso/recarga/saída básicos confirmados. | Expiração temporal, falha/recuperação no navegador e auditoria de acessibilidade. |
+| FE-04/FE-05/FE-06 | Páginas listagem/cadastro/detalhe/edição integradas ao serviço, com formulário reutilizado e testes de cadastro/formulário/detalhe/edição. | Ajustes específicos abaixo, testes da listagem e marco de catálogo em FE-15. |
+| Serviço de produtos | Listar, consultar, cadastrar e atualizar. Cadastro agora retorna HttpResponse, com `status` e `body?.id`. | Consumidores devem usar o contrato atualizado; homologar o fluxo completo com banco real. |
 | Ambiente de desenvolvimento sem banco | Simulador HTTP isolado, comandos próprios, aviso permanente e cenários de catálogo/vazio/falhas/atraso/expiração; instruções em [README.md](README.md). | As páginas continuam com Leticia. O simulador apoia o desenvolvimento; não conclui integração ou homologação real. |
 | Verificação da base | Testes Angular, 42 cenários HTTP reais, conferência SQL e roteiro de acesso/recarga/saída no navegador confirmado pelo usuário. | AXE/390 px/teclado, indisponibilidade no navegador, expiração temporal e persistência após reinício. |
 
@@ -75,10 +88,10 @@ Contrato extraído das rotas, controllers e services atuais, posteriormente veri
 | Tela ou fluxo | O que pode ser feito agora no front-end | O que impede concluir com dados reais | To-dos |
 | --- | --- | --- | --- |
 | Login (RF01) | **Implementado e verificado no recorte básico:** API/seed e roteiro no navegador confirmados. | Falta auditoria de acessibilidade e cenários de falha restantes. | FE-01, BE-02, BE-15 |
-| Estrutura interna e navegação | **Implementada em parte:** `/inicio`, menu, usuário por e-mail, guard, expiração/saída e página não encontrada. | Páginas do catálogo e verificação visual pendentes. Nome/loja não vêm da sessão; revogação do JWT segue em BE-03. | FE-02, FE-03, BE-03 |
-| Produtos — listagem (RF03) | **Liberado para integrar:** lista de nome, SKU e preço, paginação e total, estados vazio/erro/carregamento. | Implementação Angular e ensaio real pendentes. Busca, saldo e canais não vêm desse endpoint. | FE-01, FE-03, FE-04, BE-15 |
-| Novo produto (RF02) | **Liberado no recorte básico:** cadastrar nome, SKU e preço pela API. | Não inclui todos os campos do protótipo; confirmar recorte em DEC-02. Não há rejeição de SKU duplicado/controle de versão. | FE-05, BE-05, BE-15, DEC-02 |
-| Detalhe/edição de produto (RF04) | **Liberado no recorte básico:** consultar por ID e salvar os três campos via PUT, tratando `400`/`401`/`404`/`500`. | Campos adicionais, conflito de versão e SKU único não estão liberados. Validar persistência e isolamento no ensaio. | FE-06, BE-05, BE-15 |
+| Estrutura interna e navegação | **Implementada:** início, menu Produtos, rotas protegidas de catálogo, conta, saída e identidade visual. | Atualizar aviso da página inicial e concluir foco/acessibilidade/homologação. Nome/loja não vêm da sessão. | FE-02, FE-03, BE-03 |
+| Produtos — listagem (RF03) | **Implementação entregue:** lista, preço, total/paginação e estados usando serviço real. | Testes da página, recuperação de página vazia e ensaio real/acessibilidade. Busca, saldo e canais não são suportados. | FE-04, FE-15, BE-15 |
+| Novo produto (RF02) | **Implementação entregue:** formulário básico reutilizável, POST/`201`, validações e testes. | Ajustes de limites/foco e ensaio da página. Cadastro completo, SKU único e versão continuam BE-05/DEC-02. | FE-05, FE-15, BE-05, DEC-02 |
+| Detalhe/edição de produto (RF04) | **Implementação entregue:** GET/PUT, `404`, estados e formulário reaproveitado. | Novos cenários de teste/recuperação, acessibilidade e homologação. Campos adicionais e conflitos continuam bloqueados. | FE-06, FE-15, BE-05 |
 | Fotos e características do produto | Preparar seleção e prévia local de foto real, se esse incremento for priorizado. | Não há upload, metadados ou persistência de características. Prévia não significa arquivo salvo. | FE-07, BE-05, BE-06 |
 | Anúncios — listagem/gestão (RF05) | Estrutura visual com filtros e situações simuladas. | Não há listagem HTTP, vínculo exposto com produto/canal ou ações reais. | FE-08, BE-07 |
 | Novo/editar anúncio, revisão e publicação (RF06) | Formulário e prévia simulados; revisão humana explícita antes da publicação. | Faltam rascunhos HTTP, requisitos por canal, revisão/aprovação, conector e retorno da operação. | FE-09, BE-07, BE-08, DEC-03 |
@@ -96,7 +109,7 @@ Não foi identificada uma tela de auditoria nos protótipos/requisitos de interf
 
 ### Regras de desenvolvimento e conclusão
 
-FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; permanecem abertas até cumprir as verificações de aceite. Demais tarefas continuam pendentes. Caio coordena infraestrutura, contratos, serviços/modelos compartilhados e integrações externas. Leticia desenvolve as páginas, formulários e componentes indicados na divisão, incluindo seus estados e testes. FE-09 e FE-13 têm partes atribuídas a cada pessoa; FE-15 reúne o ensaio integrado, sem concentrar todos os testes no fim.
+FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam abertas pelos critérios de revisão/homologação registrados. FE-07 a FE-14 não tiveram implementação identificada nos commits revisados. Caio mantém infraestrutura, contratos, serviços e integrações externas; Leticia mantém suas páginas/componentes e os ajustes da revisão. FE-09/FE-13 são divididas e FE-15 reúne o aceite dos marcos. Não repetir a implementação já entregue do catálogo.
 
 - **Estrutura:** Angular standalone, `OnPush`, signals para estado local, formulários reativos, rotas sob demanda e tipos sem `any`. Criar serviços/componentes compartilhados quando houver uso concreto, sem biblioteca de estado global ou framework de CRUD antecipado.
 - **Interface:** usar os protótipos existentes como referência; contemplar desktop e largura de 390 px, teclado, foco visível, labels, mensagens associadas aos campos e anúncios de carregamento/erro/sucesso. Atender WCAG AA e verificar AXE nas telas alteradas.
@@ -131,7 +144,15 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-02 — Construir a estrutura das páginas internas.**
 
-**Responsável:** Caio. **Situação:** estrutura implementada; integração do catálogo e verificação visual pendentes. **Dependências:** FE-03 para acesso autenticado e FE-04 para o destino definitivo; `/inicio` é o destino provisório.
+**Responsável:** Caio pela estrutura/navegação; Leticia pelos ajustes das suas páginas e identidade visual. **Situação:** rotas/menu do catálogo e logo entregues; início e acessibilidade pendentes. **Dependências:** FE-03 e FE-15 para o aceite; páginas FE-04/FE-05/FE-06 já disponíveis.
+
+**Implementação entregue e fechamento**
+
+- [x] Registrar as quatro rotas protegidas de catálogo e ativar Produtos no menu (Leticia).
+- [x] Adicionar logo e favicon (Leticia, `da81eb35`).
+- [ ] **Caio — imediato:** manter `/inicio` como entrada por enquanto e substituir o aviso de cadastro/consulta/edição "em breve" por acesso ao catálogo já disponível; conferir navegação entre as quatro rotas.
+- [ ] **Leticia, com revisão de Caio — imediato:** aplicar foco inicial nos títulos de cadastro/detalhe/edição, que ainda não usam `appFocoPagina`; remover `<main>` internos de cadastro/detalhe, pois a estrutura já fornece o principal; conferir mensagens de carregamento/erro da edição e executar teclado/390 px/AXE. São achados de leitura; não há laudo AXE novo.
+- [ ] **Leticia — acabamento:** reduzir o PNG de 1.088.280 bytes usado em logo de 42 px e favicon, preparar favicon apropriado e aplicar NgOptimizedImage à imagem estática conforme as convenções. Este acabamento não deve atrasar contratos/publicação.
 
 **Requisitos de desenvolvimento**
 
@@ -172,7 +193,14 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-04 — Construir e integrar a lista de produtos.**
 
-**Responsável:** Leticia. **Situação:** liberado. **Dependências:** FE-01/FE-03 para integração; BE-15 para homologação. **Referência:** RF03.
+**Responsável:** Leticia. **Situação:** implementação entregue em `47ee5b7b`, revisão/aceite pendentes. **Dependências:** FE-01/FE-03 existentes; FE-15/BE-15 para homologação. **Referência:** RF03.
+
+**Implementação entregue e fechamento**
+
+- [x] Implementar tabela, preço BRL, total/paginação, vazio/erro/nova tentativa, switchMap e menu/rota.
+- [ ] **Imediato:** criar testes de ProdutosComponent — não há spec dessa página — cobrindo vazio, total/limites da navegação, `500`/recuperação, cancelamento de leitura anterior e destruição do componente. Os testes do serviço não cobrem esses comportamentos da página.
+- [ ] **Revisão de robustez:** se `itens` vier vazio com `total > 0`, preservar recuperação para página válida; hoje o ramo vazio afirma que o catálogo não tem produtos e esconde a paginação. Testar a diferença entre catálogo vazio e página sem itens.
+- [ ] **Com Caio:** cumprir FE-15 com API/banco reais, desktop/390 px e acessibilidade antes de fechar a tarefa integral.
 
 **Requisitos de desenvolvimento**
 
@@ -192,7 +220,14 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-05 — Construir e integrar o formulário de novo produto.**
 
-**Responsável:** Leticia. **Situação:** liberado para três campos. **Dependências:** FE-04 e FE-01/FE-03; BE-05/DEC-02 para o recorte completo. **Referência:** RF02.
+**Responsável:** Leticia. **Situação:** implementação básica entregue em `51898427`, revisão/aceite pendentes. **Dependências:** base FE-01/FE-03/FE-04 disponível; BE-05/DEC-02 apenas para ampliar o recorte. **Referência:** RF02.
+
+**Implementação entregue e fechamento**
+
+- [x] Criar formulário reutilizável de nome/SKU/preço, validações monetárias, POST com HttpResponse/`201`, bloqueio de repetição, erro/cancelamento e testes.
+- [ ] **Imediato:** alinhar limites de nome/SKU após trim e por caracteres Unicode com o Go. Hoje `Validators.maxLength`/`maxlength` usam o texto bruto e unidades UTF-16; a API remove espaços antes de contar caracteres. Cobrir texto no limite com espaços nas pontas e caracteres fora do BMP, sem rejeitar valores que a API aceita.
+- [ ] **Imediato:** complementar testes com `200` sem criação/`201` sem ID, falha preservando valores realmente digitados e mensagens/estado inválido/foco dos campos; seguir os ajustes de acessibilidade em FE-02.
+- [ ] **Com Caio:** conferir cadastro real → lista → detalhe → F5, e identificação do recorte básico. Não prometer SKU único/campos completos.
 
 **Requisitos de desenvolvimento**
 
@@ -213,7 +248,15 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-06 — Construir e integrar consulta por ID e edição básica.**
 
-**Responsável:** Leticia. **Situação:** liberado para três campos. **Dependências:** FE-04/FE-05; BE-05 para conflitos/campos adicionais. **Referência:** RF04.
+**Responsável:** Leticia. **Situação:** detalhe/edição básicos entregues em `7f0be9c0`, revisão/aceite pendentes. **Dependências:** FE-04/FE-05 disponíveis; BE-05 para conflitos/campos adicionais. **Referência:** RF04.
+
+**Implementação entregue e fechamento**
+
+- [x] Implementar GET por ID, detalhe, erro/`404`/nova tentativa no detalhe, PUT com formulário reutilizado, cancelamento, retorno ao detalhe e testes de componentes.
+- [ ] **Imediato:** oferecer nova tentativa de leitura na edição após falha transitória; hoje a tela recomenda tentar novamente, mas só oferece voltar à lista. Conferir foco e anúncio dos estados conforme FE-02.
+- [ ] **Imediato:** fortalecer o teste de preservação após falha: editar os controles reais do formulário e verificar que o texto digitado continua após `500`. O teste atual chama `salvar` diretamente e compara `dadosIniciais`, sem comprovar a preservação da edição.
+- [ ] **Revisão:** testar duplo PUT durante envio, ID inválido na edição, troca de ID com GET anterior pendente e recuperação de erros. Verificar que resposta de gravação atrasada não navega para um produto anterior após mudança de rota.
+- [ ] **Com Caio:** homologar edição → detalhe → lista → F5 e `404` de outra conta pelo fluxo Angular. A verificação HTTP da API em 08/11 não substitui esse roteiro.
 
 **Requisitos de desenvolvimento**
 
@@ -395,7 +438,7 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 - [ ] **FE-15 — Executar e registrar o aceite dos fluxos reais.**
 
-**Responsáveis:** Caio e Leticia. **Situação:** em execução; base de acesso conferida no navegador pelo usuário e API real testada, catálogo e demais marcos pendentes. **Dependências:** BE-02/BE-03/BE-15; FE-01 a FE-06 no primeiro marco; demais FE/BE para os marcos seguintes.
+**Responsáveis:** Caio e Leticia. **Situação:** em execução; base de acesso conferida pelo usuário, API real testada e páginas do catálogo entregues, aguardando ajustes e homologação desse marco. Publicação/operação seguem pendentes. **Dependências:** BE-02/BE-03/BE-15; FE-01 a FE-06 no primeiro marco; demais FE/BE para os marcos seguintes.
 
 **Requisitos de desenvolvimento**
 
@@ -413,29 +456,35 @@ FE-01/FE-02/FE-03 têm implementação iniciada, com código e testes abaixo; pe
 
 ## Próximos passos de Caio e dependências entre as frentes
 
-Referência: código de front em `f4013d63`, com API ainda na base `88731577`. O serviço de produtos já foi entregue, mas o catálogo não tem páginas/rotas disponíveis. As dependências abaixo distinguem desenvolvimento isolado, integração de telas e conclusão com API real.
+Referência em 09/11: catálogo entregue de `47ee5b7b` a `7f0be9c0`, identidade visual em `da81eb35`, API em `88731577`. Rotas e menu já foram ligados; não são mais dependência a aguardar. O simulador continua opcional para falhas/estados, enquanto a homologação usa Go/PostgreSQL reais.
 
-**Apoio preparado após `0391ceb0`:** Leticia já pode usar `ProdutosService` e iniciar FE-04/FE-05/FE-06 com `npm run api:simulada` + `npm run start:simulado`, sem preparar banco ou aguardar outro serviço de Caio. Há 25 registros, segunda conta vazia, criação/edição em memória e cenários controlados. Comandos, campos e cuidados de consumo estão em `web/README.md`. Formulários, paginação visual, validações locais e seus testes continuam sob a responsabilidade definida para cada página; não foram implementados neste apoio.
+| Frente imediata | Caio | Leticia | Condição de encerramento |
+| --- | --- | --- | --- |
+| Revisar e fechar catálogo | Atualizar início, conferir estrutura/serviço e coordenar roteiro real FE-15 com duas contas. | Corrigir pendências FE-04/FE-05/FE-06, completar testes e acessibilidade das páginas. | Lista → cadastro → detalhe → edição → lista → F5 → logout/retorno, sem perda de dados ou acesso de outra conta; teclado/390 px/AXE registrados. |
+| Preparar publicação em paralelo | Combinar DTOs com Samuel/Vitor e preparar adaptadores de fotos, anúncios, IA e canais assim que definidos. | Começar prévia local de fotos (FE-07) e editor manual/prévia (FE-09); lista de anúncios (FE-08) conforme contrato. | Componente e serviço com entradas/saídas combinadas, simulação explícita; operação real só depois do endpoint. |
+| Preparar consultas e formulários posteriores | Coordenar contratos de pedidos, estoque, indicadores, conta/preferências e recuperação. | Manter essas páginas atribuídas a ela e começar cada incremento com campos/estados acordados. Conta ID/e-mail em leitura já pode avançar. | BE-10 a BE-14 liberam os serviços; aprovação dos critérios de cada FE, sem inventar endpoints ou regras. |
 
-| Ordem sugerida | O que Caio pode adiantar sem aguardar as páginas de Leticia | O que ainda condiciona a conclusão |
-| --- | --- | --- |
-| 1 | FE-01/FE-03: completar acessibilidade, indisponibilidade no navegador, expiração temporal e persistência após reinício. Login, recarga, saída e bloqueio de retorno foram confirmados pelo usuário no Angular real; 42 cenários HTTP aprovados. | BE-02/BE-03/BE-15 para os cenários restantes. Isso não depende da interface do catálogo. |
-| 2 | FE-02: conferir layout, foco, teclado, página não encontrada e tratamento de indisponibilidade em desktop e 390 px; executar AXE. | Ferramenta/ambiente de navegador utilizáveis. Navegação do catálogo só pode ser conferida depois de FE-04/FE-05/FE-06. |
-| 3 | FE-13: preparar a seção de canais e seus estados e combinar o contrato de conexão com o back-end. Disponibilizar o contrato de ID/e-mail já existente para a seção de conta entregue por Leticia. | BE-08 para conectar/reconectar de verdade; BE-13 para editar conta/preferências. Não depende de a lista de produtos estar pronta. |
-| 4 | FE-07: alinhar contrato e preparar o adaptador HTTP de fotos/tratamento. O componente de seleção/prévia e sua incorporação ao cadastro ficam com Leticia. | Limites e persistência de BE-05/BE-06/DEC-02; os componentes dependem das entregas de Leticia, sem bloqueá-la de começar a prévia isoladamente. |
-| 5 | FE-09: preparar serviços/modelos de rascunho/IA/publicação e coordenação da revisão/operação. Combinar entradas/saídas para que Leticia construa editor manual e prévia usando ProdutosService. | BE-07/BE-08/BE-09 e BE-06 para as operações reais. A integração final usa os componentes e listagem entregues por Leticia; o trabalho de serviço não exige esperar essas páginas. |
-| 6 | FE-11/FE-12/FE-14: combinar contratos e preparar serviços/tipos de estoque, indicadores e recuperação de senha. As respectivas páginas/formulários ficam com Leticia. | APIs BE-11/BE-12/BE-14 e regras correspondentes; implementação de páginas e testes de interface conforme sua responsável. |
-| 7 | Preparar os serviços/modelos de anúncios e pedidos assim que os contratos forem combinados. | BE-07/BE-10 precisam definir campos, operações e erros; não inventar endpoints para adiantar integração. A definição do contrato não precisa esperar FE-08/FE-10. |
+### O que ainda aguarda componentes e o que aguarda API
 
-### O que aguarda as entregas de Leticia
+- **Já entregue por Leticia:** componentes FE-04/FE-05/FE-06 e respectivas rotas/menu. Caio pode revisar/homologar agora; não precisa implementar outra versão dessas páginas.
+- **Ainda depende de Leticia:** componentes de fotos, lista de anúncios, editor manual/prévia, pedidos, estoque, indicadores, conta/preferências e recuperação. Caio não os assume; prepara seus serviços e integra as entregas.
+- **Ainda depende do back-end:** persistência dos campos/fotos, rascunho e operação de publicação, autorização/conector, Gemini e APIs de operação/administração/recuperação. Esses adaptadores não estão liberados só porque o catálogo foi entregue.
+- **Ainda depende do grupo:** DEC-01/DEC-02/DEC-03. Confirmar regras antes de botões de escrita de pedidos/estoque, campos extras, compartilhamento do catálogo e bloqueio de anúncio por canal.
 
-- **FE-04:** registrar a rota da listagem protegida, habilitar Produtos no menu e avaliar a troca do destino provisório `/inicio` pelo catálogo. Só ativar esses caminhos quando a página estiver disponível.
-- **FE-05/FE-06:** integrar rotas/retornos de cadastro e detalhe/edição, encaixar os complementos/fotos de FE-07 no formulário existente e concluir o marco de catálogo em FE-15, com cadastro → recarga → edição → listagem.
-- **FE-08:** ligar lista/detalhe ao editor de anúncios e verificar a atualização da lista após operações reais de FE-09. Isso condiciona o fluxo entre páginas, não a construção prévia do editor.
-- **FE-10:** ligar a consulta de pedidos às demais páginas e conferir a apresentação do fluxo operacional junto ao estoque. O cálculo e a sincronização continuam responsabilidade da API.
-- **FE-07/FE-11/FE-12/FE-14 e partes de FE-09/FE-13:** integrar os serviços às entregas de fotos, estoque, indicadores, recuperação, editor/prévia e conta/preferências construídas por Leticia; revisar os critérios sem substituir sua implementação.
+## Caminho para completar o MVP — prioridades de 09/11/2026
 
-Essas entregas não são motivo para iniciar as páginas da outra pessoa ou duplicar seus componentes. Caio pode revisar os componentes entregues, integrar a estrutura e preparar as próprias funcionalidades em paralelo. As dependências FE-04/FE-07/FE-08 citadas em FE-09 representam o fluxo completo; o editor isolado pode avançar antes delas.
+Ordem de dependência, sem novos prazos ou redução de escopo aprovada. O cadastro básico é a base do MVP; sua entrega isolada não conclui o produto. A autorização do marketplace deve avançar em paralelo ao fechamento do catálogo, pois depende de acesso externo.
+
+| Prioridade e marco | Entrega de front e responsáveis | Apoio específico do back-end / decisão | Evidência para encerrar |
+| --- | --- | --- | --- |
+| **P0 — Fechar catálogo atual** | Caio: início/estrutura e coordenação FE-15. Leticia: ajustes/testes FE-04/FE-05/FE-06. Ambos: acessibilidade e ensaio. | BE-15: apoiar persistência/isolamento/erros do contrato existente. BE-05/DEC-02 só condicionam a ampliação; não bloquear os três campos atuais. | Fluxo real completo, nova leitura após recarga/reinício, duas contas, testes da listagem e aceite visual/AXE. |
+| **P1 — Liberar fotos e conexão** | Leticia: FE-07 e apresentação de seleção/upload/prévia; Caio: serviço de fotos e canais de FE-13. | BE-05/BE-06: campos aprovados, upload/consulta/limites/versões. BE-08: autorização/retorno, conexão/reconexão e capacidades reais do Mercado Livre. DEC-02 define campos do incremento. | Foto real reaberta após salvar, original/versão tratada distinguíveis e estado de conexão confirmado pela API, sem tokens no Angular. |
+| **P1 — Publicar um anúncio revisado** | Leticia: FE-08 e editor manual/prévia de FE-09. Caio: DTOs/serviços, geração assistida e coordenação de revisão/operação/publicação. | BE-07: rascunho/revisão/aprovação/operação consultável. BE-08: conector. BE-09: sugestão Gemini editável e erros/quota. DEC-03: regra produto/canal. | Produto/foto → canal → rascunho → sugestão revisada → aprovação humana → publicação autorizada real no Mercado Livre, com ID/link externo; clique duplo/timeout não duplicam anúncio e falha da IA preserva edição manual. |
+| **P2 — Pedidos e estoque** | Leticia: FE-10/FE-11. Caio: serviços/modelos e integração das consultas. | BE-10/BE-11: fonte, paginação/filtros, vínculo SKU, estados, atualização/divergências e consistência no servidor. DEC-01 antes de qualquer escrita manual. | Pedido real consultável; saldo/origem/atualização e falhas visíveis; repetição de importação não baixa estoque novamente; sem promessa de sincronização instantânea. |
+| **P2 — Completar requisitos restantes** | Leticia: FE-12, conta/preferências de FE-13 e FE-14. Caio: serviços respectivos. | BE-12 define métricas/unidades/período; BE-13 perfil/preferências; BE-14 recuperação/uso único/expiração. | Dados reais distinguem zero/ausência/falha, preferências persistem e redefinição permite novo login; critérios de cada tarefa atendidos. Não há adiamento aprovado desses requisitos. |
+| **P3 — Aceite final e demonstração** | Ambos: FE-15 nos marcos de catálogo, publicação e operação; correções e documentação de execução. | BE-15 e responsáveis pelas integrações apoiam repetição/recuperação; grupo confirma recorte/ambiente da apresentação. | Fluxos repetíveis, teclado/390 px/AXE, reinício/falhas/expiração, limites conhecidos registrados e separação explícita entre real e simulado. |
+
+Mercado Livre é a primeira integração real de publicação. Shopee/Amazon e acabamento visual não devem atrasar esse fluxo obrigatório. Nenhuma credencial, conector, publicação, geração Gemini ou cálculo de estoque deve ser transferido ao Angular. Este plano organiza o trabalho; não autoriza publicar anúncios em conta real sem a autorização correspondente.
 
 ## Divisão proposta entre duas pessoas
 
@@ -452,14 +501,14 @@ Distribuição preparada em **08/11/2026** para a dupla de front-end já identif
 | **Caio** | Parte de FE-13 | Conexão/reconexão e estados de canais; métodos HTTP para conta e preferências quando liberados. |
 | **Ambos** | FE-15 | Revisão cruzada, integração dos fluxos, acessibilidade, ensaio e registro das limitações. |
 
-Leticia inicia por **FE-04 → FE-05 → FE-06**. Depois entrega **FE-07**, **FE-08 e o editor/prévia de FE-09**, **FE-10/FE-11**, e as seções de conta/preferências, indicadores e recuperação conforme liberação. Caio mantém base/serviços e conduz as integrações externas. Isso atribui a Leticia nove tarefas principais de páginas/componentes e partes definidas de FE-09/FE-13; FE-15 é compartilhada. As entregas incluem testes e estados previstos nos critérios, sem alterar a exigência de integração real.
+Leticia já entregou a implementação **FE-04/FE-05/FE-06** e agora fecha sua revisão/homologação. A próxima implementação é **FE-07**, seguida de **FE-08/editor de FE-09**, e depois consultas/formulários conforme a prioridade e os contratos acima. A atribuição de nove tarefas principais e partes de FE-09/FE-13 permanece; Caio mantém base, serviços e integrações externas, com FE-15 compartilhada. Não reatribuir a autoria dos commits nem recomeçar o catálogo.
 
 ### Sequência de trabalho em paralelo
 
 | Etapa | Caio | Leticia | Ponto de encontro e apoio do back-end |
 | --- | --- | --- | --- |
-| 1. Preparar a primeira entrega | FE-01/FE-02/FE-03: proxy, sessão e estrutura; disponibilizar tipos e serviço de produtos com exemplos de uso e respostas de teste. | FE-04: tabela/lista, paginação, ações e estados de produtos; depois FE-05 e FE-06 reutilizando o formulário. | Combinar rotas, formato de erros e retorno do cadastro/edição; usar o contrato existente. Componentes podem começar com respostas simuladas do serviço. BE-02/BE-03/BE-15 apoiam o ensaio real. |
-| 2. Integrar o catálogo | Integrar guard/navegação, conferir serviços HTTP e revisar formulário/paginação. | Conectar páginas ao serviço disponibilizado, verificar validações e persistência de cadastro/edição e executar o roteiro do catálogo. | Ambos executam o marco inicial de FE-15 com banco real; corrigir bloqueios antes de considerar o catálogo entregue. |
+| 1. Base entregue | FE-01/FE-02/FE-03 e serviço compartilhado disponíveis. | FE-04/FE-05/FE-06 implementadas, rotas/menu ligados e formulário reaproveitado. | Não reconstruir essas entregas. Aceite integral continua condicionado aos critérios. |
+| 2. Fechar o catálogo — agora | Atualizar início e revisar integração; apoiar roteiro real e correções compartilhadas. | Fechar ajustes/testes indicados em FE-04/FE-05/FE-06 e acessibilidade das páginas. | Executar juntos o marco inicial FE-15 com API/banco, duas contas e recarga/reinício. |
 | 3. Preparar publicação | Adaptadores de fotos e anúncios; canais de FE-13, geração/coordenação de aprovação/publicação de FE-09. Combinar as interfaces dos componentes antes de editar arquivos compartilhados. | FE-07: campos/fotos/prévia; FE-08: listagem de anúncios; parte de FE-09: formulário/editor manual e prévia com estados/validações. | BE-05/BE-06/BE-07/BE-08/BE-09 liberam contratos; API de publicação e componentes são unidos no marco de FE-15. Iniciar autorização do Mercado Livre cedo no back-end, sem presumir aprovação da conta. |
 | 4. Completar operação | Serviços/modelos de pedidos, estoque, indicadores, conta/preferências e recuperação; concluir integrações externas e revisar contratos consumidos. | FE-10/FE-11, seções de conta/preferências de FE-13, FE-12 e FE-14: páginas e formulários completos com seus testes e estados, conforme contratos. | Marcos seguintes de FE-15; BE-10/BE-11/BE-12/BE-13/BE-14 conforme funcionalidade. Pedidos e estoque continuam no escopo do MVP. |
 
@@ -478,7 +527,7 @@ Essa sequência não aprova retirada de indicadores ou recuperação de senha do
 
 Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `[x]` registra entrega de código confirmada por leitura e `go vet`; homologação integrada é separada em BE-15/FE-15. Itens parciais permanecem abertos com o restante explícito. Não houve implementação de back-end nesta revisão.
 
-**Próxima liberação de contratos para o front:** priorizar BE-06/BE-07/BE-08/BE-09 após homologar a base. Em cada item, informar método/caminho, corpo, tipos e obrigatoriedade dos campos, resposta de sucesso, erros e estados; isso permite preparar os adaptadores antes das páginas. Para fotos, incluir formato de envio, limites e identificadores/URLs do original e da versão tratada. Para anúncios, separar revisão aprovada, estado remoto e operação consultável. Para canais, definir início/retorno da autorização, consulta de conexão e capacidades, mantendo tokens no Go. Para IA, definir entrada, sugestão editável, limites e erros/quota. Sem esse acordo, os respectivos serviços HTTP seguem bloqueados; não há endpoints inventados no simulador.
+**Prioridade para Samuel/Vitor em 09/11:** apoiar o aceite do catálogo existente em BE-15 e, em paralelo, iniciar/liberar BE-08 (autorização/conexão/conector) e combinar BE-05/BE-06/BE-07/BE-09 para fotos/rascunho/publicação/IA. Não aguardar acabamento/AXE do catálogo para tratar acesso externo. Em cada contrato, informar método/caminho, corpo, tipos/obrigatoriedade, sucesso, erros e estados. Fotos precisam de formato/limites/identificadores das versões; anúncios precisam de revisão aprovada e operação consultável; canais precisam de autorização/retorno, capacidades e consulta sem tokens; IA precisa de sugestão editável/limites/quota. BE-10/BE-11 vêm na frente operacional e BE-12/BE-13/BE-14 completam os requisitos. Sem contrato, os adaptadores seguem bloqueados; o front não implementará esses ajustes no Go/schema.
 
 - [x] **BE-01 — Restaurar compilação do login (entregue em `88731577`):** consulta por e-mail restaurada no SQL/sqlc, identificador adequado e `go vet ./...` aprovado em 08/11. Login normaliza o e-mail na entrada; a garantia de normalização dos registros existentes ainda deve ser conferida em BE-15. Não é mais bloqueio de FE-01.
 - [ ] **BE-02 — Carga de desenvolvimento (parcial):** na cópia local de Caio, banco atual preparado separadamente da PoC; três usuários confirmados por SQL e login HTTP de Caio/Samuel aprovado. Senha incorreta e e-mail inexistente retornaram `401`; e-mail com espaços/maiúsculas foi normalizado. O usuário também confirmou login incorreto/correto no navegador; resta confirmar os ambientes dos demais integrantes. O seed contém `samuel@sellerhub.com`, `caio@sellerhub.com` e `vitor@sellerhub.com`, com senha de demonstração `123456`. Não recriar ou sobrescrever um banco existente sem avaliar seus dados.
@@ -502,15 +551,20 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 - [ ] **DEC-02 — Produto mínimo e vínculo ao usuário:** protótipo inclui descrição, categoria e características; API só persiste nome, SKU e preço, vinculados ao usuário do JWT. Já é possível construir/integrar esse recorte técnico; confirmar se ele atende à primeira entrega e quais campos devem ser acrescentados. A implementação isola produtos por usuário; confirmar se a conta única precisa de catálogo compartilhado. Não tratar o comportamento atual como aprovação automática de uma regra de produto.
 - [ ] **DEC-03 — Canais e anúncios:** o protótipo impede selecionar canal já anunciado; o banco não garante anúncio único por produto/canal. Confirmar essa regra antes de bloquear na interface. Acordar campos obrigatórios e capacidades reais de cada canal; não assumir que os três do protótipo já serão integrados.
 
-## Ordem de início definida em 08/11/2026 e critério de conclusão
+## Ordem de início e critério de conclusão — reconciliação de 09/11/2026
 
-Primeira frente: **login → estrutura interna/sessão → listagem de produtos → novo produto → detalhe/edição de produto**. O resumo por página e a prioridade de apoio do back-end estão em [AGENTS.md](AGENTS.md). FE-01/FE-02/FE-03 e o serviço compartilhado de produtos já têm código local; páginas do catálogo continuam pendentes. Os estados e critérios completos permanecem nesta fila, sem marcar a integração como concluída antes do ensaio real.
+A primeira frente **login → estrutura/sessão → listagem → cadastro → detalhe/edição** já tem código entregue. A revisão atual passa de construir páginas básicas para corrigir/homologar o fluxo. O resumo e a prioridade de apoio estão em [AGENTS.md](AGENTS.md); detalhes e checklists permanecem somente nesta fila.
 
-Começar **FE-01 → FE-02/FE-03 → FE-04 → FE-05/FE-06**, integrando as rotas já entregues, sem esperar novos endpoints de catálogo. Preparar o ambiente e a homologação em BE-02/BE-15; fechar o fluxo com FE-15. BE-05 e DEC-02 condicionam a ampliação/aceite do cadastro completo, sem impedir a construção do recorte básico. Depois, avançar anúncios e conexão de canal; liberar Vendas, Estoque, Indicadores e Administração conforme os contratos correspondentes. A ordem entre módulos posteriores pode mudar por decisão do grupo.
+Fechar os ajustes imediatos de FE-02/FE-04/FE-05/FE-06 e o marco de catálogo FE-15. Em paralelo, preparar fotos, anúncios e conexão de canal conforme o caminho do MVP acima. BE-05/DEC-02 condicionam ampliar o cadastro, sem exigir novo endpoint para os três campos atuais. Vendas, Estoque, Indicadores, Administração e Recuperação seguem pendentes, sem exclusão ou adiamento aprovado.
 
 Marcar um item como concluído somente após registrar o que foi entregue e sua verificação. Uma tela visualmente pronta pode fechar a parte de interface, mas deve manter a integração pendente com o respectivo ID de back-end. Em cada retomada, conferir arquivos/rotas e atualizar este documento, sem presumir que esta fotografia permanece atual.
 
 ## Verificações
+
+- **Revisão de 09/11/2026:** lidos os quatro commits de Leticia e os componentes/templates/estilos/testes resultantes, rotas, estrutura, configuração, serviço/contrato e instruções. `git fetch origin` concluído, sem commits em HEAD..origin/main; árvore inicialmente limpa. Nenhuma mudança em API/schema desde `88731577`.
+- `npm.cmd test -- --watch=false`: **57 testes em 11 arquivos aprovados**. Novos arquivos de teste cobrem formulário, cadastro, detalhe e edição; não existe teste próprio de ProdutosComponent. A suíte usa dados/HTTP controlados e não prova persistência ou execução das páginas com Go/PostgreSQL.
+- `npm.cmd run build`: **aprovado**, 276,35 kB iniciais. O PNG da marca tem 1.088.280 bytes e é asset separado, sem estar refletido no total de JavaScript inicial. Nenhum novo teste foi escrito, nenhum fluxo de navegador/AXE/API real foi executado e nenhum dado do banco foi alterado nesta revisão. Achados viraram subitens de execução, preservando os critérios integrais.
+- Atualizados planejamento, estados e subtarefas nesta fila, resumo em AGENTS/Claude e contrato técnico no README do front. Contexto local atualizado sem credenciais, README da raiz preservado; sem commit/push. Os registros de 08/11 abaixo são históricos e não substituem a homologação do catálogo novo.
 
 - **Confirmação manual do usuário em 08/11/2026:** com Angular iniciado por `npm.cmd start` e API Go/PostgreSQL reais, todo o roteiro proposto funcionou: senha incorreta rejeitada, senha correta aceita, abertura de `/inicio` com e-mail, F5 preservando o acesso, saída para login e acesso direto a `/inicio` após saída novamente bloqueado. Evidência relatada pelo usuário; sem inspeção automatizada de tela, screenshot ou AXE. Não abrange catálogo, teclado/390 px, indisponibilidade, expiração temporal ou reinício. FE-01/FE-03 e FE-15 mantêm os critérios restantes abertos.
 
