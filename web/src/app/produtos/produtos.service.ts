@@ -42,7 +42,9 @@ export class ProdutosService {
 
   cadastrar(produto: DadosProduto) {
     return this.http
-      .post<{ id: number }>('/api/produtos', corpoProduto(produto))
+      .post<{ id: number }>('/api/produtos', corpoProduto(produto), {
+      observe: 'response',
+    })
       .pipe(timeout(10_000));
   }
 

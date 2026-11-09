@@ -1,0 +1,24 @@
+
+<main class="pagina-cadastro">
+  <header class="cabecalho">
+    <div>
+      <a routerLink="/produtos" class="link-voltar">
+        Voltar para produtos
+      </a>
+
+      <h1>Novo produto</h1>
+      <p>Preencha os dados abaixo para cadastrar um produto no SellerHub.</p>
+    </div>
+  </header>
+
+  <section class="cartao-formulario" aria-labelledby="titulo-formulario">
+    <h2 id="titulo-formulario">Informações do produto</h2>
+
+    <app-produto-formulario
+      [enviando]="enviando()"
+      [erroEnvio]="erro()"
+      (salvar)="salvar($event)"
+      (cancelar)="cancelar()"
+    />
+  </section>
+</main>
