@@ -1,11 +1,9 @@
-<section class="pagina-produtos" aria-labelledby="titulo-produtos">
-  <header class="cabecalho-produtos">
-    <div>
-      <h1 id="titulo-produtos" appFocoPagina>Produtos</h1>
-      <p>Consulte e gerencie os produtos do seu catálogo.</p>
-    </div>
-
-    <a class="acao-principal" routerLink="/produtos/novo"> Novo produto </a>
+<section aria-labelledby="titulo-produtos">
+  <header class="cabecalho-pagina">
+    <h1 id="titulo-produtos" appFocoPagina>Produtos</h1>
+    <a class="botao-primario" routerLink="/produtos/novo">
+      <span class="mais" aria-hidden="true">+</span> Novo produto
+    </a>
   </header>
 
   @if (carregando()) {
@@ -21,7 +19,7 @@
     <div class="estado vazio">
       <h2>Nenhum produto encontrado</h2>
       <p>Seu catálogo ainda não possui produtos cadastrados.</p>
-      <a class="acao-principal" routerLink="/produtos/novo"> Cadastrar primeiro produto </a>
+      <a class="botao-primario" routerLink="/produtos/novo">Cadastrar primeiro produto</a>
     </div>
   } @else {
     @if (produtos().length === 0) {
@@ -39,21 +37,19 @@
             <tr>
               <th scope="col">Produto</th>
               <th scope="col">SKU</th>
-              <th scope="col">Preço base</th>
-              <th scope="col">Ações</th>
+              <th scope="col" class="numero">Preço base</th>
             </tr>
           </thead>
 
           <tbody>
             @for (produto of produtos(); track produto.id) {
               <tr>
-                <td>{{ produto.nome }}</td>
-                <td>{{ produto.sku }}</td>
-                <td>{{ produto.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</td>
                 <td>
-                  <a [routerLink]="['/produtos', produto.id]"> Ver detalhes </a>
-                  <span aria-hidden="true"> | </span>
-                  <a [routerLink]="['/produtos', produto.id, 'editar']"> Editar </a>
+                  <a class="nome" [routerLink]="['/produtos', produto.id]">{{ produto.nome }}</a>
+                </td>
+                <td class="sku">{{ produto.sku }}</td>
+                <td class="numero">
+                  {{ produto.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
                 </td>
               </tr>
             }

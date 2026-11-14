@@ -21,14 +21,14 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     nome = `Produto ${sku}`;
     await page.goto('/produtos');
   } else {
-    await page.getByRole('link', { name: 'Cadastrar produto', exact: true }).click();
-    await page.getByLabel('Nome do produto').fill(nome);
+    await page.getByRole('link', { name: 'Novo produto', exact: true }).click();
+    await page.getByLabel('Nome', { exact: true }).fill(nome);
     await page.getByLabel('SKU', { exact: true }).fill(sku);
     await page.getByLabel('Preço base (R$)').fill('35,50');
     const criacao = page.waitForResponse(
       (r) => new URL(r.url()).pathname === '/api/produtos' && r.request().method() === 'POST',
     );
-    await page.getByRole('button', { name: 'Cadastrar produto', exact: true }).click();
+    await page.getByRole('button', { name: 'Salvar produto', exact: true }).click();
     const resposta = await criacao;
     expect(resposta.status()).toBe(201);
     const criado: { id: number } = await resposta.json();
@@ -56,7 +56,7 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     await expect(page.getByRole('table')).toBeVisible();
   }
   await expect(linha).toContainText(precoInicial.toFixed(2).replace('.', ','));
-  await linha.getByRole('link', { name: 'Ver detalhes', exact: true }).click();
+  await linha.getByRole('link').click();
   await expect(page).toHaveURL(`/produtos/${id}`);
   await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
   await page.reload();
@@ -67,7 +67,7 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Editar produto', exact: true }).click();
-  await page.getByLabel('Nome do produto').fill(`${nome} editado`);
+  await page.getByLabel('Nome', { exact: true }).fill(`${nome} editado`);
   await page.getByLabel('Preço base (R$)').fill('42,01');
   const atualizacao = page.waitForResponse((r) => r.request().method() === 'PUT');
   await page.getByRole('button', { name: 'Salvar alterações', exact: true }).click();

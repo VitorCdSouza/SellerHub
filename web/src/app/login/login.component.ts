@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -18,7 +19,7 @@ import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, FocoPaginaDirective],
+  imports: [NgOptimizedImage, ReactiveFormsModule, FocoPaginaDirective],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +39,8 @@ export class LoginComponent {
     senha: ['', Validators.required],
   });
   protected readonly enviando = signal(false);
+  protected readonly senhaVisivel = signal(false);
+  protected readonly submetido = signal(false);
   protected readonly sucesso = signal('');
   protected readonly erro = signal(
     this.rota.snapshot.queryParamMap.get('motivo') === 'expirada'
@@ -50,9 +53,8 @@ export class LoginComponent {
     this.sucesso.set('');
     this.erro.set('');
     this.formulario.controls.email.setValue(this.formulario.controls.email.value.trim());
-    this.formulario.markAllAsTouched();
+    this.submetido.set(true);
     if (this.formulario.invalid) {
-      this.erro.set('Confira o e-mail e a senha antes de entrar.');
       const campo = this.formulario.controls.email.invalid ? this.campoEmail() : this.campoSenha();
       campo.nativeElement.focus();
       return;
@@ -84,6 +86,7 @@ export class LoginComponent {
           this.enviando.set(false);
           this.formulario.enable();
           this.formulario.controls.senha.reset();
+          this.submetido.set(false);
           if (!this.destroyRef.destroyed && !this.navegando)
             this.campoSenha().nativeElement.focus();
         }),

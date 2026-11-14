@@ -25,7 +25,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     return harness.routeNativeElement!;
   }
 
-  async function autenticar(caminho = '/inicio') {
+  async function autenticar(caminho = '/produtos/novo') {
     const navegacao = harness.navigateByUrl(caminho);
     await vi.waitFor(() => expect(TestBed.inject(AuthService).estado()).toBe('consultando'));
     http.expectOne('/api/sessao').flush({ id: 2, email: 'conta-a@exemplo.test' });
@@ -62,18 +62,12 @@ describe('Integração da estrutura, sessão e catálogo', () => {
       await navegacao;
       expect(router.parseUrl(router.url).queryParams['retorno']).toBe(caminho);
       expect(tela().querySelector('form')).not.toBeNull();
-      expect(tela().textContent).not.toContain('Conta conectada');
+      expect(tela().querySelector('.conta')).toBeNull();
     },
   );
 
-  it('liga a página inicial ao catálogo disponível pelo menu e pelas ações', async () => {
+  it('leva ao catálogo pelo menu lateral', async () => {
     await autenticar();
-    const acoes = tela().querySelector('.acoes-catalogo')!;
-    expect(acoes.querySelector('a[href="/produtos"]')?.textContent).toContain('Ver produtos');
-    expect(acoes.querySelector('a[href="/produtos/novo"]')?.textContent).toContain(
-      'Cadastrar produto',
-    );
-    expect(tela().textContent).not.toContain('estarão disponíveis aqui em breve');
     tela().querySelector<HTMLAnchorElement>('nav a[href="/produtos"]')!.click();
     await harness.fixture.whenStable();
     responderLista();

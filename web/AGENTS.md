@@ -9,7 +9,7 @@ O README da raiz deve conter apresentação do projeto e instruções gerais de 
 
 Ao concluir uma entrega, sugerir mensagens de commit em Conventional Commits, com descrição concreta em português e escopo coerente com os arquivos alterados. A sugestão não autoriza executar commit ou push.
 
-Antes de entregar alterações de código/configuração/testes, executar `npm run test:qualidade` com ambiente real e conferir [QUALIDADE.md](QUALIDADE.md). Corrigir falhas com regressão e repetir até aprovação do conteúdo atual; ambiente ou dependência externa exige bloqueio identificado. `test:qualidade:conferir` só valida a prova em cache. Não reduzir testes/AXE nem usar gravação automática. O README do front documenta os estados e a impressão do código; manter logs/traces locais ignorados.
+Durante o desenvolvimento, basta `npm test -- --watch=false`. Antes de commitar alterações de código/configuração/testes, executar `npm run test:qualidade` com ambiente real e conferir [QUALIDADE.md](QUALIDADE.md). Corrigir falhas com regressão e repetir até aprovação do conteúdo atual; ambiente ou dependência externa exige bloqueio identificado. `test:qualidade:conferir` só valida a prova em cache. Não reduzir testes/AXE nem usar gravação automática. O README do front documenta os estados e a impressão do código; manter logs/traces locais ignorados.
 
 Para desenvolvimento do catálogo sem banco, usar os comandos e cenários de simulação descritos em [README.md](README.md). O modo é explícito (`start:simulado`), tem aviso permanente e não substitui a homologação real. Não acrescentar endpoints simulados para módulos cujo contrato ainda não foi combinado.
 

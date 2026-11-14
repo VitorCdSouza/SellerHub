@@ -1,5 +1,12 @@
 .aviso-simulacao {
-  padding: 0.8rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--altura-aviso);
+  padding: 0 1rem;
   background: #fff3cd;
   color: #594300;
   text-align: center;
@@ -12,4 +19,12 @@
   color: #244bc1;
   text-align: center;
   font-size: 0.9rem;
+}
+
+@media (max-width: 760px) {
+  .aviso-simulacao {
+    position: static;
+    height: auto;
+    padding: 0.8rem 1rem;
+  }
 }

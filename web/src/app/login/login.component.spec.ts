@@ -34,6 +34,20 @@ describe('Login integrado ao AuthService', () => {
     fixture.detectChanges();
   }
 
+  it('alterna a visibilidade da senha', () => {
+    const senha = tela.querySelector<HTMLInputElement>('#senha')!;
+    const mostrar = tela.querySelector<HTMLButtonElement>('.mostrar-senha')!;
+    expect(senha.type).toBe('password');
+    expect(mostrar.getAttribute('aria-pressed')).toBe('false');
+    mostrar.click();
+    fixture.detectChanges();
+    expect(senha.type).toBe('text');
+    expect(mostrar.getAttribute('aria-pressed')).toBe('true');
+    mostrar.click();
+    fixture.detectChanges();
+    expect(senha.type).toBe('password');
+  });
+
   it('não envia formulário vazio', () => {
     enviar();
     http.expectNone('/api/login');
@@ -45,7 +59,7 @@ describe('Login integrado ao AuthService', () => {
     preencher('email', 'teste@email.com');
     preencher('senha', '123456');
     enviar();
-    expect(tela.querySelector('button')!.disabled).toBe(true);
+    expect(tela.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
     enviar();
     const requisicao = http.expectOne('/api/login');
     expect(requisicao.request.method).toBe('POST');
@@ -55,11 +69,11 @@ describe('Login integrado ao AuthService', () => {
     expect(TestBed.inject(Router).navigateByUrl).not.toHaveBeenCalled();
     http.expectOne('/api/sessao').flush({ id: 2, email: 'teste@email.com' });
     fixture.detectChanges();
-    expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/inicio', {
+    expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/produtos', {
       replaceUrl: true,
     });
     expect(tela.querySelector<HTMLInputElement>('#senha')!.value).toBe('');
-    expect(tela.querySelector('button')!.disabled).toBe(false);
+    expect(tela.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
   });
 
   it('apresenta credenciais inválidas e permite tentar novamente', () => {
@@ -74,7 +88,7 @@ describe('Login integrado ao AuthService', () => {
       );
     fixture.detectChanges();
     expect(tela.querySelector('[role="alert"]')!.textContent).toContain('Credenciais inválidas');
-    expect(tela.querySelector('button')!.disabled).toBe(false);
+    expect(tela.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
   });
 
   it('apresenta indisponibilidade da API', () => {

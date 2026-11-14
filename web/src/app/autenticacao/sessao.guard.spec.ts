@@ -24,7 +24,7 @@ describe('Proteção de navegação', () => {
 
   function verificar() {
     return TestBed.runInInjectionContext(() =>
-      sessaoGuard({} as ActivatedRouteSnapshot, { url: '/inicio' } as RouterStateSnapshot),
+      sessaoGuard({} as ActivatedRouteSnapshot, { url: '/produtos' } as RouterStateSnapshot),
     ) as Observable<boolean | UrlTree>;
   }
 
@@ -39,8 +39,8 @@ describe('Proteção de navegação', () => {
   });
 
   it.each([
-    [401, '/?retorno=%2Finicio'],
-    [500, '/sessao-indisponivel?retorno=%2Finicio'],
+    [401, '/?retorno=%2Fprodutos'],
+    [500, '/sessao-indisponivel?retorno=%2Fprodutos'],
   ])('trata status %s sem exibir a área interna', (status, destino) => {
     let resultado: boolean | UrlTree | undefined;
     verificar().subscribe((valor) => {
@@ -52,10 +52,10 @@ describe('Proteção de navegação', () => {
   });
 
   it('aceita apenas um retorno interno que não volte ao próprio login', () => {
-    expect(destinoAposLogin('//outro-site.com')).toBe('/inicio');
-    expect(destinoAposLogin('https://outro-site.com')).toBe('/inicio');
-    expect(destinoAposLogin('/?retorno=/')).toBe('/inicio');
-    expect(destinoAposLogin('/sessao-indisponivel')).toBe('/inicio');
+    expect(destinoAposLogin('//outro-site.com')).toBe('/produtos');
+    expect(destinoAposLogin('https://outro-site.com')).toBe('/produtos');
+    expect(destinoAposLogin('/?retorno=/')).toBe('/produtos');
+    expect(destinoAposLogin('/sessao-indisponivel')).toBe('/produtos');
     expect(destinoAposLogin('/produtos?pagina=2')).toBe('/produtos?pagina=2');
   });
 });

@@ -1,39 +1,50 @@
 <a class="pular-conteudo" href="#conteudo-principal">Ir para o conteúdo</a>
 <div class="estrutura">
   <aside class="lateral" aria-label="Área de trabalho">
-    <a routerLink="/inicio" class="marca" aria-label="SellerHub — início">
-      <img src="/logo-sellerhub.png" class="logo" alt="" aria-hidden="true" />
+    <a routerLink="/produtos" class="marca" aria-label="SellerHub — produtos">
+      <img
+        ngSrc="/logo-sellerhub.png"
+        width="32"
+        height="30"
+        class="logo"
+        alt=""
+        aria-hidden="true"
+        priority
+      />
       SellerHub
     </a>
     <nav aria-label="Menu principal">
-      <a routerLink="/inicio" routerLinkActive="ativo" ariaCurrentWhenActive="page">Início</a>
-      @for (modulo of modulos; track modulo) {
-      @if (modulo === 'Produtos') {
-      <a routerLink="/produtos" routerLinkActive="ativo" ariaCurrentWhenActive="page">
-        {{ modulo }}
-      </a>
-      } @else {
-      <span class="modulo-pendente">
-        {{ modulo }} <span>Em breve</span>
-      </span>
-      }
+      @for (modulo of modulos; track modulo.nome) {
+        @if (modulo.rota) {
+          <a [routerLink]="modulo.rota" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+            <svg class="icone" viewBox="0 0 24 24" aria-hidden="true">
+              <path [attr.d]="modulo.icone" />
+            </svg>
+            {{ modulo.nome }}
+          </a>
+        } @else {
+          <span class="modulo-pendente">
+            <svg class="icone" viewBox="0 0 24 24" aria-hidden="true">
+              <path [attr.d]="modulo.icone" />
+            </svg>
+            {{ modulo.nome }}
+            <span class="em-breve">Em breve</span>
+          </span>
+        }
       }
     </nav>
-    <p class="nota-lateral">Seu negócio, em um só lugar.</p>
-  </aside>
-  <div class="area-principal">
-    <header class="cabecalho">
-      <div class="conta">
-        <span class="rotulo-conta">Conta conectada</span>
-        <span class="email">{{ auth.usuario()?.email }}</span>
-      </div>
+    <div class="conta">
+      <span class="avatar" aria-hidden="true">{{ iniciais() }}</span>
+      <span class="email">{{ auth.usuario()?.email }}</span>
       <button type="button" class="botao-saida" (click)="sair()" [disabled]="saindo()">
         {{ saindo() ? 'Saindo...' : 'Sair' }}
       </button>
-    </header>
+    </div>
+  </aside>
+  <div class="area-principal">
     <div role="alert" aria-atomic="true">
       @if (erroSaida()) {
-      <p class="erro-saida">{{ erroSaida() }}</p>
+        <p class="erro-saida">{{ erroSaida() }}</p>
       }
     </div>
     <main id="conteudo-principal" tabindex="-1"><router-outlet /></main>

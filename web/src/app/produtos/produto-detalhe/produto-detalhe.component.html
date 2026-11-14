@@ -1,59 +1,45 @@
-<section class="pagina-detalhe" aria-labelledby="titulo-detalhe">
-  <header class="cabecalho">
+<section aria-labelledby="titulo-detalhe">
+  <header class="cabecalho-pagina">
     <div>
-      <a routerLink="/produtos" class="link-voltar"> Voltar para produtos </a>
-
+      <a routerLink="/produtos" class="link-voltar">Produtos</a>
       <h1 id="titulo-detalhe" appFocoPagina>Detalhes do produto</h1>
-      <p>Consulte as informações cadastradas no seu catálogo.</p>
     </div>
+
+    @if (produto(); as item) {
+      <a class="botao-primario" [routerLink]="['/produtos', item.id, 'editar']">Editar produto</a>
+    }
   </header>
 
   @if (carregando()) {
-    <section class="cartao estado" role="status">Carregando informações do produto...</section>
+    <p class="estado" role="status">Carregando informações do produto...</p>
   } @else if (erro()) {
-    <section class="cartao estado erro" role="alert">
+    <div class="estado erro" role="alert">
       <h2>Não foi possível consultar o produto</h2>
       <p>{{ erro() }}</p>
-
-      <div class="acoes">
+      <div class="acoes-pagina">
         <button type="button" class="botao-secundario" (click)="tentarNovamente()">
           Tentar novamente
         </button>
-
-        <a routerLink="/produtos" class="acao-principal"> Voltar para produtos </a>
+        <a routerLink="/produtos" class="botao-primario">Voltar para produtos</a>
       </div>
-    </section>
+    </div>
   } @else if (produto(); as item) {
-    <section class="cartao" aria-labelledby="titulo-informacoes">
-      <div class="cabecalho-cartao">
+    <div class="cartao informacoes" aria-labelledby="titulo-informacoes" role="region">
+      <h2 id="titulo-informacoes">{{ item.nome }}</h2>
+      <dl>
         <div>
-          <h2 id="titulo-informacoes">{{ item.nome }}</h2>
-          <span class="identificador">Código: {{ item.id }}</span>
+          <dt>SKU</dt>
+          <dd class="sku">{{ item.sku }}</dd>
         </div>
-
-        <a class="acao-principal" [routerLink]="['/produtos', item.id, 'editar']">
-          Editar produto
-        </a>
-      </div>
-
-      <div class="informacoes">
-        <div class="campo">
-          <span>Nome do produto</span>
-          <strong>{{ item.nome }}</strong>
+        <div>
+          <dt>Preço base</dt>
+          <dd>{{ item.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</dd>
         </div>
-
-        <div class="campo">
-          <span>SKU</span>
-          <strong>{{ item.sku }}</strong>
+        <div>
+          <dt>Código</dt>
+          <dd>{{ item.id }}</dd>
         </div>
-
-        <div class="campo">
-          <span>Preço base</span>
-          <strong>
-            {{ item.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-          </strong>
-        </div>
-      </div>
-    </section>
+      </dl>
+    </div>
   }
 </section>

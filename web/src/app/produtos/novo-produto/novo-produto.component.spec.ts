@@ -116,7 +116,9 @@ describe('Tela de cadastro de produto', () => {
   });
 
   it('deve voltar para a listagem ao cancelar', () => {
-    formulario.cancelar.emit();
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('.acoes-pagina .botao-secundario')!
+      .click();
 
     expect(router.navigate).toHaveBeenCalledWith(['/produtos']);
   });

@@ -1,21 +1,25 @@
-<section class="pagina-cadastro" aria-labelledby="titulo-cadastro">
-  <header class="cabecalho">
+<section aria-labelledby="titulo-cadastro">
+  <header class="cabecalho-pagina">
     <div>
-      <a routerLink="/produtos" class="link-voltar"> Voltar para produtos </a>
-
+      <a routerLink="/produtos" class="link-voltar">Produtos</a>
       <h1 id="titulo-cadastro" appFocoPagina>Novo produto</h1>
-      <p>Preencha os dados abaixo para cadastrar um produto no SellerHub.</p>
+    </div>
+
+    <div class="acoes-pagina">
+      <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button type="submit" form="formulario-produto" class="botao-primario" [disabled]="enviando()">
+        {{ enviando() ? 'Salvando...' : 'Salvar produto' }}
+      </button>
     </div>
   </header>
 
-  <section class="cartao-formulario" aria-labelledby="titulo-formulario">
-    <h2 id="titulo-formulario">Informações do produto</h2>
-
+  <div class="cartao formulario">
     <app-produto-formulario
       [enviando]="enviando()"
       [erroEnvio]="erro()"
       (salvar)="salvar($event)"
-      (cancelar)="cancelar()"
     />
-  </section>
+  </div>
 </section>

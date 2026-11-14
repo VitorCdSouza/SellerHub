@@ -6,10 +6,9 @@ test('AXE e captura do login', async ({ page }, info) => {
   await auditar(page, info);
 });
 
-for (const tela of ['inicio', 'lista', 'cadastro', 'detalhe', 'edicao'] as const) {
+for (const tela of ['lista', 'cadastro', 'detalhe', 'edicao'] as const) {
   test(`AXE, foco e largura da página: ${tela}`, async ({ page, produtoId }, info) => {
     const caminhos = {
-      inicio: '/inicio',
       lista: '/produtos',
       cadastro: '/produtos/novo',
       detalhe: `/produtos/${produtoId}`,
@@ -20,7 +19,7 @@ for (const tela of ['inicio', 'lista', 'cadastro', 'detalhe', 'edicao'] as const
     if (tela === 'lista') await expect(page.getByRole('table')).toBeVisible();
     if (tela === 'detalhe')
       await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
-    if (tela === 'edicao') await expect(page.getByLabel('Nome do produto')).not.toHaveValue('');
+    if (tela === 'edicao') await expect(page.getByLabel('Nome', { exact: true })).not.toHaveValue('');
     await expect.soft(page.getByRole('heading', { level: 1 })).toBeFocused({ timeout: 2_000 });
     const largura = await page.evaluate(() => ({
       conteudo: document.documentElement.scrollWidth,

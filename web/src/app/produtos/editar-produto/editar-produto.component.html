@@ -1,27 +1,47 @@
-<section class="pagina-editar">
-  <header class="cabecalho">
-    <h1 appFocoPagina>Editar produto</h1>
-    <p>Atualize as informações do produto cadastrado.</p>
+<section aria-labelledby="titulo-edicao">
+  <header class="cabecalho-pagina">
+    <div>
+      <a routerLink="/produtos" class="link-voltar">Produtos</a>
+      <h1 id="titulo-edicao" appFocoPagina>Editar produto</h1>
+    </div>
+
+    @if (dadosIniciais()) {
+      <div class="acoes-pagina">
+        <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="cancelar()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          form="formulario-produto"
+          class="botao-primario"
+          [disabled]="enviando()"
+        >
+          {{ enviando() ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
+      </div>
+    }
   </header>
 
   @if (carregando()) {
-    <p class="mensagem" role="status">Carregando produto...</p>
+    <p class="estado" role="status">Carregando produto...</p>
   } @else if (erroCarregamento()) {
-    <div class="mensagem erro" role="alert">
+    <div class="estado erro" role="alert">
       <p>{{ erroCarregamento() }}</p>
-
-      <button type="button" class="acao-principal" (click)="tentarNovamente()">
-        Tentar novamente
-      </button>
-      <a routerLink="/produtos">Voltar para produtos</a>
+      <div class="acoes-pagina">
+        <button type="button" class="botao-secundario" (click)="tentarNovamente()">
+          Tentar novamente
+        </button>
+        <a class="botao-primario" routerLink="/produtos">Voltar para produtos</a>
+      </div>
     </div>
   } @else if (dadosIniciais()) {
-    <app-produto-formulario
-      [dadosIniciais]="dadosIniciais()"
-      [enviando]="enviando()"
-      [erroEnvio]="erroEnvio()"
-      (salvar)="salvar($event)"
-      (cancelar)="cancelar()"
-    />
+    <div class="cartao formulario">
+      <app-produto-formulario
+        [dadosIniciais]="dadosIniciais()"
+        [enviando]="enviando()"
+        [erroEnvio]="erroEnvio()"
+        (salvar)="salvar($event)"
+      />
+    </div>
   }
 </section>

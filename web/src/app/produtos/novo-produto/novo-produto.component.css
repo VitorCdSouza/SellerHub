@@ -1,72 +1,7 @@
-
 :host {
   display: block;
-  width: 100%;
 }
 
-.pagina-cadastro {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.cabecalho {
-  margin-bottom: 1.75rem;
-}
-
-.link-voltar {
-  display: inline-block;
-  margin-bottom: 1rem;
-  color: var(--cor-primaria, #2563a6);
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.link-voltar:hover {
-  text-decoration: underline;
-}
-
-.cabecalho h1 {
-  margin: 0 0 0.5rem;
-  color: var(--cor-texto, #252b36);
-  font-size: 1.75rem;
-  font-weight: 700;
-}
-
-.cabecalho p {
-  margin: 0;
-  color: var(--cor-texto-secundario, #526075);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.cartao-formulario {
-  padding: 1.75rem;
-  border: 1px solid var(--cor-borda, #d5dbe3);
-  border-radius: 12px;
-  background-color: var(--cor-superficie, #ffffff);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 4%);
-}
-
-.cartao-formulario h2 {
-  margin: 0 0 1.5rem;
-  color: var(--cor-texto, #252b36);
-  font-size: 1.1rem;
-  font-weight: 650;
-}
-
-@media (max-width: 600px) {
-  .pagina-cadastro {
-    padding: 1rem;
-  }
-
-  .cartao-formulario {
-    padding: 1.25rem;
-  }
-
-  .cabecalho h1 {
-    font-size: 1.5rem;
-  }
+.formulario {
+  max-width: 720px;
 }

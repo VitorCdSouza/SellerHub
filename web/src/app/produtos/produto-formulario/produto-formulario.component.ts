@@ -1,8 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  ElementRef,
   effect,
+  inject,
   input,
   output,
   signal,
@@ -58,12 +59,12 @@ function precoValido(control: AbstractControl<string>): ValidationErrors | null 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProdutoFormularioComponent {
+  private readonly elemento = inject<ElementRef<HTMLElement>>(ElementRef);
   readonly dadosIniciais = input<DadosProduto | null>(null);
   readonly enviando = input(false);
   readonly erroEnvio = input('');
 
   readonly salvar = output<DadosProduto>();
-  readonly cancelar = output<void>();
 
   protected readonly formulario = new FormGroup({
     nome: new FormControl('', {
@@ -82,10 +83,6 @@ export class ProdutoFormularioComponent {
 
   protected readonly submetido = signal(false);
 
-  protected readonly tituloBotao = computed(() =>
-    this.dadosIniciais() ? 'Salvar alterações' : 'Cadastrar produto',
-  );
-
   constructor() {
     effect(() => {
       const dados = this.dadosIniciais();
@@ -100,11 +97,19 @@ export class ProdutoFormularioComponent {
     });
   }
 
+  protected erroVisivel(campo: 'nome' | 'sku' | 'precoBase'): boolean {
+    return this.submetido() && this.formulario.controls[campo].invalid;
+  }
+
   protected enviar(): void {
     this.submetido.set(true);
-    this.formulario.markAllAsTouched();
 
-    if (this.formulario.invalid || this.enviando()) {
+    if (this.formulario.invalid) {
+      this.elemento.nativeElement.querySelector<HTMLInputElement>('input.ng-invalid')?.focus();
+      return;
+    }
+
+    if (this.enviando()) {
       return;
     }
 

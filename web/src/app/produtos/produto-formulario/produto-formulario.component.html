@@ -1,15 +1,17 @@
-<form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+<form id="formulario-produto" [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
   <div class="campo">
-    <label for="nome">Nome do produto</label>
+    <label for="nome">Nome</label>
     <input
       id="nome"
       type="text"
       formControlName="nome"
+      class="campo-texto"
+      [attr.aria-invalid]="erroVisivel('nome')"
       autocomplete="off"
-      aria-describedby="erro-nome"
+      [attr.aria-describedby]="erroVisivel('nome') ? 'erro-nome' : null"
     />
 
-    @if (formulario.controls.nome.invalid && (formulario.controls.nome.touched || submetido())) {
+    @if (erroVisivel('nome')) {
       <small id="erro-nome" class="mensagem-erro">
         @if (formulario.controls.nome.hasError('required')) {
           Informe o nome do produto.
@@ -20,55 +22,58 @@
     }
   </div>
 
-  <div class="campo">
-    <label for="sku">SKU</label>
-    <input
-      id="sku"
-      type="text"
-      formControlName="sku"
-      autocomplete="off"
-      aria-describedby="erro-sku"
-    />
+  <div class="linha">
+    <div class="campo">
+      <label for="sku">SKU</label>
+      <input
+        id="sku"
+        type="text"
+        formControlName="sku"
+        class="campo-texto"
+        [attr.aria-invalid]="erroVisivel('sku')"
+        autocomplete="off"
+        [attr.aria-describedby]="erroVisivel('sku') ? 'erro-sku' : null"
+      />
 
-    @if (formulario.controls.sku.invalid && (formulario.controls.sku.touched || submetido())) {
-      <small id="erro-sku" class="mensagem-erro">
-        @if (formulario.controls.sku.hasError('required')) {
-          Informe o SKU do produto.
-        } @else if (formulario.controls.sku.hasError('maxlength')) {
-          O SKU deve ter no máximo 100 caracteres.
-        }
-      </small>
-    }
-  </div>
+      @if (erroVisivel('sku')) {
+        <small id="erro-sku" class="mensagem-erro">
+          @if (formulario.controls.sku.hasError('required')) {
+            Informe o SKU do produto.
+          } @else if (formulario.controls.sku.hasError('maxlength')) {
+            O SKU deve ter no máximo 100 caracteres.
+          }
+        </small>
+      }
+    </div>
 
-  <div class="campo">
-    <label for="precoBase">Preço base (R$)</label>
-    <input
-      id="precoBase"
-      type="text"
-      inputmode="decimal"
-      formControlName="precoBase"
-      placeholder="Ex.: 129,90"
-      autocomplete="off"
-      aria-describedby="erro-preco"
-    />
+    <div class="campo">
+      <label for="precoBase">Preço base (R$)</label>
+      <input
+        id="precoBase"
+        type="text"
+        inputmode="decimal"
+        formControlName="precoBase"
+        class="campo-texto"
+        [attr.aria-invalid]="erroVisivel('precoBase')"
+        placeholder="Ex.: 129,90"
+        autocomplete="off"
+        [attr.aria-describedby]="erroVisivel('precoBase') ? 'erro-preco' : null"
+      />
 
-    @if (
-      formulario.controls.precoBase.invalid &&
-      (formulario.controls.precoBase.touched || submetido())
-    ) {
-      <small id="erro-preco" class="mensagem-erro">
-        @if (formulario.controls.precoBase.hasError('required')) {
-          Informe o preço do produto.
-        } @else if (formulario.controls.precoBase.hasError('formatoPreco')) {
-          Informe um preço válido, com até duas casas decimais.
-        } @else if (formulario.controls.precoBase.hasError('precoMinimo')) {
-          O preço deve ser maior que zero.
-        } @else if (formulario.controls.precoBase.hasError('precoMaximo')) {
-          O preço deve ser menor que R$ 100 milhões.
-        }
-      </small>
-    }
+      @if (erroVisivel('precoBase')) {
+        <small id="erro-preco" class="mensagem-erro">
+          @if (formulario.controls.precoBase.hasError('required')) {
+            Informe o preço do produto.
+          } @else if (formulario.controls.precoBase.hasError('formatoPreco')) {
+            Informe um preço válido, com até duas casas decimais.
+          } @else if (formulario.controls.precoBase.hasError('precoMinimo')) {
+            O preço deve ser maior que zero.
+          } @else if (formulario.controls.precoBase.hasError('precoMaximo')) {
+            O preço deve ser menor que R$ 100 milhões.
+          }
+        </small>
+      }
+    </div>
   </div>
 
   @if (erroEnvio()) {
@@ -76,14 +81,4 @@
       {{ erroEnvio() }}
     </p>
   }
-
-  <div class="acoes">
-    <button type="button" class="botao-cancelar" [disabled]="enviando()" (click)="cancelar.emit()">
-      Cancelar
-    </button>
-
-    <button type="submit" class="botao-salvar" [disabled]="formulario.invalid || enviando()">
-      {{ enviando() ? 'Salvando...' : tituloBotao() }}
-    </button>
-  </div>
 </form>

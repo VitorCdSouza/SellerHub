@@ -1,7 +1,7 @@
 @if (apiSimulada) {
-  <div class="aviso-simulacao" role="note">
+  <aside class="aviso-simulacao" aria-label="Aviso de ambiente">
     Ambiente simulado: dados fictícios, mantidos apenas durante a execução. Sem integração real.
-  </div>
+  </aside>
 }
 @if (auth.estado() === 'consultando') {
   <div class="consulta-sessao" role="status">Verificando seu acesso...</div>

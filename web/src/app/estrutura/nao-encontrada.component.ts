@@ -10,8 +10,8 @@ import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
       <section class="cartao-de-estado" aria-labelledby="titulo-pagina">
         <p class="marca-estado">SellerHub</p>
         <h1 id="titulo-pagina" appFocoPagina>Página não encontrada</h1>
-        <p>Este endereço não está disponível. Volte ao início para continuar.</p>
-        <a class="acao-principal" routerLink="/inicio">Voltar ao início</a>
+        <p>Este endereço não está disponível. Volte aos produtos para continuar.</p>
+        <a class="acao-principal" routerLink="/produtos">Ir para produtos</a>
       </section>
     </main>
   `,

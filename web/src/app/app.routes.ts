@@ -23,12 +23,6 @@ export const routes: Routes = [
     canActivateChild: [sessaoGuard],
     children: [
       {
-        path: 'inicio',
-        loadComponent: () =>
-          import('./estrutura/inicio.component').then((modulo) => modulo.InicioComponent),
-        title: 'Início | SellerHub',
-      },
-      {
         path: 'produtos/novo',
         loadComponent: () =>
           import('./produtos/novo-produto/novo-produto.component').then(

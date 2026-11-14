@@ -1,109 +1,42 @@
-
 :host {
   display: block;
-  width: 100%;
 }
 
 form {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .campo label {
-  color: var(--cor-texto, #252b36);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
-.campo input {
-  width: 100%;
-  min-height: 44px;
-  padding: 0.7rem 0.85rem;
-  border: 1px solid var(--cor-borda, #d5dbe3);
-  border-radius: 8px;
-  background-color: var(--cor-superficie, #ffffff);
-  color: var(--cor-texto, #252b36);
-  font: inherit;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.campo input:focus {
-  border-color: var(--cor-primaria, #2563a6);
-  box-shadow: 0 0 0 3px rgb(37 99 166 / 15%);
-}
-
-.campo input.ng-invalid.ng-touched {
-  border-color: #c62828;
-}
-
-.campo input::placeholder {
-  color: #8a929e;
+#sku {
+  font-family: var(--fonte-mono);
 }
 
 .mensagem-erro {
-  color: #c62828;
-  font-size: 0.8rem;
+  color: var(--cor-erro);
+  font-size: 0.85rem;
   line-height: 1.4;
 }
 
-.acoes {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.acoes button {
-  min-height: 42px;
-  padding: 0.65rem 1.2rem;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-
-.botao-cancelar {
-  border-color: var(--cor-borda, #d5dbe3) !important;
-  background-color: transparent;
-  color: var(--cor-texto, #252b36);
-}
-
-.botao-cancelar:hover:not(:disabled) {
-  background-color: #f1f3f6;
-}
-
-.botao-salvar {
-  background-color: var(--cor-primaria, #2563a6);
-  color: #ffffff;
-}
-
-.botao-salvar:hover:not(:disabled) {
-  background-color: #1d4f85;
-}
-
-.acoes button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-@media (max-width: 480px) {
-  .acoes {
-    flex-direction: column-reverse;
-  }
-
-  .acoes button {
-    width: 100%;
+@media (max-width: 600px) {
+  .linha {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

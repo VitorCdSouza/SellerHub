@@ -164,4 +164,12 @@ describe('Formulário de produto', () => {
       expect(salvar).toHaveBeenCalledWith({ nome: nome.trim(), sku: sku.trim(), precoBase: 10 });
     },
   );
+
+  it('leva o foco ao primeiro campo inválido ao enviar', () => {
+    fixture.nativeElement.ownerDocument.body.appendChild(fixture.nativeElement);
+    preencherCampo('nome', 'Produto');
+    enviarFormulario();
+
+    expect(document.activeElement?.id).toBe('sku');
+  });
 });
