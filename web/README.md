@@ -3,7 +3,6 @@
 ## Referências de trabalho
 
 - [TODO.md](TODO.md): fila única de tarefas, critérios de aceite, dependências FE/BE, responsáveis e resultados de verificação.
-- [AGENTS.md](AGENTS.md): convenções Angular e orientações de execução para os agentes.
 - [README da aplicação](../README.md): instalação e execução do conjunto Angular/Go/PostgreSQL.
 
 Andamento, entregas individuais, impedimentos e resultados de sessões ficam no TODO e nas instruções aplicáveis. O README da raiz apresenta o projeto e sua instalação/operação; não deve ser usado como diário de desenvolvimento. Os arquivos privados locais continuam separados da documentação compartilhada.

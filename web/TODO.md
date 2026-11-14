@@ -611,7 +611,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 
 ## Ordem de início e critério de conclusão — reconciliação de 09/11/2026
 
-A primeira frente **login → estrutura/sessão → listagem → cadastro → detalhe/edição** já tem código entregue. A revisão atual passa de construir páginas básicas para corrigir/homologar o fluxo. O resumo e a prioridade de apoio estão em [AGENTS.md](AGENTS.md); detalhes e checklists permanecem somente nesta fila.
+A primeira frente **login → estrutura/sessão → listagem → cadastro → detalhe/edição** já tem código entregue. A revisão atual passa de construir páginas básicas para corrigir/homologar o fluxo. Detalhes, prioridades e checklists permanecem somente nesta fila.
 
 Fechar os critérios restantes do catálogo e preparar anúncio/envio ao destino de teste conforme o recorte no início da fila. BE-05/DEC-02 condicionam ampliar o cadastro, sem exigir novos campos para os três existentes. Vendas, Estoque, Indicadores, Administração e Recuperação seguem no produto completo; não são condições de aceite da primeira demonstração esclarecida por Caio.
 
@@ -629,7 +629,7 @@ Marcar um item como concluído somente após registrar o que foi entregue e sua 
 - **Revisão de 09/11/2026:** lidos os quatro commits de Leticia e os componentes/templates/estilos/testes resultantes, rotas, estrutura, configuração, serviço/contrato e instruções. `git fetch origin` concluído, sem commits em HEAD..origin/main; árvore inicialmente limpa. Nenhuma mudança em API/schema desde `88731577`.
 - `npm.cmd test -- --watch=false`: **57 testes em 11 arquivos aprovados**. Novos arquivos de teste cobrem formulário, cadastro, detalhe e edição; não existe teste próprio de ProdutosComponent. A suíte usa dados/HTTP controlados e não prova persistência ou execução das páginas com Go/PostgreSQL.
 - `npm.cmd run build`: **aprovado**, 276,35 kB iniciais. O PNG da marca tem 1.088.280 bytes e é asset separado, sem estar refletido no total de JavaScript inicial. Nenhum novo teste foi escrito, nenhum fluxo de navegador/AXE/API real foi executado e nenhum dado do banco foi alterado nesta revisão. Achados viraram subitens de execução, preservando os critérios integrais.
-- Atualizados planejamento, estados e subtarefas nesta fila, resumo em AGENTS/Claude e contrato técnico no README do front. Contexto local atualizado sem credenciais, README da raiz preservado; sem commit/push. Os registros de 08/11 abaixo são históricos e não substituem a homologação do catálogo novo.
+- Atualizados planejamento, estados e subtarefas nesta fila e contrato técnico no README do front. Contexto local atualizado sem credenciais, README da raiz preservado; sem commit/push. Os registros de 08/11 abaixo são históricos e não substituem a homologação do catálogo novo.
 
 - **Confirmação manual do usuário em 08/11/2026:** com Angular iniciado por `npm.cmd start` e API Go/PostgreSQL reais, todo o roteiro proposto funcionou: senha incorreta rejeitada, senha correta aceita, abertura de `/inicio` com e-mail, F5 preservando o acesso, saída para login e acesso direto a `/inicio` após saída novamente bloqueado. Evidência relatada pelo usuário; sem inspeção automatizada de tela, screenshot ou AXE. Não abrange catálogo, teclado/390 px, indisponibilidade, expiração temporal ou reinício. FE-01/FE-03 e FE-15 mantêm os critérios restantes abertos.
 
