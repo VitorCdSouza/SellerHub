@@ -4,7 +4,7 @@ Atualização em **09/11/2026**, após revisão dos quatro commits de Leticia de
 
 ## Primeira entrega — demonstração em ambiente de testes
 
-**Esclarecimento de Caio em 09/11/2026:** o primeiro MVP demonstra cadastrar produto → criar/preparar anúncio → aprovar → enviar chamada a um destino de teste → apresentar o resultado. Integração real e comando manual RF11 ficam para uma entrega futura, com os controles necessários. O [registro central de DEC-01](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque) substitui a pendência anterior sobre RF11 bloquear esta demonstração.
+**Esclarecimento de Caio em 09/11/2026:** o primeiro MVP demonstra cadastrar produto → criar/preparar anúncio → aprovar → enviar chamada a um destino de teste → apresentar o resultado. Integração real e comando manual RF11 ficam para uma entrega futura, com os controles necessários. O esclarecimento de DEC-01 substitui a pendência anterior sobre RF11 bloquear esta demonstração.
 
 **Prioridade atual:** fechar catálogo FE-04/05/06 e o editor/envio de FE-08/09 com serviços de Caio e componentes de Leticia; homologação FE-15. Samuel/Vitor priorizam BE-07/BE-08 para o contrato do anúncio, destino e retorno do envio, com BE-15 para a prova do fluxo. A escolha do destino ainda está aberta: marketplace próprio de teste é alternativa em avaliação. Não criar novos endpoints simulados sem acordo.
 
@@ -384,7 +384,7 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 
 - [ ] **FE-10 — Construir listagem e detalhe de pedidos para consulta.**
 
-**Responsável:** Leticia, usando o serviço e o modelo de pedidos preparados por Caio. **Situação:** evolução após a primeira demonstração; integração bloqueada. **Dependências:** FE-03, BE-10 e DEC-01 para qualquer escrita. **Referência:** RF07; comando manual RF11 pertence à entrega futura com os controles necessários, conforme o [registro central](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque).
+**Responsável:** Leticia, usando o serviço e o modelo de pedidos preparados por Caio. **Situação:** evolução após a primeira demonstração; integração bloqueada. **Dependências:** FE-03, BE-10 e DEC-01 para qualquer escrita. **Referência:** RF07; comando manual RF11 pertence à entrega futura com os controles necessários, conforme DEC-01.
 
 **Requisitos de desenvolvimento**
 
@@ -605,7 +605,7 @@ Estes itens são dependências de Samuel/Vitor, cruzadas com o último commit. `
 
 ## Decisões que precisam de alinhamento
 
-- [ ] **DEC-01 — Vendas e estoque — recorte inicial esclarecido; operação futura pendente:** consultar o [registro central](../documentacao/DECISOES.md#dec-01--pedidos-e-estoque). RF11 não bloqueia a primeira demonstração de produto/anúncio/envio em testes e continua aberto para a entrega futura. Antes de movimentos reais, detalhar fonte/estados e contratos seguros de BE-10/BE-11. Destino de teste ainda precisa ser escolhido. Não marcar controles operacionais ou integração real como concluídos por este esclarecimento.
+- [ ] **DEC-01 — Vendas e estoque — recorte inicial esclarecido; operação futura pendente:** considerar o recorte de demonstração confirmado. RF11 não bloqueia a primeira demonstração de produto/anúncio/envio em testes e continua aberto para a entrega futura. Antes de movimentos reais, detalhar fonte/estados e contratos seguros de BE-10/BE-11. Destino de teste ainda precisa ser escolhido. Não marcar controles operacionais ou integração real como concluídos por este esclarecimento.
 - [ ] **DEC-02 — Produto mínimo e vínculo ao usuário:** protótipo inclui descrição, categoria e características; API só persiste nome, SKU e preço, vinculados ao usuário do JWT. Já é possível construir/integrar esse recorte técnico; confirmar se ele atende à primeira entrega e quais campos devem ser acrescentados. A implementação isola produtos por usuário; confirmar se a conta única precisa de catálogo compartilhado. Não tratar o comportamento atual como aprovação automática de uma regra de produto.
 - [ ] **DEC-03 — Canais e anúncios:** o protótipo impede selecionar canal já anunciado; o banco não garante anúncio único por produto/canal. Confirmar essa regra antes de bloquear na interface. Acordar campos obrigatórios e capacidades reais de cada canal; não assumir que os três do protótipo já serão integrados.
 
