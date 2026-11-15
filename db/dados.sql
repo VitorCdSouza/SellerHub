@@ -5,6 +5,8 @@ INSERT INTO CAD_PESSOA (nome, cpf_cnpj, tipo_pessoa) VALUES
 ('Samuel Do Prado Silva', '11122233344', 'PF'),
 ('Caio Beneton', '55566677788', 'PF'),
 ('Vitor Souza', '99988877766', 'PF');
+('Leticia Rangel', '88822277796', 'PF');
+
 
 -- 2. Inserir Marketplaces
 INSERT INTO CAD_MARKETPLACE (nome_marketplace, taxa_comissao) VALUES
@@ -17,6 +19,7 @@ INSERT INTO CAD_USUARIO (id_pessoa, login_campo, senha_hash, email) VALUES
 (1, 'samuel.admin', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'samuel@sellerhub.com'),
 (2, 'caio.beneton', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'caio@sellerhub.com'),
 (3, 'vitor.souza', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'vitor@sellerhub.com');
+(4, 'leticia.rangel', '$2a$10$s2xxrllamNO8GTcA9dq6auL69ycZQda0TRjJDJL.fKvzctezuKU2y', 'leticia@sellerhub.com');
 
 -- 4. Inserir Auditoria de exemplo
 INSERT INTO CAD_AUDITORIA (id_usuario, acao, tabela_afetada) VALUES
@@ -30,6 +33,7 @@ INSERT INTO CAD_PRODUTO (id_usuario, sku, nome_produto, preco_base) VALUES
 (1, 'LUV-ALP-02', 'Luva de Couro Alpinestars', 250.00),
 (2, 'ANT-CP-01', 'Antena Corta Pipa Retrátil', 35.50),
 (3, 'ESC-T-04', 'Escapamento Esportivo', 450.00);
+(4, 'RET-BM-01', 'Par de Retrovisor Mini Bmw ', 30.00);
 
 -- 6. Inserir Anúncios (Cruzando Produtos e Marketplaces)
 INSERT INTO CAD_ANUNCIO (id_marketplace, id_produto, titulo_anuncio, descricao_anuncio, preco_venda, id_externo_mp, status_campo) VALUES
@@ -37,6 +41,8 @@ INSERT INTO CAD_ANUNCIO (id_marketplace, id_produto, titulo_anuncio, descricao_a
 (2, 1, 'Capacete Moto San Marino Viseira Cristal', 'Envio rápido. Capacete fechado para o dia a dia.', 170.00, 'SHP987654321', 'ATIVO'),
 (1, 2, 'Luva Alpinestars Couro Legítimo', 'Proteção e conforto para motociclistas. Tamanho G.', 290.00, 'MLB987654321', 'PAUSADO'),
 (3, 4, 'Escapamento Esportivo Moto', 'Aumente o ronco da sua moto, fácil instalação.', 500.00, 'AMZ112233', 'ATIVO');
+(2, 4,'Par de Retrovisor Mini Bmw ', 'Compatível com todas as motos Honda com o padrão de rosca DIREITA', 30.00, 'SHP986543210', 'ATIVO');
+
 
 -- 7. Inserir Histórico de Métricas dos Anúncios
 INSERT INTO HIST_METRICA_ANUNCIO (id_anuncio, data_referencia, visualizacoes, conversoes) VALUES
