@@ -55,3 +55,28 @@
   bookmarksdepth=4
 }
 \makeatother
+
+\usepackage[brazil]{babel}
+\addto\captionsbrazil{
+  \renewcommand{\tablename}{Quadro}
+  \renewcommand{\listtablename}{Lista de Quadros}
+}
+
+% Codificação de caracteres e idioma (necessário para \guillemotleft e \guillemotright)
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% Suporte a imagens, cores e \resizebox
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+% Pacote TikZ e bibliotecas usadas no diagrama de pacotes
+\usepackage{tikz}
+\usetikzlibrary{
+    arrows.meta, % Pontas de seta modernas (>=Stealth)
+    positioning, % Posicionamento relativo (below=... of, right=... of)
+    fit,         % Ajuste automático dos contêineres tracejados (fit=...)
+    backgrounds, % Camada de fundo para os grupos (on background layer)
+    calc         % Cálculos de coordenadas
+}

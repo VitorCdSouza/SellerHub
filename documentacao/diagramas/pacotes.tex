@@ -1,34 +1,212 @@
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  font=\footnotesize,
-  pacote/.style={draw, text width=3.8cm, align=center, minimum height=1.1cm, inner sep=3pt,
-    execute at begin node={\hyphenpenalty=10000}},
-  arquivo/.style={draw, dashed, text width=2.8cm, align=center, minimum height=0.9cm, inner sep=3pt},
-  aba/.style={draw, anchor=south west, inner sep=3pt},
-  usa/.style={dashed, -{Stealth[length=2mm]}},
-  rotulo/.style={font=\scriptsize},
+    >=Stealth,
+    web_pkg/.style={
+        draw=black!80,
+        thick,
+        fill=orange!6,
+        rounded corners=2pt,
+        minimum width=7.6cm,
+        minimum height=1.15cm,
+        align=left,
+        font=\small\ttfamily
+    },
+    api_pkg/.style={
+        draw=black!80,
+        thick,
+        fill=blue!5,
+        rounded corners=2pt,
+        minimum width=6.8cm,
+        minimum height=1.15cm,
+        align=left,
+        font=\small\ttfamily
+    },
+    db_pkg/.style={
+        draw=black!80,
+        thick,
+        fill=green!6,
+        rounded corners=2pt,
+        minimum width=6.8cm,
+        minimum height=1.15cm,
+        align=left,
+        font=\small\ttfamily
+    },
+    pkgtab/.style={
+        draw=black!80,
+        thick,
+        fill=blue!15,
+        font=\scriptsize\bfseries,
+        anchor=south west,
+        inner xsep=5pt,
+        inner ysep=2pt
+    },
+    container/.style={
+        draw=black!60,
+        dashed,
+        thick,
+        rounded corners=4pt,
+        inner sep=15pt
+    },
+    dep/.style={
+        ->,
+        thick,
+        dashed,
+        draw=black!75
+    },
+    line_only/.style={
+        thick,
+        dashed,
+        draw=black!75
+    },
+    lbl/.style={
+        font=\scriptsize,
+        fill=white,
+        inner sep=1.5pt
+    }
 ]
-  % back-end
-  \draw (-2.9,-1.2) rectangle (8.1,7.0);
-  \node[aba] at (-2.9,7.0) {api};
-  \node[pacote] (cmd) at (0,6) {\textbf{cmd}\\inicialização, rotas e CORS};
-  \node[pacote] (controller) at (0,3.9) {\textbf{controller}\\HTTP e JSON};
-  \node[pacote] (service) at (0,1.8) {\textbf{service}\\regras de negócio};
-  \node[pacote] (db) at (0,-0.3) {\textbf{db}\\conexão e código gerado pelo sqlc};
-  \node[arquivo] (sql) at (6.0,-0.3) {estrutura.sql\\queries.sql};
 
-  \draw[usa] (cmd) -- (controller);
-  \draw[usa] (controller) -- (service);
-  \draw[usa] (service) -- (db);
-  \draw[usa] (cmd.west) -- ++(-0.6,0) |- (db.west);
-  \draw[usa] (sql) -- node[rotulo, above] {sqlc generate} (db);
+% =========================================================
+% MÓDULO FRONTEND (web)
+% =========================================================
+\node[web_pkg] (web_est) {
+    estrutura.component \\
+    nao-encontrada.component
+};
+\node[pkgtab, fill=orange!18] (tab_web_est) at (web_est.north west) {app/estrutura};
 
-  % front-end
-  \draw (9.0,0.7) rectangle (15.0,7.0);
-  \node[aba] at (9.0,7.0) {web};
-  \node[pacote] (app) at (11.4,6) {\textbf{app}\\configuração e rotas};
-  \node[pacote] (login) at (11.4,3.9) {\textbf{login}\\componente de login};
-  \node[pacote] (services) at (11.4,1.8) {\textbf{services}\\AuthService};
+\node[web_pkg, below=1.15cm of web_est] (web_login) {
+    login.component
+};
+\node[pkgtab, fill=orange!18] at (web_login.north west) {app/login};
 
-  \draw[usa] (app) -- node[rotulo, right] {carga sob demanda} (login);
-  \draw[usa] (login) -- (services);
-\end{tikzpicture}
+\node[web_pkg, below=1.15cm of web_login] (web_prod) {
+    produtos.component, produtos.service \\
+    novo-produto/, editar-produto/ \\
+    produto-detalhe/, produto-formulario/
+};
+\node[pkgtab, fill=orange!18] at (web_prod.north west) {app/produtos};
+
+\node[web_pkg, below=1.15cm of web_prod] (web_anun) {
+    anuncios.component, anuncios.service \\
+    novo-anuncio/, editar-anuncio/ \\
+    anuncio-detalhe/
+};
+\node[pkgtab, fill=orange!18] at (web_anun.north west) {app/anuncios};
+
+\node[web_pkg, below=1.15cm of web_anun] (web_mkt) {
+    marketplace.component, marketplace.service \\
+    integracoes/, sincronizacao/
+};
+\node[pkgtab, fill=orange!18] at (web_mkt.north west) {app/marketplace};
+
+\node[web_pkg, below=1.15cm of web_mkt] (web_adm) {
+    administracao.component, administracao.service \\
+    usuarios/, permissoes/
+};
+\node[pkgtab, fill=orange!18] at (web_adm.north west) {app/administracao};
+
+\node[web_pkg, below=1.15cm of web_adm] (web_auth) {
+    sessao.guard, sessao.interceptor \\
+    sessao-indisponivel.component
+};
+\node[pkgtab, fill=orange!18] at (web_auth.north west) {app/autenticacao};
+
+\node[web_pkg, below=1.15cm of web_auth] (web_srv) {
+    auth.service.ts \\
+    compartilhado/ (foco-pagina)
+};
+\node[pkgtab, fill=orange!18] at (web_srv.north west) {app/services \& compartilhado};
+
+\node[web_pkg, below=1.15cm of web_srv] (web_qa) {
+    e2e/ (Playwright / AXE) \\
+    ferramentas/ (api-simulada, qualidade)
+};
+\node[pkgtab, fill=orange!18] at (web_qa.north west) {web/e2e \& web/ferramentas};
+
+\coordinate (e2e_lane) at ([xshift=-0.85cm]web_qa.west);
+
+\begin{scope}[on background layer]
+    \node[container,
+          fit=(e2e_lane) (tab_web_est) (web_est) (web_login) (web_prod) (web_anun) (web_mkt) (web_adm) (web_auth) (web_srv) (web_qa),
+          label={[font=\small\bfseries, yshift=4pt]above:Frontend (web -- Angular)}] (mod_web) {};
+\end{scope}
+
+% =========================================================
+% MÓDULO BACKEND (api)
+% =========================================================
+\node[api_pkg, right=4.8cm of web_est] (api_cmd) {
+    main.go \\
+    Endpoints: /login, /session, \\
+    /products, /anuncios, \\
+    /marketplace, /administracao
+};
+\node[pkgtab] (tab_api_cmd) at (api_cmd.north west) {api/cmd};
+
+\node[api_pkg, below=1.5cm of api_cmd] (api_ctrl) {
+    login.go, session.go, response.go \\
+    product.go, anuncio.go \\
+    marketplace.go, administracao.go
+};
+\node[pkgtab] at (api_ctrl.north west) {api/internal/controller};
+
+\node[api_pkg, below=1.5cm of api_ctrl] (api_srv) {
+    login.go, session.go \\
+    product.go, anuncio.go \\
+    marketplace.go, administracao.go
+};
+\node[pkgtab] at (api_srv.north west) {api/internal/service};
+
+\node[api_pkg, below=1.5cm of api_srv] (api_db) {
+    connection.go, db.go \\
+    models.go, queries.sql.go
+};
+\node[pkgtab] at (api_db.north west) {api/internal/db};
+
+\begin{scope}[on background layer]
+    \node[container,
+          fit=(tab_api_cmd) (api_cmd) (api_ctrl) (api_srv) (api_db),
+          label={[font=\small\bfseries, yshift=4pt]above:Backend (api -- Go)}] (mod_api) {};
+\end{scope}
+
+% =========================================================
+% MÓDULO BANCO DE DADOS (db)
+% =========================================================
+\node[db_pkg, below=1.9cm of mod_api] (db_mod) {
+    estrutura.sql \\
+    dados.sql \\
+    docker-compose.yaml
+};
+\node[pkgtab, fill=green!18] at (db_mod.north west) {Banco de Dados (db -- SQL / Docker)};
+
+% =========================================================
+% DEPENDÊNCIAS INTERNAS E ENTRE CAMADAS
+% =========================================================
+\draw[dep] ([xshift=2.6cm]web_est.south) -- node[lbl, right] {\guillemotleft route\guillemotright} ([xshift=2.6cm]web_login.north);
+\draw[dep] ([xshift=2.6cm]web_login.south) -- node[lbl, right] {\guillemotleft auth\guillemotright} ([xshift=2.6cm]web_prod.north);
+\draw[dep] ([xshift=2.6cm]web_prod.south) -- node[lbl, right] {\guillemotleft use\guillemotright} ([xshift=2.6cm]web_anun.north);
+\draw[dep] ([xshift=2.6cm]web_anun.south) -- node[lbl, right] {\guillemotleft sync\guillemotright} ([xshift=2.6cm]web_mkt.north);
+\draw[dep] ([xshift=2.6cm]web_mkt.south) -- node[lbl, right] {\guillemotleft admin\guillemotright} ([xshift=2.6cm]web_adm.north);
+\draw[dep] ([xshift=2.6cm]web_adm.south) -- node[lbl, right] {\guillemotleft guard\guillemotright} ([xshift=2.6cm]web_auth.north);
+\draw[dep] ([xshift=2.6cm]web_auth.south) -- node[lbl, right] {\guillemotleft use\guillemotright} ([xshift=2.6cm]web_srv.north);
+
+\draw[dep] (web_qa.west) -- (e2e_lane) |- node[lbl, pos=0.25, left] {\guillemotleft test\guillemotright} (web_prod.west);
+
+\coordinate (bus_json) at ([xshift=1.15cm]web_prod.east);
+\draw[line_only] (web_prod.east) -- (bus_json |- web_prod.east);
+\draw[line_only] (web_anun.east) -- (bus_json |- web_anun.east);
+\draw[line_only] (web_mkt.east) -- (bus_json |- web_mkt.east);
+\draw[line_only] (web_adm.east) -- (bus_json |- web_adm.east);
+\draw[line_only] (bus_json |- web_adm.east) -- ([yshift=-9pt]bus_json |- api_ctrl.west);
+\draw[dep] ([yshift=-9pt]bus_json |- api_ctrl.west) -- node[lbl, pos=0.62, below] {\guillemotleft HTTP/JSON\guillemotright} ([yshift=-9pt]api_ctrl.west);
+
+\coordinate (bus_jwt) at ([xshift=1.85cm]web_srv.east);
+\draw[line_only] (web_srv.east) -- (bus_jwt |- web_srv.east) -- ([yshift=9pt]bus_jwt |- api_ctrl.west);
+\draw[dep] ([yshift=9pt]bus_jwt |- api_ctrl.west) -- node[lbl, pos=0.55, above] {\guillemotleft HTTP/JWT\guillemotright} ([yshift=9pt]api_ctrl.west);
+
+\draw[dep] ([xshift=2.4cm]api_cmd.south) -- node[lbl, right] {\guillemotleft use\guillemotright} ([xshift=2.4cm]api_ctrl.north);
+\draw[dep] ([xshift=2.4cm]api_ctrl.south) -- node[lbl, right] {\guillemotleft use\guillemotright} ([xshift=2.4cm]api_srv.north);
+\draw[dep] ([xshift=2.4cm]api_srv.south) -- node[lbl, right] {\guillemotleft use\guillemotright} ([xshift=2.4cm]api_db.north);
+\draw[dep] ([xshift=2.4cm]api_db.south) -- node[lbl, right] {\guillemotleft SQL/sqlc\guillemotright} ([xshift=2.4cm]db_mod.north);
+
+\end{tikzpicture}%
+}
