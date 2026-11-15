@@ -11,6 +11,32 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countAnuncios = `-- name: CountAnuncios :one
+SELECT COUNT(*)
+FROM CAD_ANUNCIO a
+INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
+WHERE p.id_usuario = $1
+`
+
+func (q *Queries) CountAnuncios(ctx context.Context, idUsuario int32) (int64, error) {
+	row := q.db.QueryRow(ctx, countAnuncios, idUsuario)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countAuditoria = `-- name: CountAuditoria :one
+SELECT COUNT(*)
+FROM CAD_AUDITORIA
+`
+
+func (q *Queries) CountAuditoria(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countAuditoria)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countProdutos = `-- name: CountProdutos :one
 SELECT COUNT(*)
 FROM CAD_PRODUTO
@@ -22,6 +48,154 @@ func (q *Queries) CountProdutos(ctx context.Context, idUsuario int32) (int64, er
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const countUsuarios = `-- name: CountUsuarios :one
+SELECT COUNT(*)
+FROM CAD_USUARIO
+`
+
+func (q *Queries) CountUsuarios(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countUsuarios)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const createAnuncio = `-- name: CreateAnuncio :one
+INSERT INTO CAD_ANUNCIO (
+    id_marketplace,
+    id_produto,
+    titulo_anuncio,
+    descricao_anuncio,
+    preco_venda,
+    id_externo_mp,
+    status_campo
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7
+) RETURNING id_anuncio
+`
+
+type CreateAnuncioParams struct {
+	IDMarketplace    int32
+	IDProduto        int32
+	TituloAnuncio    string
+	DescricaoAnuncio pgtype.Text
+	PrecoVenda       pgtype.Numeric
+	IDExternoMp      pgtype.Text
+	StatusCampo      string
+}
+
+func (q *Queries) CreateAnuncio(ctx context.Context, arg CreateAnuncioParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createAnuncio,
+		arg.IDMarketplace,
+		arg.IDProduto,
+		arg.TituloAnuncio,
+		arg.DescricaoAnuncio,
+		arg.PrecoVenda,
+		arg.IDExternoMp,
+		arg.StatusCampo,
+	)
+	var id_anuncio int32
+	err := row.Scan(&id_anuncio)
+	return id_anuncio, err
+}
+
+const createAuditoria = `-- name: CreateAuditoria :one
+INSERT INTO CAD_AUDITORIA (
+    id_usuario,
+    acao,
+    tabela_afetada
+) VALUES (
+    $1, $2, $3
+) RETURNING id_auditoria
+`
+
+type CreateAuditoriaParams struct {
+	IDUsuario     int32
+	Acao          string
+	TabelaAfetada string
+}
+
+func (q *Queries) CreateAuditoria(ctx context.Context, arg CreateAuditoriaParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createAuditoria, arg.IDUsuario, arg.Acao, arg.TabelaAfetada)
+	var id_auditoria int32
+	err := row.Scan(&id_auditoria)
+	return id_auditoria, err
+}
+
+const createMarketplace = `-- name: CreateMarketplace :one
+INSERT INTO CAD_MARKETPLACE (
+    nome_marketplace,
+    taxa_comissao
+) VALUES (
+    $1, $2
+) RETURNING id_marketplace
+`
+
+type CreateMarketplaceParams struct {
+	NomeMarketplace string
+	TaxaComissao    pgtype.Numeric
+}
+
+func (q *Queries) CreateMarketplace(ctx context.Context, arg CreateMarketplaceParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createMarketplace, arg.NomeMarketplace, arg.TaxaComissao)
+	var id_marketplace int32
+	err := row.Scan(&id_marketplace)
+	return id_marketplace, err
+}
+
+const createMetricaAnuncio = `-- name: CreateMetricaAnuncio :one
+INSERT INTO HIST_METRICA_ANUNCIO (
+    id_anuncio,
+    data_referencia,
+    visualizacoes,
+    conversoes
+) VALUES (
+    $1, $2, $3, $4
+) RETURNING id_metrica
+`
+
+type CreateMetricaAnuncioParams struct {
+	IDAnuncio      int32
+	DataReferencia pgtype.Date
+	Visualizacoes  pgtype.Int4
+	Conversoes     pgtype.Int4
+}
+
+func (q *Queries) CreateMetricaAnuncio(ctx context.Context, arg CreateMetricaAnuncioParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createMetricaAnuncio,
+		arg.IDAnuncio,
+		arg.DataReferencia,
+		arg.Visualizacoes,
+		arg.Conversoes,
+	)
+	var id_metrica int32
+	err := row.Scan(&id_metrica)
+	return id_metrica, err
+}
+
+const createPessoa = `-- name: CreatePessoa :one
+INSERT INTO CAD_PESSOA (
+    nome,
+    cpf_cnpj,
+    tipo_pessoa
+) VALUES (
+    $1, $2, $3
+) RETURNING ID_pessoa
+`
+
+type CreatePessoaParams struct {
+	Nome       string
+	CpfCnpj    string
+	TipoPessoa string
+}
+
+func (q *Queries) CreatePessoa(ctx context.Context, arg CreatePessoaParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createPessoa, arg.Nome, arg.CpfCnpj, arg.TipoPessoa)
+	var id_pessoa int32
+	err := row.Scan(&id_pessoa)
+	return id_pessoa, err
 }
 
 const createProduto = `-- name: CreateProduto :one
@@ -51,6 +225,127 @@ func (q *Queries) CreateProduto(ctx context.Context, arg CreateProdutoParams) (i
 	return id_produto, err
 }
 
+const createUsuario = `-- name: CreateUsuario :one
+INSERT INTO CAD_USUARIO (
+    id_pessoa,
+    login_campo,
+    senha_hash,
+    email
+) VALUES (
+    $1, $2, $3, $4
+) RETURNING id_usuario
+`
+
+type CreateUsuarioParams struct {
+	IDPessoa   int32
+	LoginCampo string
+	SenhaHash  string
+	Email      string
+}
+
+func (q *Queries) CreateUsuario(ctx context.Context, arg CreateUsuarioParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createUsuario,
+		arg.IDPessoa,
+		arg.LoginCampo,
+		arg.SenhaHash,
+		arg.Email,
+	)
+	var id_usuario int32
+	err := row.Scan(&id_usuario)
+	return id_usuario, err
+}
+
+const deleteAnuncio = `-- name: DeleteAnuncio :execrows
+DELETE FROM CAD_ANUNCIO a
+USING CAD_PRODUTO p
+WHERE a.id_produto = p.id_produto
+  AND a.id_anuncio = $1
+  AND p.id_usuario = $2
+`
+
+type DeleteAnuncioParams struct {
+	IDAnuncio int32
+	IDUsuario int32
+}
+
+func (q *Queries) DeleteAnuncio(ctx context.Context, arg DeleteAnuncioParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteAnuncio, arg.IDAnuncio, arg.IDUsuario)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const getAnuncioById = `-- name: GetAnuncioById :one
+SELECT
+    a.id_anuncio,
+    a.id_marketplace,
+    m.nome_marketplace,
+    a.id_produto,
+    p.nome_produto,
+    a.titulo_anuncio,
+    a.descricao_anuncio,
+    a.preco_venda,
+    a.id_externo_mp,
+    a.status_campo
+FROM CAD_ANUNCIO a
+INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
+INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
+WHERE a.id_anuncio = $1 AND p.id_usuario = $2
+`
+
+type GetAnuncioByIdParams struct {
+	IDAnuncio int32
+	IDUsuario int32
+}
+
+type GetAnuncioByIdRow struct {
+	IDAnuncio        int32
+	IDMarketplace    int32
+	NomeMarketplace  string
+	IDProduto        int32
+	NomeProduto      string
+	TituloAnuncio    string
+	DescricaoAnuncio pgtype.Text
+	PrecoVenda       pgtype.Numeric
+	IDExternoMp      pgtype.Text
+	StatusCampo      string
+}
+
+func (q *Queries) GetAnuncioById(ctx context.Context, arg GetAnuncioByIdParams) (GetAnuncioByIdRow, error) {
+	row := q.db.QueryRow(ctx, getAnuncioById, arg.IDAnuncio, arg.IDUsuario)
+	var i GetAnuncioByIdRow
+	err := row.Scan(
+		&i.IDAnuncio,
+		&i.IDMarketplace,
+		&i.NomeMarketplace,
+		&i.IDProduto,
+		&i.NomeProduto,
+		&i.TituloAnuncio,
+		&i.DescricaoAnuncio,
+		&i.PrecoVenda,
+		&i.IDExternoMp,
+		&i.StatusCampo,
+	)
+	return i, err
+}
+
+const getMarketplaceById = `-- name: GetMarketplaceById :one
+SELECT
+    id_marketplace,
+    nome_marketplace,
+    taxa_comissao
+FROM CAD_MARKETPLACE
+WHERE id_marketplace = $1
+`
+
+func (q *Queries) GetMarketplaceById(ctx context.Context, idMarketplace int32) (CadMarketplace, error) {
+	row := q.db.QueryRow(ctx, getMarketplaceById, idMarketplace)
+	var i CadMarketplace
+	err := row.Scan(&i.IDMarketplace, &i.NomeMarketplace, &i.TaxaComissao)
+	return i, err
+}
+
 const getProdutoById = `-- name: GetProdutoById :one
 SELECT id_produto, id_usuario, sku, nome_produto, preco_base 
 FROM CAD_PRODUTO 
@@ -72,6 +367,38 @@ func (q *Queries) GetProdutoById(ctx context.Context, arg GetProdutoByIdParams) 
 		&i.NomeProduto,
 		&i.PrecoBase,
 	)
+	return i, err
+}
+
+const getResumoMetricasUsuario = `-- name: GetResumoMetricasUsuario :one
+SELECT
+    COUNT(DISTINCT a.id_anuncio) AS total_anuncios,
+    COALESCE(SUM(h.visualizacoes), 0)::bigint AS total_visualizacoes,
+    COALESCE(SUM(h.conversoes), 0)::bigint AS total_conversoes
+FROM CAD_PRODUTO p
+INNER JOIN CAD_ANUNCIO a ON a.id_produto = p.id_produto
+LEFT JOIN HIST_METRICA_ANUNCIO h
+    ON h.id_anuncio = a.id_anuncio
+   AND h.data_referencia BETWEEN $2 AND $3
+WHERE p.id_usuario = $1
+`
+
+type GetResumoMetricasUsuarioParams struct {
+	IDUsuario        int32
+	DataReferencia   pgtype.Date
+	DataReferencia_2 pgtype.Date
+}
+
+type GetResumoMetricasUsuarioRow struct {
+	TotalAnuncios      int64
+	TotalVisualizacoes int64
+	TotalConversoes    int64
+}
+
+func (q *Queries) GetResumoMetricasUsuario(ctx context.Context, arg GetResumoMetricasUsuarioParams) (GetResumoMetricasUsuarioRow, error) {
+	row := q.db.QueryRow(ctx, getResumoMetricasUsuario, arg.IDUsuario, arg.DataReferencia, arg.DataReferencia_2)
+	var i GetResumoMetricasUsuarioRow
+	err := row.Scan(&i.TotalAnuncios, &i.TotalVisualizacoes, &i.TotalConversoes)
 	return i, err
 }
 
@@ -109,6 +436,278 @@ func (q *Queries) GetUserById(ctx context.Context, idUsuario int32) (GetUserById
 	var i GetUserByIdRow
 	err := row.Scan(&i.IDUsuario, &i.Email)
 	return i, err
+}
+
+const listAnuncios = `-- name: ListAnuncios :many
+SELECT
+    a.id_anuncio,
+    a.id_marketplace,
+    m.nome_marketplace,
+    a.id_produto,
+    p.nome_produto,
+    p.sku,
+    a.titulo_anuncio,
+    a.preco_venda,
+    a.id_externo_mp,
+    a.status_campo
+FROM CAD_ANUNCIO a
+INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
+INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
+WHERE p.id_usuario = $1
+ORDER BY a.titulo_anuncio, a.id_anuncio
+LIMIT $2 OFFSET $3
+`
+
+type ListAnunciosParams struct {
+	IDUsuario int32
+	Limit     int32
+	Offset    int32
+}
+
+type ListAnunciosRow struct {
+	IDAnuncio       int32
+	IDMarketplace   int32
+	NomeMarketplace string
+	IDProduto       int32
+	NomeProduto     string
+	Sku             string
+	TituloAnuncio   string
+	PrecoVenda      pgtype.Numeric
+	IDExternoMp     pgtype.Text
+	StatusCampo     string
+}
+
+func (q *Queries) ListAnuncios(ctx context.Context, arg ListAnunciosParams) ([]ListAnunciosRow, error) {
+	rows, err := q.db.Query(ctx, listAnuncios, arg.IDUsuario, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAnunciosRow
+	for rows.Next() {
+		var i ListAnunciosRow
+		if err := rows.Scan(
+			&i.IDAnuncio,
+			&i.IDMarketplace,
+			&i.NomeMarketplace,
+			&i.IDProduto,
+			&i.NomeProduto,
+			&i.Sku,
+			&i.TituloAnuncio,
+			&i.PrecoVenda,
+			&i.IDExternoMp,
+			&i.StatusCampo,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAuditoria = `-- name: ListAuditoria :many
+SELECT
+    aud.id_auditoria,
+    aud.id_usuario,
+    u.login_campo,
+    u.email,
+    aud.acao,
+    aud.tabela_afetada,
+    aud.data_hora
+FROM CAD_AUDITORIA aud
+INNER JOIN CAD_USUARIO u ON u.id_usuario = aud.id_usuario
+ORDER BY aud.data_hora DESC, aud.id_auditoria DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListAuditoriaParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type ListAuditoriaRow struct {
+	IDAuditoria   int32
+	IDUsuario     int32
+	LoginCampo    string
+	Email         string
+	Acao          string
+	TabelaAfetada string
+	DataHora      pgtype.Timestamp
+}
+
+func (q *Queries) ListAuditoria(ctx context.Context, arg ListAuditoriaParams) ([]ListAuditoriaRow, error) {
+	rows, err := q.db.Query(ctx, listAuditoria, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListAuditoriaRow
+	for rows.Next() {
+		var i ListAuditoriaRow
+		if err := rows.Scan(
+			&i.IDAuditoria,
+			&i.IDUsuario,
+			&i.LoginCampo,
+			&i.Email,
+			&i.Acao,
+			&i.TabelaAfetada,
+			&i.DataHora,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMarketplacesComResumo = `-- name: ListMarketplacesComResumo :many
+SELECT
+    m.id_marketplace,
+    m.nome_marketplace,
+    m.taxa_comissao,
+    COUNT(a.id_anuncio) AS total_anuncios
+FROM CAD_MARKETPLACE m
+LEFT JOIN CAD_ANUNCIO a ON a.id_marketplace = m.id_marketplace
+LEFT JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto AND p.id_usuario = $1
+GROUP BY m.id_marketplace, m.nome_marketplace, m.taxa_comissao
+ORDER BY m.nome_marketplace, m.id_marketplace
+`
+
+type ListMarketplacesComResumoRow struct {
+	IDMarketplace   int32
+	NomeMarketplace string
+	TaxaComissao    pgtype.Numeric
+	TotalAnuncios   int64
+}
+
+func (q *Queries) ListMarketplacesComResumo(ctx context.Context, idUsuario int32) ([]ListMarketplacesComResumoRow, error) {
+	rows, err := q.db.Query(ctx, listMarketplacesComResumo, idUsuario)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMarketplacesComResumoRow
+	for rows.Next() {
+		var i ListMarketplacesComResumoRow
+		if err := rows.Scan(
+			&i.IDMarketplace,
+			&i.NomeMarketplace,
+			&i.TaxaComissao,
+			&i.TotalAnuncios,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMetricasPorAnuncio = `-- name: ListMetricasPorAnuncio :many
+SELECT
+    a.id_anuncio,
+    a.titulo_anuncio,
+    m.nome_marketplace,
+    a.status_campo,
+    COALESCE(SUM(h.visualizacoes), 0)::bigint AS total_visualizacoes,
+    COALESCE(SUM(h.conversoes), 0)::bigint AS total_conversoes
+FROM CAD_ANUNCIO a
+INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
+INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
+LEFT JOIN HIST_METRICA_ANUNCIO h ON h.id_anuncio = a.id_anuncio
+WHERE p.id_usuario = $1
+GROUP BY a.id_anuncio, a.titulo_anuncio, m.nome_marketplace, a.status_campo
+ORDER BY total_conversoes DESC, total_visualizacoes DESC
+`
+
+type ListMetricasPorAnuncioRow struct {
+	IDAnuncio          int32
+	TituloAnuncio      string
+	NomeMarketplace    string
+	StatusCampo        string
+	TotalVisualizacoes int64
+	TotalConversoes    int64
+}
+
+func (q *Queries) ListMetricasPorAnuncio(ctx context.Context, idUsuario int32) ([]ListMetricasPorAnuncioRow, error) {
+	rows, err := q.db.Query(ctx, listMetricasPorAnuncio, idUsuario)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMetricasPorAnuncioRow
+	for rows.Next() {
+		var i ListMetricasPorAnuncioRow
+		if err := rows.Scan(
+			&i.IDAnuncio,
+			&i.TituloAnuncio,
+			&i.NomeMarketplace,
+			&i.StatusCampo,
+			&i.TotalVisualizacoes,
+			&i.TotalConversoes,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listMetricasPorDia = `-- name: ListMetricasPorDia :many
+SELECT
+    h.data_referencia,
+    COALESCE(SUM(h.visualizacoes), 0)::bigint AS visualizacoes,
+    COALESCE(SUM(h.conversoes), 0)::bigint AS conversoes
+FROM HIST_METRICA_ANUNCIO h
+INNER JOIN CAD_ANUNCIO a ON a.id_anuncio = h.id_anuncio
+INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
+WHERE p.id_usuario = $1
+  AND h.data_referencia BETWEEN $2 AND $3
+GROUP BY h.data_referencia
+ORDER BY h.data_referencia ASC
+`
+
+type ListMetricasPorDiaParams struct {
+	IDUsuario        int32
+	DataReferencia   pgtype.Date
+	DataReferencia_2 pgtype.Date
+}
+
+type ListMetricasPorDiaRow struct {
+	DataReferencia pgtype.Date
+	Visualizacoes  int64
+	Conversoes     int64
+}
+
+func (q *Queries) ListMetricasPorDia(ctx context.Context, arg ListMetricasPorDiaParams) ([]ListMetricasPorDiaRow, error) {
+	rows, err := q.db.Query(ctx, listMetricasPorDia, arg.IDUsuario, arg.DataReferencia, arg.DataReferencia_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListMetricasPorDiaRow
+	for rows.Next() {
+		var i ListMetricasPorDiaRow
+		if err := rows.Scan(&i.DataReferencia, &i.Visualizacoes, &i.Conversoes); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listProdutos = `-- name: ListProdutos :many
@@ -157,6 +756,127 @@ func (q *Queries) ListProdutos(ctx context.Context, arg ListProdutosParams) ([]L
 	return items, nil
 }
 
+const listUsuarios = `-- name: ListUsuarios :many
+SELECT
+    u.id_usuario,
+    u.id_pessoa,
+    p.nome,
+    p.cpf_cnpj,
+    p.tipo_pessoa,
+    u.login_campo,
+    u.email
+FROM CAD_USUARIO u
+INNER JOIN CAD_PESSOA p ON p.ID_pessoa = u.id_pessoa
+ORDER BY p.nome, u.id_usuario
+LIMIT $1 OFFSET $2
+`
+
+type ListUsuariosParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type ListUsuariosRow struct {
+	IDUsuario  int32
+	IDPessoa   int32
+	Nome       string
+	CpfCnpj    string
+	TipoPessoa string
+	LoginCampo string
+	Email      string
+}
+
+func (q *Queries) ListUsuarios(ctx context.Context, arg ListUsuariosParams) ([]ListUsuariosRow, error) {
+	rows, err := q.db.Query(ctx, listUsuarios, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListUsuariosRow
+	for rows.Next() {
+		var i ListUsuariosRow
+		if err := rows.Scan(
+			&i.IDUsuario,
+			&i.IDPessoa,
+			&i.Nome,
+			&i.CpfCnpj,
+			&i.TipoPessoa,
+			&i.LoginCampo,
+			&i.Email,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateAnuncio = `-- name: UpdateAnuncio :execrows
+UPDATE CAD_ANUNCIO a
+SET id_marketplace = $3,
+    titulo_anuncio = $4,
+    descricao_anuncio = $5,
+    preco_venda = $6,
+    id_externo_mp = $7,
+    status_campo = $8
+FROM CAD_PRODUTO p
+WHERE a.id_produto = p.id_produto
+  AND a.id_anuncio = $1
+  AND p.id_usuario = $2
+`
+
+type UpdateAnuncioParams struct {
+	IDAnuncio        int32
+	IDUsuario        int32
+	IDMarketplace    int32
+	TituloAnuncio    string
+	DescricaoAnuncio pgtype.Text
+	PrecoVenda       pgtype.Numeric
+	IDExternoMp      pgtype.Text
+	StatusCampo      string
+}
+
+func (q *Queries) UpdateAnuncio(ctx context.Context, arg UpdateAnuncioParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateAnuncio,
+		arg.IDAnuncio,
+		arg.IDUsuario,
+		arg.IDMarketplace,
+		arg.TituloAnuncio,
+		arg.DescricaoAnuncio,
+		arg.PrecoVenda,
+		arg.IDExternoMp,
+		arg.StatusCampo,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const updateMarketplace = `-- name: UpdateMarketplace :execrows
+UPDATE CAD_MARKETPLACE
+SET nome_marketplace = $2,
+    taxa_comissao = $3
+WHERE id_marketplace = $1
+`
+
+type UpdateMarketplaceParams struct {
+	IDMarketplace   int32
+	NomeMarketplace string
+	TaxaComissao    pgtype.Numeric
+}
+
+func (q *Queries) UpdateMarketplace(ctx context.Context, arg UpdateMarketplaceParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateMarketplace, arg.IDMarketplace, arg.NomeMarketplace, arg.TaxaComissao)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const updateProduto = `-- name: UpdateProduto :execrows
 UPDATE CAD_PRODUTO
 SET sku = $3,
@@ -181,6 +901,27 @@ func (q *Queries) UpdateProduto(ctx context.Context, arg UpdateProdutoParams) (i
 		arg.NomeProduto,
 		arg.PrecoBase,
 	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const updateUsuario = `-- name: UpdateUsuario :execrows
+UPDATE CAD_USUARIO
+SET login_campo = $2,
+    email = $3
+WHERE id_usuario = $1
+`
+
+type UpdateUsuarioParams struct {
+	IDUsuario  int32
+	LoginCampo string
+	Email      string
+}
+
+func (q *Queries) UpdateUsuario(ctx context.Context, arg UpdateUsuarioParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateUsuario, arg.IDUsuario, arg.LoginCampo, arg.Email)
 	if err != nil {
 		return 0, err
 	}
