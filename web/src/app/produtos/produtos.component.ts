@@ -12,11 +12,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 import { EMPTY, Subject, catchError, finalize, startWith, switchMap } from 'rxjs';
 import { ProdutosService } from './produtos.service';
+import { NovoProdutoComponent } from './novo-produto/novo-produto.component';
 import { Produto } from './produto.model';
 
 @Component({
   selector: 'app-produtos',
-  imports: [CurrencyPipe, RouterLink, FocoPaginaDirective],
+  imports: [CurrencyPipe, RouterLink, FocoPaginaDirective, NovoProdutoComponent],
   templateUrl: './produtos.component.html',
   styleUrl: './produtos.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +33,7 @@ export class ProdutosComponent {
   protected readonly total = signal(0);
   protected readonly carregando = signal(false);
   protected readonly erro = signal('');
+  protected readonly cadastroAberto = signal(false);
 
   protected readonly totalPaginas = computed(() =>
     Math.max(1, Math.ceil(this.total() / this.limite())),
@@ -83,7 +85,7 @@ export class ProdutosComponent {
     }
   }
 
-  protected tentarNovamente(): void {
+  protected recarregar(): void {
     this.solicitacaoPagina.next(this.paginaAtual());
   }
 }

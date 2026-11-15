@@ -21,14 +21,15 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     nome = `Produto ${sku}`;
     await page.goto('/produtos');
   } else {
-    await page.getByRole('link', { name: 'Novo produto', exact: true }).click();
-    await page.getByLabel('Nome', { exact: true }).fill(nome);
-    await page.getByLabel('SKU', { exact: true }).fill(sku);
-    await page.getByLabel('Preço base (R$)').fill('35,50');
+    await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
+    const modal = page.getByRole('dialog', { name: 'Novo produto' });
+    await modal.getByLabel('Nome', { exact: true }).fill(nome);
+    await modal.getByLabel('SKU', { exact: true }).fill(sku);
+    await modal.getByLabel('Preço base (R$)').fill('35,50');
     const criacao = page.waitForResponse(
       (r) => new URL(r.url()).pathname === '/api/produtos' && r.request().method() === 'POST',
     );
-    await page.getByRole('button', { name: 'Salvar produto', exact: true }).click();
+    await modal.getByRole('button', { name: 'Salvar produto', exact: true }).click();
     const resposta = await criacao;
     expect(resposta.status()).toBe(201);
     const criado: { id: number } = await resposta.json();

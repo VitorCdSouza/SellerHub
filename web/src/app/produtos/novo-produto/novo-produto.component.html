@@ -1,25 +1,24 @@
-<section aria-labelledby="titulo-cadastro">
-  <header class="cabecalho-pagina">
-    <div>
-      <a routerLink="/produtos" class="link-voltar">Produtos</a>
-      <h1 id="titulo-cadastro" appFocoPagina>Novo produto</h1>
-    </div>
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-cadastro"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-cadastro">Novo produto</h2>
 
-    <div class="acoes-pagina">
-      <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="cancelar()">
-        Cancelar
-      </button>
-      <button type="submit" form="formulario-produto" class="botao-primario" [disabled]="enviando()">
-        {{ enviando() ? 'Salvando...' : 'Salvar produto' }}
-      </button>
-    </div>
-  </header>
+  <app-produto-formulario
+    [enviando]="enviando()"
+    [erroEnvio]="erro()"
+    (salvar)="salvar($event)"
+  />
 
-  <div class="cartao formulario">
-    <app-produto-formulario
-      [enviando]="enviando()"
-      [erroEnvio]="erro()"
-      (salvar)="salvar($event)"
-    />
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    <button type="submit" form="formulario-produto" class="botao-primario" [disabled]="enviando()">
+      {{ enviando() ? 'Salvando...' : 'Salvar produto' }}
+    </button>
   </div>
-</section>
+</dialog>

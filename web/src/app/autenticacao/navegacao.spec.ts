@@ -28,8 +28,12 @@ describe('Navegação da estrutura e recuperação de acesso', () => {
   });
   afterEach(() => http.verify());
 
+  function leituraCatalogo() {
+    return http.expectOne('/api/produtos?pagina=1&limite=20');
+  }
+
   async function iniciarNavegacao() {
-    const navegacao = harness.navigateByUrl('/produtos/novo?origem=teste');
+    const navegacao = harness.navigateByUrl('/produtos?origem=teste');
     await vi.waitFor(() => expect(auth.estado()).toBe('consultando'));
     return { navegacao };
   }
@@ -39,6 +43,7 @@ describe('Navegação da estrutura e recuperação de acesso', () => {
     http.expectOne('/api/sessao').flush({ id: 1, email: 'conta@exemplo.test' });
     await navegacao;
     harness.detectChanges();
+    leituraCatalogo();
   }
 
   it('aguarda a sessão no acesso direto e preserva caminho e parâmetros', async () => {
@@ -46,7 +51,8 @@ describe('Navegação da estrutura e recuperação de acesso', () => {
     expect(harness.routeNativeElement?.querySelector('.conta') ?? null).toBeNull();
     http.expectOne('/api/sessao').flush({ id: 1, email: 'conta@exemplo.test' });
     await navegacao;
-    expect(router.url).toBe('/produtos/novo?origem=teste');
+    leituraCatalogo();
+    expect(router.url).toBe('/produtos?origem=teste');
     expect(harness.routeNativeElement?.textContent).toContain('conta@exemplo.test');
     expect(
       harness.routeNativeElement?.querySelector('a[aria-current="page"]')?.textContent,
@@ -57,7 +63,7 @@ describe('Navegação da estrutura e recuperação de acesso', () => {
     const { navegacao } = await iniciarNavegacao();
     http.expectOne('/api/sessao').flush({}, { status: 401, statusText: 'Unauthorized' });
     await navegacao;
-    expect(router.parseUrl(router.url).queryParams['retorno']).toBe('/produtos/novo?origem=teste');
+    expect(router.parseUrl(router.url).queryParams['retorno']).toBe('/produtos?origem=teste');
     expect(harness.routeNativeElement?.querySelector('form')).not.toBeNull();
     expect(harness.routeNativeElement?.querySelector('.conta')).toBeNull();
   });
@@ -80,7 +86,8 @@ describe('Navegação da estrutura e recuperação de acesso', () => {
     botao.click();
     http.expectOne('/api/sessao').flush({ id: 1, email: 'conta@exemplo.test' });
     await harness.fixture.whenStable();
-    expect(router.url).toBe('/produtos/novo?origem=teste');
+    leituraCatalogo();
+    expect(router.url).toBe('/produtos?origem=teste');
   });
 
   it('mantém a conta em falha de saída e só sai após confirmação, sem duplicar o envio', async () => {
@@ -99,8 +106,8 @@ describe('Navegação da estrutura e recuperação de acesso', () => {
     await harness.fixture.whenStable();
     expect(router.url).toBe('/');
     expect(auth.usuario()).toBeNull();
-    await harness.navigateByUrl('/produtos/novo');
-    expect(router.parseUrl(router.url).queryParams['retorno']).toBe('/produtos/novo');
+    await harness.navigateByUrl('/produtos');
+    expect(router.parseUrl(router.url).queryParams['retorno']).toBe('/produtos');
     expect(harness.routeNativeElement?.querySelector('form')).not.toBeNull();
   });
 

@@ -23,26 +23,33 @@ test('login inválido, entrada por teclado, recarga e saída reais', async ({ pa
 });
 
 test('acesso anônimo preserva a URL após o login', async ({ page }) => {
-  await page.goto('/produtos/novo');
+  await page.goto('/produtos?origem=teste');
   await expect(page.getByRole('heading', { name: 'Entre na sua conta' })).toBeVisible();
-  await expect(page.getByLabel('Nome', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('table')).toHaveCount(0);
   await entrar(page);
-  await expect(page).toHaveURL('/produtos/novo');
-  await expect(page.getByLabel('Nome', { exact: true })).toBeVisible();
+  await expect(page).toHaveURL('/produtos?origem=teste');
+  await expect(page.getByRole('heading', { name: 'Produtos', level: 1 })).toBeVisible();
 });
 
 test('navega pelo catálogo real e cancela sem gravar', async ({ page, produtoId }) => {
-  await page.goto('/produtos/novo');
+  await page.goto(`/produtos/${produtoId}`);
   await page.getByRole('navigation', { name: 'Menu principal' }).getByRole('link', { name: 'Produtos' }).click();
   await expect(page.getByRole('table')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anterior', exact: true })).toBeDisabled();
-  await page.getByRole('link', { name: 'Novo produto', exact: true }).click();
-  await page.getByRole('button', { name: 'Salvar produto', exact: true }).click();
-  await expect(page.getByText('Informe o nome do produto.')).toBeVisible();
-  await expect(page).toHaveURL('/produtos/novo');
-  await page.getByLabel('Nome', { exact: true }).fill('Rascunho local não salvo');
-  await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
+  const modal = page.getByRole('dialog', { name: 'Novo produto' });
+  await expect(modal).toBeVisible();
+  await expect(modal.getByLabel('Nome', { exact: true })).toBeFocused();
+  await modal.getByRole('button', { name: 'Salvar produto', exact: true }).click();
+  await expect(modal.getByText('Informe o nome do produto.')).toBeVisible();
   await expect(page).toHaveURL('/produtos');
+  await modal.getByLabel('Nome', { exact: true }).fill('Rascunho local não salvo');
+  await modal.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  await expect(modal).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Novo produto', exact: true })).toBeFocused();
+  await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await expect(modal).toHaveCount(0);
   await page.goto(`/produtos/${produtoId}`);
   await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Editar produto', exact: true }).click();
@@ -76,7 +83,7 @@ test('perda do cookie durante uso exige login e recupera o destino', async ({
   context,
   produtoId,
 }) => {
-  await page.goto('/produtos/novo');
+  await page.goto(`/produtos/${produtoId}`);
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
   await context.clearCookies();
   await page.getByRole('navigation', { name: 'Menu principal' }).getByRole('link', { name: 'Produtos' }).click();

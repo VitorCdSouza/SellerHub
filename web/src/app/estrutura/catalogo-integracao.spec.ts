@@ -12,6 +12,15 @@ describe('Integração da estrutura, sessão e catálogo', () => {
   const produto = { id: 5, name: 'Produto da conta A', sku: 'QA-5', basePrice: 35.5 };
 
   beforeEach(async () => {
+    // jsdom nao implementa showModal nem close
+    HTMLDialogElement.prototype.showModal = function () {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close = function () {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+
     TestBed.configureTestingModule({
       providers: [...appConfig.providers, provideHttpClientTesting()],
     });
@@ -25,7 +34,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     return harness.routeNativeElement!;
   }
 
-  async function autenticar(caminho = '/produtos/novo') {
+  async function autenticar(caminho: string) {
     const navegacao = harness.navigateByUrl(caminho);
     await vi.waitFor(() => expect(TestBed.inject(AuthService).estado()).toBe('consultando'));
     http.expectOne('/api/sessao').flush({ id: 2, email: 'conta-a@exemplo.test' });
@@ -52,7 +61,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     harness.detectChanges();
   }
 
-  it.each(['/produtos', '/produtos/novo', '/produtos/5', '/produtos/5/editar'])(
+  it.each(['/produtos', '/produtos/5', '/produtos/5/editar'])(
     'protege acesso direto a %s e preserva o destino para novo login',
     async (caminho) => {
       const navegacao = harness.navigateByUrl(caminho);
@@ -67,7 +76,8 @@ describe('Integração da estrutura, sessão e catálogo', () => {
   );
 
   it('leva ao catálogo pelo menu lateral', async () => {
-    await autenticar();
+    await autenticar('/produtos/5');
+    http.expectOne('/api/produtos/5').flush(produto);
     tela().querySelector<HTMLAnchorElement>('nav a[href="/produtos"]')!.click();
     await harness.fixture.whenStable();
     responderLista();
@@ -77,8 +87,13 @@ describe('Integração da estrutura, sessão e catálogo', () => {
   });
 
   it('compõe cadastro, detalhe, edição e retorno à lista com os DTOs reais', async () => {
-    await autenticar();
-    await harness.navigateByUrl('/produtos/novo');
+    await autenticar('/produtos');
+    responderLista([]);
+    Array.from(tela().querySelectorAll<HTMLButtonElement>('button'))
+      .find((botao) => botao.textContent?.includes('Novo produto'))!
+      .click();
+    harness.detectChanges();
+    expect(tela().querySelector('dialog')?.open).toBe(true);
     preencher('nome', 'Produto novo');
     preencher('sku', 'QA-NOVO');
     preencher('precoBase', '35,50');
@@ -95,6 +110,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     const criado = { ...produto, name: 'Produto novo', sku: 'QA-NOVO' };
     responderLista([criado]);
     expect(router.url).toBe('/produtos');
+    expect(tela().querySelector('dialog')).toBeNull();
     expect(tela().textContent).toContain('Produto novo');
 
     await harness.navigateByUrl('/produtos/5');
@@ -129,8 +145,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
   });
 
   it('cancela a leitura do catálogo ao sair e não mantém dados para a próxima conta', async () => {
-    await autenticar();
-    await harness.navigateByUrl('/produtos');
+    await autenticar('/produtos');
     const pendente = http.expectOne('/api/produtos?pagina=1&limite=20');
     tela().querySelector<HTMLButtonElement>('.botao-saida')!.click();
     http.expectOne('/api/logout').flush({ success: true, message: 'Sessão encerrada' });
@@ -186,8 +201,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
   });
 
   it('retorna ao login com o destino original se a API expirar o acesso ao detalhe', async () => {
-    await autenticar();
-    await harness.navigateByUrl('/produtos/5');
+    await autenticar('/produtos/5');
     http.expectOne('/api/produtos/5').flush({}, { status: 401, statusText: 'Unauthorized' });
     await harness.fixture.whenStable();
     harness.detectChanges();

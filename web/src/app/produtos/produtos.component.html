@@ -1,9 +1,9 @@
 <section aria-labelledby="titulo-produtos">
   <header class="cabecalho-pagina">
     <h1 id="titulo-produtos" appFocoPagina>Produtos</h1>
-    <a class="botao-primario" routerLink="/produtos/novo">
+    <button type="button" class="botao-primario" (click)="cadastroAberto.set(true)">
       <span class="mais" aria-hidden="true">+</span> Novo produto
-    </a>
+    </button>
   </header>
 
   @if (carregando()) {
@@ -11,7 +11,7 @@
   } @else if (erro()) {
     <div class="estado erro" role="alert">
       <p>{{ erro() }}</p>
-      <button type="button" class="botao-secundario" (click)="tentarNovamente()">
+      <button type="button" class="botao-secundario" (click)="recarregar()">
         Tentar novamente
       </button>
     </div>
@@ -19,14 +19,16 @@
     <div class="estado vazio">
       <h2>Nenhum produto encontrado</h2>
       <p>Seu catálogo ainda não possui produtos cadastrados.</p>
-      <a class="botao-primario" routerLink="/produtos/novo">Cadastrar primeiro produto</a>
+      <button type="button" class="botao-primario" (click)="cadastroAberto.set(true)">
+        Cadastrar primeiro produto
+      </button>
     </div>
   } @else {
     @if (produtos().length === 0) {
       <div class="estado" role="status">
         <h2>Nenhum produto nesta página</h2>
         <p>O catálogo mudou. Consulte esta página novamente ou use a navegação disponível.</p>
-        <button type="button" class="botao-secundario" (click)="tentarNovamente()">
+        <button type="button" class="botao-secundario" (click)="recarregar()">
           Tentar novamente
         </button>
       </div>
@@ -88,5 +90,9 @@
         </button>
       </div>
     </nav>
+  }
+
+  @if (cadastroAberto()) {
+    <app-novo-produto (cadastrado)="recarregar()" (fechado)="cadastroAberto.set(false)" />
   }
 </section>

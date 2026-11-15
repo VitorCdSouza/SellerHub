@@ -1,28 +1,42 @@
-import { RouterLink } from '@angular/router';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  inject,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { DadosProduto } from '../produto.model';
 import { ProdutosService } from '../produtos.service';
 import { ProdutoFormularioComponent } from '../produto-formulario/produto-formulario.component';
-import { FocoPaginaDirective } from '../../compartilhado/foco-pagina.directive';
 
 @Component({
   selector: 'app-novo-produto',
-  imports: [ProdutoFormularioComponent, RouterLink, FocoPaginaDirective],
+  imports: [ProdutoFormularioComponent],
   templateUrl: './novo-produto.component.html',
   styleUrl: './novo-produto.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NovoProdutoComponent {
   private readonly service = inject(ProdutosService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly dialogo = viewChild.required<ElementRef<HTMLDialogElement>>('dialogo');
+
+  readonly cadastrado = output();
+  readonly fechado = output();
 
   protected readonly enviando = signal(false);
   protected readonly erro = signal('');
+
+  constructor() {
+    afterNextRender(() => this.dialogo().nativeElement.showModal());
+  }
 
   protected salvar(dados: DadosProduto): void {
     if (this.enviando()) {
@@ -41,7 +55,8 @@ export class NovoProdutoComponent {
       .subscribe({
         next: (resposta) => {
           if (resposta.status === 201 && resposta.body?.id) {
-            this.router.navigate(['/produtos']);
+            this.cadastrado.emit();
+            this.fechar();
           } else {
             this.erro.set('O cadastro não foi confirmado pela API. Tente novamente.');
           }
@@ -64,7 +79,14 @@ export class NovoProdutoComponent {
       });
   }
 
-  protected cancelar(): void {
-    this.router.navigate(['/produtos']);
+  protected fechar(): void {
+    this.dialogo().nativeElement.close();
+  }
+
+  // esc dispara cancel; durante o envio o modal fica aberto ate a resposta
+  protected impedirFechamentoDuranteEnvio(evento: Event): void {
+    if (this.enviando()) {
+      evento.preventDefault();
+    }
   }
 }

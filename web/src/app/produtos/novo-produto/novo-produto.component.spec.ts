@@ -1,7 +1,5 @@
-
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { of, Subject, throwError } from 'rxjs';
 import { NovoProdutoComponent } from './novo-produto.component';
@@ -9,11 +7,12 @@ import { ProdutoFormularioComponent } from '../produto-formulario/produto-formul
 import { ProdutosService } from '../produtos.service';
 import { DadosProduto } from '../produto.model';
 
-describe('Tela de cadastro de produto', () => {
+describe('Modal de cadastro de produto', () => {
   let fixture: ComponentFixture<NovoProdutoComponent>;
   let service: { cadastrar: ReturnType<typeof vi.fn> };
-  let router: Router;
   let formulario: ProdutoFormularioComponent;
+  let cadastrado: ReturnType<typeof vi.fn<() => void>>;
+  let fechado: ReturnType<typeof vi.fn<() => void>>;
 
   const dados: DadosProduto = {
     nome: 'Produto teste',
@@ -21,105 +20,118 @@ describe('Tela de cadastro de produto', () => {
     precoBase: 35.5,
   };
 
+  function dialogo(): HTMLDialogElement {
+    return (fixture.nativeElement as HTMLElement).querySelector('dialog')!;
+  }
+
+  function botao(texto: string): HTMLButtonElement {
+    return Array.from(dialogo().querySelectorAll('button')).find(
+      (item) => item.textContent?.trim() === texto,
+    )!;
+  }
+
   beforeEach(() => {
-    service = {
-      cadastrar: vi.fn(),
+    // jsdom nao implementa showModal nem close
+    HTMLDialogElement.prototype.showModal = function () {
+      this.open = true;
     };
+    HTMLDialogElement.prototype.close = function () {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+
+    service = { cadastrar: vi.fn() };
 
     TestBed.configureTestingModule({
       imports: [NovoProdutoComponent],
-      providers: [
-        provideRouter([]),
-        { provide: ProdutosService, useValue: service },
-      ],
+      providers: [{ provide: ProdutosService, useValue: service }],
     });
 
-    router = TestBed.inject(Router);
-    vi.spyOn(router, 'navigate').mockResolvedValue(true);
-
     fixture = TestBed.createComponent(NovoProdutoComponent);
+    cadastrado = vi.fn<() => void>();
+    fechado = vi.fn<() => void>();
+    fixture.componentInstance.cadastrado.subscribe(cadastrado);
+    fixture.componentInstance.fechado.subscribe(fechado);
     fixture.detectChanges();
 
-    formulario = fixture.debugElement.query(
-      By.directive(ProdutoFormularioComponent),
-    ).componentInstance as ProdutoFormularioComponent;
+    formulario = fixture.debugElement.query(By.directive(ProdutoFormularioComponent))
+      .componentInstance as ProdutoFormularioComponent;
   });
 
-  it('deve criar a tela de cadastro', () => {
-    expect(fixture.componentInstance).toBeTruthy();
+  it('abre como modal rotulado pelo título', () => {
+    expect(dialogo().open).toBe(true);
+    expect(dialogo().getAttribute('aria-labelledby')).toBe('titulo-cadastro');
+    expect(dialogo().querySelector('#titulo-cadastro')?.textContent).toContain('Novo produto');
   });
 
-  it('deve cadastrar o produto e retornar para a listagem', () => {
-    service.cadastrar.mockReturnValue(of({ status: 201, body: { id: 5 }, }));
+  it('cadastra o produto, avisa a listagem e fecha o modal', () => {
+    service.cadastrar.mockReturnValue(of({ status: 201, body: { id: 5 } }));
 
     formulario.salvar.emit(dados);
 
     expect(service.cadastrar).toHaveBeenCalledWith(dados);
-    expect(router.navigate).toHaveBeenCalledWith(['/produtos']);
+    expect(cadastrado).toHaveBeenCalledTimes(1);
+    expect(fechado).toHaveBeenCalledTimes(1);
+    expect(dialogo().open).toBe(false);
   });
 
-  it('deve impedir envios duplicados enquanto a requisição estiver pendente', () => {
-    const resposta = new Subject<{
-        status: number;
-        body: { id: number };
-    }>();
+  it('impede envios duplicados e mantém o modal aberto enquanto a requisição estiver pendente', () => {
+    const resposta = new Subject<{ status: number; body: { id: number } }>();
     service.cadastrar.mockReturnValue(resposta.asObservable());
 
     formulario.salvar.emit(dados);
     formulario.salvar.emit(dados);
+    const esc = new Event('cancel', { cancelable: true });
+    dialogo().dispatchEvent(esc);
 
     expect(service.cadastrar).toHaveBeenCalledTimes(1);
+    expect(esc.defaultPrevented).toBe(true);
+    expect(fechado).not.toHaveBeenCalled();
 
-    resposta.next({  status: 201, body: { id: 5 }, });
+    resposta.next({ status: 201, body: { id: 5 } });
     resposta.complete();
 
-    expect(router.navigate).toHaveBeenCalledWith(['/produtos']);
+    expect(cadastrado).toHaveBeenCalledTimes(1);
+    expect(fechado).toHaveBeenCalledTimes(1);
   });
 
-  it('deve apresentar mensagem quando a API retornar erro 400', () => {
+  it('apresenta mensagem e mantém o modal aberto quando a API retornar erro 400', () => {
     service.cadastrar.mockReturnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 400,
-            statusText: 'Bad Request',
-          }),
-      ),
+      throwError(() => new HttpErrorResponse({ status: 400, statusText: 'Bad Request' })),
     );
 
     formulario.salvar.emit(dados);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain(
-      'Os dados informados são inválidos.',
-    );
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(dialogo().textContent).toContain('Os dados informados são inválidos.');
+    expect(dialogo().open).toBe(true);
+    expect(cadastrado).not.toHaveBeenCalled();
   });
 
-  it('deve apresentar mensagem quando a sessão expirar', () => {
+  it('apresenta mensagem quando a sessão expirar', () => {
     service.cadastrar.mockReturnValue(
-      throwError(
-        () =>
-          new HttpErrorResponse({
-            status: 401,
-            statusText: 'Unauthorized',
-          }),
-      ),
+      throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' })),
     );
 
     formulario.salvar.emit(dados);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain(
-      'Sua sessão expirou.',
-    );
+    expect(dialogo().textContent).toContain('Sua sessão expirou.');
   });
 
-  it('deve voltar para a listagem ao cancelar', () => {
-    (fixture.nativeElement as HTMLElement)
-      .querySelector<HTMLButtonElement>('.acoes-pagina .botao-secundario')!
-      .click();
+  it('fecha sem cadastrar ao cancelar', () => {
+    botao('Cancelar').click();
 
-    expect(router.navigate).toHaveBeenCalledWith(['/produtos']);
+    expect(dialogo().open).toBe(false);
+    expect(fechado).toHaveBeenCalledTimes(1);
+    expect(cadastrado).not.toHaveBeenCalled();
+    expect(service.cadastrar).not.toHaveBeenCalled();
+  });
+
+  it('permite fechar com Esc quando não há envio em andamento', () => {
+    const esc = new Event('cancel', { cancelable: true });
+    dialogo().dispatchEvent(esc);
+
+    expect(esc.defaultPrevented).toBe(false);
   });
 });

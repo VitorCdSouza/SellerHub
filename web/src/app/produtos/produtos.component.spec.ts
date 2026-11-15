@@ -15,6 +15,15 @@ describe('Listagem de produtos integrada ao serviço HTTP', () => {
   const produto = { id: 5, name: 'Peça de teste', sku: 'PECA-5', basePrice: 35.5 };
 
   beforeEach(() => {
+    // jsdom nao implementa showModal nem close
+    HTMLDialogElement.prototype.showModal = function () {
+      this.open = true;
+    };
+    HTMLDialogElement.prototype.close = function () {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    };
+
     TestBed.configureTestingModule({
       imports: [ProdutosComponent],
       providers: [
@@ -125,6 +134,49 @@ describe('Listagem de produtos integrada ao serviço HTTP', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Página 1 de 2');
     expect(fixture.nativeElement.textContent).toContain(produto.name);
+  });
+
+  it('abre o cadastro em modal e recarrega a página atual depois de cadastrar', () => {
+    const tela = fixture.nativeElement as HTMLElement;
+    leitura(1).flush({ items: [], total: 0 });
+    fixture.detectChanges();
+
+    botao('Cadastrar primeiro produto').click();
+    fixture.detectChanges();
+    expect(tela.querySelector('dialog')?.open).toBe(true);
+
+    for (const [id, valor] of [
+      ['nome', produto.name],
+      ['sku', produto.sku],
+      ['precoBase', '35,50'],
+    ]) {
+      const campo = tela.querySelector<HTMLInputElement>(`#${id}`)!;
+      campo.value = valor;
+      campo.dispatchEvent(new Event('input'));
+    }
+    tela.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    http.expectOne('/api/produtos').flush({ id: 5 }, { status: 201, statusText: 'Created' });
+    leitura(1).flush({ items: [produto], total: 1 });
+    fixture.detectChanges();
+
+    expect(tela.querySelector('dialog')).toBeNull();
+    expect(tela.textContent).toContain(produto.name);
+  });
+
+  it('fecha o modal sem gravar nem recarregar a listagem', () => {
+    const tela = fixture.nativeElement as HTMLElement;
+    leitura(1).flush({ items: [produto], total: 1 });
+    fixture.detectChanges();
+
+    botao('+ Novo produto').click();
+    fixture.detectChanges();
+    Array.from(tela.querySelectorAll<HTMLButtonElement>('dialog button'))
+      .find((item) => item.textContent?.trim() === 'Cancelar')!
+      .click();
+    fixture.detectChanges();
+
+    expect(tela.querySelector('dialog')).toBeNull();
+    http.expectNone('/api/produtos');
   });
 
   it('cancela a consulta ao destruir a página', () => {
