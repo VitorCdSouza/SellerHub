@@ -50,6 +50,7 @@ func main() {
 	mux.HandleFunc("GET /api/produtos/{id}", protected(productController.Get))
 	mux.HandleFunc("POST /api/produtos", protected(productController.Create))
 	mux.HandleFunc("PUT /api/produtos/{id}", protected(productController.Update))
+	mux.HandleFunc("DELETE /api/produtos/{id}", protected(productController.Delete))
 
 	log.Print("API em http://localhost:8080")
 	log.Fatal(http.ListenAndServe("localhost:8080", mux))

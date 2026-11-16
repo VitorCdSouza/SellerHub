@@ -137,6 +137,27 @@ func (productController *ProductController) Update(writer http.ResponseWriter, r
 	}
 }
 
+func (productController *ProductController) Delete(writer http.ResponseWriter, request *http.Request) {
+	productID, ok := pathID(request)
+	if !ok {
+		respond(writer, http.StatusNotFound, false, "Produto não encontrado")
+		return
+	}
+
+	err := productController.Service.Delete(request.Context(), sessionUserID(request), productID)
+	switch {
+	case err == nil:
+		respond(writer, http.StatusOK, true, "Produto excluído")
+	case errors.Is(err, service.ErrNotFound):
+		respond(writer, http.StatusNotFound, false, "Produto não encontrado")
+	case errors.Is(err, service.ErrProductHasListings):
+		respond(writer, http.StatusConflict, false, "O produto possui anúncios e não pode ser excluído")
+	default:
+		log.Printf("excluir produto: %v", err)
+		respond(writer, http.StatusInternalServerError, false, "Não foi possível excluir o produto")
+	}
+}
+
 func decodeProduct(writer http.ResponseWriter, request *http.Request) (service.ProductInput, bool) {
 	var body productRequest
 	if err := json.NewDecoder(http.MaxBytesReader(writer, request.Body, 4096)).Decode(&body); err != nil {

@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 
 	"sellerhub/api/internal/db"
@@ -18,6 +19,8 @@ const (
 	DefaultPageSize = 20
 	MaxPageSize     = 100
 )
+
+var ErrProductHasListings = errors.New("produto possui anuncios")
 
 type ProductService struct {
 	Queries *db.Queries
@@ -100,6 +103,25 @@ func (productService *ProductService) Update(ctx context.Context, userID, produc
 		return fmt.Errorf("atualizar produto: %w", err)
 	}
 	if updated == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (productService *ProductService) Delete(ctx context.Context, userID, productID int32) error {
+	deleted, err := productService.Queries.DeleteProduto(ctx, db.DeleteProdutoParams{
+		IDProduto: productID,
+		IDUsuario: userID,
+	})
+	// 23503 e a fk de CAD_ANUNCIO barrando a exclusao
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+		return ErrProductHasListings
+	}
+	if err != nil {
+		return fmt.Errorf("excluir produto: %w", err)
+	}
+	if deleted == 0 {
 		return ErrNotFound
 	}
 	return nil

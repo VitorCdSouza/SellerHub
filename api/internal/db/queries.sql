@@ -39,6 +39,10 @@ SET sku = $3,
     preco_base = $5
 WHERE id_produto = $1 AND id_usuario = $2;
 
+-- name: DeleteProduto :execrows
+DELETE FROM CAD_PRODUTO
+WHERE id_produto = $1 AND id_usuario = $2;
+
 -- name: ListAnuncios :many
 SELECT
     a.id_anuncio,

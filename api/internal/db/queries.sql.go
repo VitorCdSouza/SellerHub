@@ -276,6 +276,24 @@ func (q *Queries) DeleteAnuncio(ctx context.Context, arg DeleteAnuncioParams) (i
 	return result.RowsAffected(), nil
 }
 
+const deleteProduto = `-- name: DeleteProduto :execrows
+DELETE FROM CAD_PRODUTO
+WHERE id_produto = $1 AND id_usuario = $2
+`
+
+type DeleteProdutoParams struct {
+	IDProduto int32
+	IDUsuario int32
+}
+
+func (q *Queries) DeleteProduto(ctx context.Context, arg DeleteProdutoParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteProduto, arg.IDProduto, arg.IDUsuario)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const getAnuncioById = `-- name: GetAnuncioById :one
 SELECT
     a.id_anuncio,

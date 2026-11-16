@@ -1,7 +1,7 @@
 .PHONY: run api web install db stop-db reset-db doc doc-clean
 
-# sobe api e web em paralelo, ctrl+c encerra os dois
-run:
+# sobe o banco e depois api e web em paralelo, ctrl+c encerra api e web
+run: db
 	$(MAKE) -j2 api web
 
 api:
