@@ -1,4 +1,3 @@
-import { RouterLink } from '@angular/router';
 import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
 import {
   ChangeDetectionStrategy,
@@ -13,6 +12,7 @@ import { CurrencyPipe } from '@angular/common';
 import { EMPTY, Subject, catchError, finalize, startWith, switchMap } from 'rxjs';
 import { ProdutosService } from './produtos.service';
 import { NovoProdutoComponent } from './novo-produto/novo-produto.component';
+import { EditarProdutoComponent } from './editar-produto/editar-produto.component';
 import { ExcluirProdutoComponent } from './excluir-produto/excluir-produto.component';
 import { Produto } from './produto.model';
 
@@ -20,9 +20,9 @@ import { Produto } from './produto.model';
   selector: 'app-produtos',
   imports: [
     CurrencyPipe,
-    RouterLink,
     FocoPaginaDirective,
     NovoProdutoComponent,
+    EditarProdutoComponent,
     ExcluirProdutoComponent,
   ],
   templateUrl: './produtos.component.html',
@@ -41,6 +41,7 @@ export class ProdutosComponent {
   protected readonly carregando = signal(false);
   protected readonly erro = signal('');
   protected readonly cadastroAberto = signal(false);
+  protected readonly produtoEditando = signal<Produto | null>(null);
   protected readonly produtoExcluindo = signal<Produto | null>(null);
 
   protected readonly totalPaginas = computed(() =>
@@ -106,6 +107,11 @@ export class ProdutosComponent {
     const area = botao.getBoundingClientRect();
     menu.style.top = `${area.bottom + window.scrollY + 4}px`;
     menu.style.left = `${area.left + window.scrollX}px`;
+  }
+
+  protected abrirEdicao(produto: Produto, evento: Event): void {
+    (evento.target as HTMLElement).closest<HTMLElement>('[popover]')?.hidePopover();
+    this.produtoEditando.set(produto);
   }
 
   protected abrirExclusao(produto: Produto, evento: Event): void {

@@ -4,7 +4,7 @@
   --cor-texto: #182335;
   --cor-texto-secundario: #526075;
   --cor-divisoria: #e4e8ef;
-  --cor-borda-campo: #8290a4;
+  --cor-borda-campo: #c5ccd6;
   --cor-primaria: #244bc1;
   --cor-primaria-escura: #1d3b96;
   --cor-primaria-suave: #edf2ff;
@@ -67,13 +67,12 @@ input[type='checkbox']:focus-visible,
 }
 
 .campo-texto:hover:not(:disabled, :focus) {
-  border-color: #5f6b7d;
+  border-color: #a3adbb;
 }
 
 .campo-texto:focus {
   outline: none;
-  border-color: var(--cor-primaria);
-  box-shadow: 0 0 0 3px rgb(36 75 193 / 18%);
+  box-shadow: 0 0 0 2px rgb(36 75 193 / 10%);
 }
 
 .campo-texto[aria-invalid='true'] {
@@ -81,7 +80,7 @@ input[type='checkbox']:focus-visible,
 }
 
 .campo-texto[aria-invalid='true']:focus {
-  box-shadow: 0 0 0 3px rgb(160 30 45 / 15%);
+  box-shadow: 0 0 0 2px rgb(160 30 45 / 15%);
 }
 
 .campo-texto:disabled {

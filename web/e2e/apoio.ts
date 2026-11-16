@@ -1,4 +1,4 @@
-import { expect, test as base, type Page, type TestInfo } from '@playwright/test';
+import { expect, test as base, type Locator, type Page, type TestInfo } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { writeFile } from 'node:fs/promises';
 
@@ -27,6 +27,14 @@ export async function entrar(page: Page, email = conta.email) {
   await page.getByLabel('Senha', { exact: true }).fill(conta.password);
   await page.getByRole('button', { name: 'Entrar', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
+}
+
+export async function abrirEdicao(page: Page, linha: Locator = page.getByRole('row').nth(1)) {
+  await linha.getByRole('button', { name: /^Opções de / }).click();
+  await linha.getByRole('button', { name: 'Editar', exact: true }).click();
+  const modal = page.getByRole('dialog', { name: 'Editar produto' });
+  await expect(modal).toBeVisible();
+  return modal;
 }
 
 export async function capturar(page: Page, info: TestInfo, nome: string) {

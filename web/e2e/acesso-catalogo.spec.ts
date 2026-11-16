@@ -1,4 +1,4 @@
-import { test, expect, conta, entrar, capturar } from './apoio';
+import { test, expect, conta, entrar, capturar, abrirEdicao } from './apoio';
 
 test('login inválido, entrada por teclado, recarga e saída reais', async ({ page }, info) => {
   await page.goto('/');
@@ -32,8 +32,8 @@ test('acesso anônimo preserva a URL após o login', async ({ page }) => {
 });
 
 test('navega pelo catálogo real e cancela sem gravar', async ({ page, produtoId }) => {
-  await page.goto(`/produtos/${produtoId}`);
-  await page.getByRole('navigation', { name: 'Menu principal' }).getByRole('link', { name: 'Produtos' }).click();
+  expect(produtoId).toBeGreaterThan(0);
+  await page.goto('/produtos');
   await expect(page.getByRole('table')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anterior', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
@@ -50,32 +50,11 @@ test('navega pelo catálogo real e cancela sem gravar', async ({ page, produtoId
   await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
   await page.keyboard.press('Escape');
   await expect(modal).toHaveCount(0);
-  await page.goto(`/produtos/${produtoId}`);
-  await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
-  await page.getByRole('link', { name: 'Editar produto', exact: true }).click();
-  await expect(page.getByLabel('Nome', { exact: true })).not.toHaveValue('');
-  await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
-  await expect(page).toHaveURL(`/produtos/${produtoId}`);
-});
-
-test('produto de outra conta recebe 404 real no detalhe e na edição', async ({
-  page,
-  produtoId,
-}) => {
-  const resposta = await page.request.post('/api/login', {
-    data: { ...conta, email: 'samuel@sellerhub.com' },
-  });
-  expect(resposta.status()).toBe(200);
-  for (const caminho of [`/produtos/${produtoId}`, `/produtos/${produtoId}/editar`]) {
-    const leitura = page.waitForResponse(
-      (r) => new URL(r.url()).pathname === `/api/produtos/${produtoId}`,
-    );
-    await page.goto(caminho);
-    expect((await leitura).status()).toBe(404);
-    await expect(page.getByText('Produto não encontrado.', { exact: true })).toBeVisible();
-    await expect(page.getByLabel('Nome', { exact: true })).toHaveCount(0);
-    await expect(page.getByText('samuel@sellerhub.com', { exact: true })).toBeVisible();
-  }
+  const edicao = await abrirEdicao(page);
+  await expect(edicao.getByLabel('Nome', { exact: true })).not.toHaveValue('');
+  await edicao.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  await expect(edicao).toHaveCount(0);
+  await expect(page).toHaveURL('/produtos');
 });
 
 test('perda do cookie durante uso exige login e recupera o destino', async ({
@@ -83,29 +62,31 @@ test('perda do cookie durante uso exige login e recupera o destino', async ({
   context,
   produtoId,
 }) => {
-  await page.goto(`/produtos/${produtoId}`);
+  await page.goto('/produtos');
   await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
+  const edicao = await abrirEdicao(page);
   await context.clearCookies();
-  await page.getByRole('navigation', { name: 'Menu principal' }).getByRole('link', { name: 'Produtos' }).click();
+  await edicao.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
   await expect(page).toHaveURL(/motivo=expirada/);
   await expect(page.getByRole('table')).toHaveCount(0);
   await entrar(page);
   await expect(page).toHaveURL('/produtos');
-  await expect(page.getByRole('table').getByRole('link').first()).toBeVisible();
+  await expect(page.getByRole('row').nth(1)).toBeVisible();
   expect(produtoId).toBeGreaterThan(0);
 });
 
 test('falha controlada de rede na sessão permite recuperação', async ({ page, produtoId }) => {
   await page.route('**/api/sessao', (route) => route.abort('connectionrefused'));
-  await page.goto(`/produtos/${produtoId}`);
+  await page.goto('/produtos');
   await expect(
     page.getByRole('heading', { name: 'Não foi possível verificar seu acesso' }),
   ).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('table')).toHaveCount(0);
   await page.unroute('**/api/sessao');
   await page.getByRole('button', { name: 'Tentar novamente', exact: true }).click();
-  await expect(page).toHaveURL(`/produtos/${produtoId}`);
-  await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
+  await expect(page).toHaveURL('/produtos');
+  await expect(page.getByRole('table')).toBeVisible();
+  expect(produtoId).toBeGreaterThan(0);
 });
 
 test('500 controlado na lista permite tentar novamente na API real', async ({
@@ -139,16 +120,17 @@ test('500 controlado no PUT preserva os valores digitados sem alterar o banco', 
       json: { success: false, message: 'Falha controlada do E2E' },
     });
   });
-  await page.goto(`/produtos/${produtoId}/editar`);
-  await expect(page.getByLabel('Nome', { exact: true })).not.toHaveValue('');
-  await page.getByLabel('Nome', { exact: true }).fill('Edição local preservada');
-  await page.getByLabel('Preço base (R$)').fill('42,01');
-  await page.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
+  await page.goto('/produtos');
+  const edicao = await abrirEdicao(page);
+  await expect(edicao.getByLabel('Nome', { exact: true })).not.toHaveValue('');
+  await edicao.getByLabel('Nome', { exact: true }).fill('Edição local preservada');
+  await edicao.getByLabel('Preço base (R$)').fill('42,01');
+  await edicao.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
   await expect(
-    page.getByRole('alert').filter({ hasText: 'Não foi possível salvar' }),
+    edicao.getByRole('alert').filter({ hasText: 'Não foi possível salvar' }),
   ).toBeVisible();
-  await expect(page.getByLabel('Nome', { exact: true })).toHaveValue('Edição local preservada');
-  await expect(page.getByLabel('Preço base (R$)')).toHaveValue('42,01');
+  await expect(edicao.getByLabel('Nome', { exact: true })).toHaveValue('Edição local preservada');
+  await expect(edicao.getByLabel('Preço base (R$)')).toHaveValue('42,01');
   expect(envios).toBe(1);
   await capturar(page, info, 'falha-gravacao-controlada');
 });

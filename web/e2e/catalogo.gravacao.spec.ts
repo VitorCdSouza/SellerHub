@@ -1,4 +1,4 @@
-import { test, expect, entrar, capturar } from './apoio';
+import { test, expect, entrar, capturar, abrirEdicao } from './apoio';
 
 test('cadastra ou retoma um produto QA e edita pela interface real', async ({ page }, info) => {
   let sku = `QA-E2E-${Date.now()}`;
@@ -57,32 +57,23 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     await expect(page.getByRole('table')).toBeVisible();
   }
   await expect(linha).toContainText(precoInicial.toFixed(2).replace('.', ','));
-  await linha.getByRole('link').click();
-  await expect(page).toHaveURL(`/produtos/${id}`);
-  await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
-  await page.reload();
-  await expect(
-    page.getByRole('heading', {
-      name: retomar ? new RegExp(`^${nome}( editado)?$`) : nome,
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.getByRole('link', { name: 'Editar produto', exact: true }).click();
-  await page.getByLabel('Nome', { exact: true }).fill(`${nome} editado`);
-  await page.getByLabel('Preço base (R$)').fill('42,01');
+  const edicao = await abrirEdicao(page, linha);
+  await expect(edicao.getByLabel('Nome', { exact: true })).toHaveValue(
+    retomar ? new RegExp(`^${nome}( editado)?$`) : nome,
+  );
+  await edicao.getByLabel('Nome', { exact: true }).fill(`${nome} editado`);
+  await edicao.getByLabel('Preço base (R$)').fill('42,01');
   const atualizacao = page.waitForResponse((r) => r.request().method() === 'PUT');
-  await page.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
+  await edicao.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
   expect((await atualizacao).status()).toBe(200);
-  await expect(page).toHaveURL(`/produtos/${id}`);
-  await page.reload();
-  await expect(page.getByRole('heading', { name: `${nome} editado`, exact: true })).toBeVisible();
+  await expect(edicao).toHaveCount(0);
+  await expect(page).toHaveURL('/produtos');
   const consulta = await page.request.get(`/api/produtos/${id}`);
   expect(await consulta.json()).toEqual({ id, name: `${nome} editado`, sku, basePrice: 42.01 });
   await capturar(page, info, 'produto-gravado');
   await page.getByRole('button', { name: 'Sair', exact: true }).click();
-  await page.goto(`/produtos/${id}`);
   await expect(page.getByRole('heading', { name: 'Entre na sua conta' })).toBeVisible();
   await entrar(page, 'samuel@sellerhub.com');
-  await expect(page.getByText('Produto não encontrado.', { exact: true })).toBeVisible();
+  expect((await page.request.get(`/api/produtos/${id}`)).status()).toBe(404);
   await page.getByRole('button', { name: 'Sair', exact: true }).click();
 });

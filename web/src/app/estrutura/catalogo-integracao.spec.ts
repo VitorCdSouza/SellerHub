@@ -12,7 +12,8 @@ describe('Integração da estrutura, sessão e catálogo', () => {
   const produto = { id: 5, name: 'Produto da conta A', sku: 'QA-5', basePrice: 35.5 };
 
   beforeEach(async () => {
-    // jsdom nao implementa showModal nem close
+    // jsdom nao implementa showModal, close nem hidePopover
+    HTMLElement.prototype.hidePopover = function () {};
     HTMLDialogElement.prototype.showModal = function () {
       this.open = true;
     };
@@ -61,32 +62,25 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     harness.detectChanges();
   }
 
-  it.each(['/produtos', '/produtos/5', '/produtos/5/editar'])(
-    'protege acesso direto a %s e preserva o destino para novo login',
-    async (caminho) => {
-      const navegacao = harness.navigateByUrl(caminho);
-      await vi.waitFor(() => expect(TestBed.inject(AuthService).estado()).toBe('consultando'));
-      http.expectNone((req) => req.url.startsWith('/api/produtos'));
-      http.expectOne('/api/sessao').flush({}, { status: 401, statusText: 'Unauthorized' });
-      await navegacao;
-      expect(router.parseUrl(router.url).queryParams['retorno']).toBe(caminho);
-      expect(tela().querySelector('form')).not.toBeNull();
-      expect(tela().querySelector('.conta')).toBeNull();
-    },
-  );
+  it('protege acesso direto a /produtos e preserva o destino para novo login', async () => {
+    const navegacao = harness.navigateByUrl('/produtos');
+    await vi.waitFor(() => expect(TestBed.inject(AuthService).estado()).toBe('consultando'));
+    http.expectNone((req) => req.url.startsWith('/api/produtos'));
+    http.expectOne('/api/sessao').flush({}, { status: 401, statusText: 'Unauthorized' });
+    await navegacao;
+    expect(router.parseUrl(router.url).queryParams['retorno']).toBe('/produtos');
+    expect(tela().querySelector('form')).not.toBeNull();
+    expect(tela().querySelector('.conta')).toBeNull();
+  });
 
-  it('leva ao catálogo pelo menu lateral', async () => {
-    await autenticar('/produtos/5');
-    http.expectOne('/api/produtos/5').flush(produto);
-    tela().querySelector<HTMLAnchorElement>('nav a[href="/produtos"]')!.click();
-    await harness.fixture.whenStable();
+  it('marca o catálogo como ativo no menu lateral', async () => {
+    await autenticar('/produtos');
     responderLista();
-    expect(router.url).toBe('/produtos');
     expect(tela().querySelector('nav a[aria-current="page"]')?.textContent).toContain('Produtos');
     expect(tela().textContent).toContain('35,50');
   });
 
-  it('compõe cadastro, detalhe, edição e retorno à lista com os DTOs reais', async () => {
+  it('compõe cadastro e edição pela lista com os DTOs reais', async () => {
     await autenticar('/produtos');
     responderLista([]);
     Array.from(tela().querySelectorAll<HTMLButtonElement>('button'))
@@ -113,13 +107,11 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     expect(tela().querySelector('dialog')).toBeNull();
     expect(tela().textContent).toContain('Produto novo');
 
-    await harness.navigateByUrl('/produtos/5');
-    http.expectOne('/api/produtos/5').flush(criado);
+    Array.from(tela().querySelectorAll<HTMLButtonElement>('.menu-opcoes button'))
+      .find((botao) => botao.textContent?.includes('Editar'))!
+      .click();
     harness.detectChanges();
-    expect(tela().textContent).toContain('Produto novo');
-    await harness.navigateByUrl('/produtos/5/editar');
-    http.expectOne('/api/produtos/5').flush(criado);
-    harness.detectChanges();
+    expect(tela().querySelector('dialog')?.open).toBe(true);
     expect(tela().querySelector<HTMLInputElement>('#nome')!.value).toBe('Produto novo');
     preencher('nome', 'Produto editado');
     preencher('precoBase', '42,01');
@@ -134,12 +126,9 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     atualizacao.flush({ success: true, message: 'Produto atualizado' });
     await harness.fixture.whenStable();
     const editado = { ...criado, name: 'Produto editado', basePrice: 42.01 };
-    http.expectOne('/api/produtos/5').flush(editado);
-    harness.detectChanges();
-    expect(router.url).toBe('/produtos/5');
-    expect(tela().textContent).toContain('42,01');
-    await harness.navigateByUrl('/produtos');
     responderLista([editado]);
+    expect(router.url).toBe('/produtos');
+    expect(tela().querySelector('dialog')).toBeNull();
     expect(tela().textContent).toContain('Produto editado');
     expect(tela().textContent).toContain('42,01');
   });
@@ -167,24 +156,23 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     expect(tela().textContent).toContain('Nenhum produto encontrado');
   });
 
-  it('recupera o destino de detalhe depois de indisponibilidade da sessão', async () => {
-    const navegacao = harness.navigateByUrl('/produtos/5');
+  it('recupera o destino depois de indisponibilidade da sessão', async () => {
+    const navegacao = harness.navigateByUrl('/produtos');
     await vi.waitFor(() => expect(TestBed.inject(AuthService).estado()).toBe('consultando'));
     http.expectOne('/api/sessao').flush({}, { status: 500, statusText: 'Server Error' });
     await navegacao;
     expect(router.url).toContain('/sessao-indisponivel');
-    http.expectNone('/api/produtos/5');
+    http.expectNone((req) => req.url.startsWith('/api/produtos'));
     tela().querySelector<HTMLButtonElement>('button')!.click();
     http.expectOne('/api/sessao').flush({ id: 2, email: 'conta-a@exemplo.test' });
     await harness.fixture.whenStable();
-    http.expectOne('/api/produtos/5').flush(produto);
-    harness.detectChanges();
-    expect(router.url).toBe('/produtos/5');
+    responderLista();
+    expect(router.url).toBe('/produtos');
     expect(tela().textContent).toContain('Produto da conta A');
   });
 
-  it('retoma a URL de edição depois do login solicitado pelo guard', async () => {
-    const navegacao = harness.navigateByUrl('/produtos/5/editar');
+  it('retoma a URL protegida depois do login solicitado pelo guard', async () => {
+    const navegacao = harness.navigateByUrl('/produtos');
     await vi.waitFor(() => expect(TestBed.inject(AuthService).estado()).toBe('consultando'));
     http.expectOne('/api/sessao').flush({}, { status: 401, statusText: 'Unauthorized' });
     await navegacao;
@@ -194,20 +182,21 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     http.expectOne('/api/login').flush({ success: true, message: 'Login realizado' });
     http.expectOne('/api/sessao').flush({ id: 2, email: 'conta-a@exemplo.test' });
     await harness.fixture.whenStable();
-    http.expectOne('/api/produtos/5').flush(produto);
-    harness.detectChanges();
-    expect(router.url).toBe('/produtos/5/editar');
-    expect(tela().querySelector<HTMLInputElement>('#nome')!.value).toBe('Produto da conta A');
+    responderLista();
+    expect(router.url).toBe('/produtos');
+    expect(tela().textContent).toContain('Produto da conta A');
   });
 
-  it('retorna ao login com o destino original se a API expirar o acesso ao detalhe', async () => {
-    await autenticar('/produtos/5');
-    http.expectOne('/api/produtos/5').flush({}, { status: 401, statusText: 'Unauthorized' });
+  it('retorna ao login com o destino original se a API expirar o acesso ao catálogo', async () => {
+    await autenticar('/produtos');
+    http
+      .expectOne('/api/produtos?pagina=1&limite=20')
+      .flush({}, { status: 401, statusText: 'Unauthorized' });
     await harness.fixture.whenStable();
     harness.detectChanges();
     expect(router.parseUrl(router.url).queryParams).toEqual({
       motivo: 'expirada',
-      retorno: '/produtos/5',
+      retorno: '/produtos',
     });
     expect(tela().textContent).toContain('Sua sessão expirou');
     expect(tela().textContent).not.toContain('Produto da conta A');

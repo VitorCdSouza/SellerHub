@@ -1,7 +1,50 @@
-:host {
-  display: block;
+.dialogo {
+  width: min(40rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 4px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: 0 20px 48px rgb(20 43 73 / 24%);
 }
 
-.formulario {
-  max-width: 45rem;
+.dialogo::backdrop {
+  background: rgb(24 35 53 / 45%);
+}
+
+h2 {
+  margin: 0;
+  padding: 1.75rem 2rem 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+app-produto-formulario {
+  padding: 1.5rem 2rem;
+}
+
+.acoes-dialogo {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 2rem 1.5rem;
+  border-top: 1px solid var(--cor-divisoria);
+}
+
+@media (max-width: 600px) {
+  h2 {
+    padding: 1.25rem 1.25rem 0;
+  }
+
+  app-produto-formulario {
+    padding: 1.25rem;
+  }
+
+  .acoes-dialogo {
+    padding: 1rem 1.25rem 1.25rem;
+  }
 }

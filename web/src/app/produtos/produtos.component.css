@@ -42,17 +42,6 @@ tbody tr:hover {
   background: #f9fafc;
 }
 
-.nome {
-  color: var(--cor-texto);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.nome:hover {
-  color: var(--cor-primaria);
-  text-decoration: underline;
-}
-
 .sku {
   color: #3a4659;
   font-family: var(--fonte-mono);
@@ -110,7 +99,6 @@ tbody tr:hover {
   box-shadow: 0 12px 28px rgb(20 43 73 / 16%);
 }
 
-.menu-opcoes a,
 .menu-opcoes button {
   display: block;
   width: 100%;
@@ -121,11 +109,9 @@ tbody tr:hover {
   color: var(--cor-texto);
   font: inherit;
   text-align: left;
-  text-decoration: none;
   cursor: pointer;
 }
 
-.menu-opcoes a:hover,
 .menu-opcoes button:hover {
   background: var(--cor-fundo);
 }

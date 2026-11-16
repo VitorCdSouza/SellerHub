@@ -70,15 +70,13 @@
                     [id]="'opcoes-' + produto.id"
                     (beforetoggle)="posicionarMenu($event, botaoOpcoes)"
                   >
-                    <a [routerLink]="['/produtos', produto.id, 'editar']">Editar</a>
+                    <button type="button" (click)="abrirEdicao(produto, $event)">Editar</button>
                     <button type="button" class="perigo" (click)="abrirExclusao(produto, $event)">
                       Excluir
                     </button>
                   </div>
                 </td>
-                <td>
-                  <a class="nome" [routerLink]="['/produtos', produto.id]">{{ produto.nome }}</a>
-                </td>
+                <td>{{ produto.nome }}</td>
                 <td class="sku">{{ produto.sku }}</td>
                 <td class="numero">
                   {{ produto.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
@@ -124,6 +122,14 @@
 
   @if (cadastroAberto()) {
     <app-novo-produto (cadastrado)="recarregar()" (fechado)="cadastroAberto.set(false)" />
+  }
+
+  @if (produtoEditando(); as produto) {
+    <app-editar-produto
+      [produto]="produto"
+      (atualizado)="recarregar()"
+      (fechado)="produtoEditando.set(null)"
+    />
   }
 
   @if (produtoExcluindo(); as produto) {

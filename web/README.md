@@ -74,7 +74,7 @@ Usar os mesmos métodos de `ProdutosService` nos dois ambientes, sem condições
 
 Ao carregar a página ou trocar o ID, usar `switchMap` para cancelar a leitura anterior, e `takeUntilDestroyed` para encerrar a assinatura ao destruir o componente. Tratar o erro dentro da leitura para que uma falha não encerre futuras tentativas. Não usar nova tentativa automática em POST/PUT; bloqueio de clique repetido e preservação dos campos ficam no formulário. Os testes de navegação em `src/app/autenticacao/navegacao.spec.ts` demonstram o uso da estrutura real com respostas HTTP controladas.
 
-Rotas do catálogo: `/produtos`, `/produtos/novo`, `/produtos/:id` e `/produtos/:id/editar`, registradas sob o pai protegido. Produtos está ativo no menu; o login ainda direciona a `/inicio`. Usar `appFocoPagina` no título para foco inicial e manter somente o `<main>` fornecido pela estrutura. Catálogo não precisa consultar sessão novamente nem enviar identificador de usuário. O formulário de nome/SKU/preço é compartilhado por cadastro e edição.
+Rota do catálogo: `/produtos`, registrada sob o pai protegido. Cadastro, edição e exclusão abrem em modal sobre a lista. Produtos está ativo no menu; o login ainda direciona a `/inicio`. Usar `appFocoPagina` no título para foco inicial e manter somente o `<main>` fornecido pela estrutura. Catálogo não precisa consultar sessão novamente nem enviar identificador de usuário. O formulário de nome/SKU/preço é compartilhado pelos modais de cadastro e edição.
 
 ## Verificação
 
@@ -186,9 +186,8 @@ Com a configuração real, seguir a ordem abaixo usando as contas fictícias de 
 | --- | --- |
 | Login → Ver produtos → Novo produto | Rotas protegidas, conta correta e formulário básico disponíveis. |
 | Preencher nome/SKU e preço `35,50`; salvar uma vez | Retornar à lista com o novo registro e preço em reais. |
-| Abrir detalhe e recarregar | Mesmo ID e dados persistidos; sem formulário de cadastro vazio. |
-| Abrir edição, alterar nome/preço, salvar e voltar à lista | Detalhe/lista mostram a gravação; nova recarga mantém os valores. |
-| Sair, tentar voltar e entrar com outra conta | Login exigido após saída e dados da conta anterior ausentes. O ID da outra conta retorna não encontrado. |
+| Opções → Editar, alterar nome/preço e salvar | Modal fecha e a lista mostra a gravação; nova recarga mantém os valores. |
+| Sair, tentar voltar e entrar com outra conta | Login exigido após saída e dados da conta anterior ausentes. O produto da outra conta não aparece na lista. |
 | Navegar por teclado e em 390 px | Ações legíveis/operáveis, foco coerente e erros associados; executar AXE nos estados principais. |
 
 Testes de rotas/componentes com HttpTestingController cobrem a composição da estrutura sem banco. O arquivo `src/app/estrutura/catalogo-integracao.spec.ts` usa as rotas, configuração, componentes e serviço reais do Angular com respostas controladas; não equivale à execução desse roteiro no navegador.

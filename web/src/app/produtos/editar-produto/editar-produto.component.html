@@ -1,47 +1,25 @@
-<section aria-labelledby="titulo-edicao">
-  <header class="cabecalho-pagina">
-    <div>
-      <a routerLink="/produtos" class="link-voltar">Produtos</a>
-      <h1 id="titulo-edicao" appFocoPagina>Editar produto</h1>
-    </div>
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-edicao"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-edicao">Editar produto</h2>
 
-    @if (dadosIniciais()) {
-      <div class="acoes-pagina">
-        <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="cancelar()">
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          form="formulario-produto"
-          class="botao-primario"
-          [disabled]="enviando()"
-        >
-          {{ enviando() ? 'Salvando...' : 'Salvar alterações' }}
-        </button>
-      </div>
-    }
-  </header>
+  <app-produto-formulario
+    [dadosIniciais]="produto()"
+    [enviando]="enviando()"
+    [erroEnvio]="erro()"
+    (salvar)="salvar($event)"
+  />
 
-  @if (carregando()) {
-    <p class="estado" role="status">Carregando produto...</p>
-  } @else if (erroCarregamento()) {
-    <div class="estado erro" role="alert">
-      <p>{{ erroCarregamento() }}</p>
-      <div class="acoes-pagina">
-        <button type="button" class="botao-secundario" (click)="tentarNovamente()">
-          Tentar novamente
-        </button>
-        <a class="botao-primario" routerLink="/produtos">Voltar para produtos</a>
-      </div>
-    </div>
-  } @else if (dadosIniciais()) {
-    <div class="cartao formulario">
-      <app-produto-formulario
-        [dadosIniciais]="dadosIniciais()"
-        [enviando]="enviando()"
-        [erroEnvio]="erroEnvio()"
-        (salvar)="salvar($event)"
-      />
-    </div>
-  }
-</section>
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    <button type="submit" form="formulario-produto" class="botao-primario" [disabled]="enviando()">
+      {{ enviando() ? 'Salvando...' : 'Salvar alterações' }}
+    </button>
+  </div>
+</dialog>

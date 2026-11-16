@@ -1,4 +1,4 @@
-import { test, expect, auditar } from './apoio';
+import { test, expect, auditar, abrirEdicao } from './apoio';
 
 test('AXE e captura do login', async ({ page }, info) => {
   await page.goto('/');
@@ -6,24 +6,20 @@ test('AXE e captura do login', async ({ page }, info) => {
   await auditar(page, info);
 });
 
-for (const tela of ['lista', 'cadastro', 'detalhe', 'edicao'] as const) {
+for (const tela of ['lista', 'cadastro', 'edicao'] as const) {
   test(`AXE, foco e largura da página: ${tela}`, async ({ page, produtoId }, info) => {
-    const caminhos = {
-      lista: '/produtos',
-      cadastro: '/produtos',
-      detalhe: `/produtos/${produtoId}`,
-      edicao: `/produtos/${produtoId}/editar`,
-    };
-    await page.goto(caminhos[tela]);
+    expect(produtoId).toBeGreaterThan(0);
+    await page.goto('/produtos');
     await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
-    if (tela === 'lista' || tela === 'cadastro') await expect(page.getByRole('table')).toBeVisible();
-    if (tela === 'detalhe')
-      await expect(page.getByRole('link', { name: 'Editar produto', exact: true })).toBeVisible();
-    if (tela === 'edicao') await expect(page.getByLabel('Nome', { exact: true })).not.toHaveValue('');
+    await expect(page.getByRole('table')).toBeVisible();
     if (tela === 'cadastro') {
       await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
       const modal = page.getByRole('dialog', { name: 'Novo produto' });
       await expect(modal).toBeVisible();
+      await expect.soft(modal.getByLabel('Nome', { exact: true })).toBeFocused({ timeout: 2_000 });
+    } else if (tela === 'edicao') {
+      const modal = await abrirEdicao(page);
+      await expect(modal.getByLabel('Nome', { exact: true })).not.toHaveValue('');
       await expect.soft(modal.getByLabel('Nome', { exact: true })).toBeFocused({ timeout: 2_000 });
     } else {
       await expect.soft(page.getByRole('heading', { level: 1 })).toBeFocused({ timeout: 2_000 });

@@ -58,18 +58,6 @@ describe('Contrato de produtos com a API', () => {
     expect(erro).toHaveBeenCalledWith(expect.objectContaining({ status: 404 }));
   });
 
-  it('adapta o detalhe sem incluir dados de autoria no contrato', () => {
-    service.consultar(5).subscribe((produto) =>
-      expect(produto).toEqual({
-        id: 5,
-        nome: 'Peça',
-        sku: 'P-1',
-        precoBase: 35.5,
-      }),
-    );
-    http.expectOne('/api/produtos/5').flush({ id: 5, name: 'Peça', sku: 'P-1', basePrice: 35.5 });
-  });
-
   it('exclui pelo identificador sem enviar corpo', () => {
     service.excluir(5).subscribe((resposta) => expect(resposta.success).toBe(true));
     const req = http.expectOne('/api/produtos/5');

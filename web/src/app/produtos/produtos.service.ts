@@ -34,12 +34,6 @@ export class ProdutosService {
     );
   }
 
-  consultar(id: number) {
-    return this.http
-      .get<ProdutoResposta>(`/api/produtos/${id}`)
-      .pipe(timeout(10_000), map(mapearProduto));
-  }
-
   cadastrar(produto: DadosProduto) {
     return this.http
       .post<{ id: number }>('/api/produtos', corpoProduto(produto), {
