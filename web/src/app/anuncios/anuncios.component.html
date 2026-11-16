@@ -1,0 +1,139 @@
+<section aria-labelledby="titulo-anuncios">
+  <header class="cabecalho-pagina">
+    <h1 id="titulo-anuncios" appFocoPagina>Anúncios</h1>
+    <button type="button" class="botao-primario" (click)="anuncioEditando.set(0)">
+      <span class="mais" aria-hidden="true">+</span> Novo anúncio
+    </button>
+  </header>
+
+  @if (carregando()) {
+    <div class="estado" role="status">Carregando anúncios...</div>
+  } @else if (erro()) {
+    <div class="estado erro" role="alert">
+      <p>{{ erro() }}</p>
+      <button type="button" class="botao-secundario" (click)="recarregar()">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (anuncios().length === 0) {
+    <div class="estado vazio">
+      <h2>Nenhum anúncio cadastrado</h2>
+      <p>Crie um anúncio a partir de um produto do catálogo.</p>
+      <button type="button" class="botao-primario" (click)="anuncioEditando.set(0)">
+        Criar primeiro anúncio
+      </button>
+    </div>
+  } @else {
+    <div class="filtros">
+      <div class="situacoes" role="group" aria-label="Filtrar por situação">
+        <button
+          type="button"
+          [class.ativa]="situacaoFiltro() === ''"
+          [attr.aria-pressed]="situacaoFiltro() === ''"
+          (click)="situacaoFiltro.set('')"
+        >
+          Todos ({{ totalFiltrado() }})
+        </button>
+        @for (situacao of situacoes; track situacao.valor) {
+          @if (contagem()[situacao.valor] || situacaoFiltro() === situacao.valor) {
+            <button
+              type="button"
+              [class.ativa]="situacaoFiltro() === situacao.valor"
+              [attr.aria-pressed]="situacaoFiltro() === situacao.valor"
+              (click)="situacaoFiltro.set(situacao.valor)"
+            >
+              {{ situacao.plural }} ({{ contagem()[situacao.valor] ?? 0 }})
+            </button>
+          }
+        }
+      </div>
+
+      <div class="busca-canal">
+        <label class="somente-leitor" for="busca-anuncio">Buscar produto</label>
+        <input
+          id="busca-anuncio"
+          type="search"
+          class="campo-texto"
+          placeholder="Buscar produto"
+          autocomplete="off"
+          [value]="busca()"
+          (input)="filtrarBusca($event)"
+        />
+        <label class="somente-leitor" for="canal-anuncio">Canal</label>
+        <select
+          id="canal-anuncio"
+          class="campo-texto"
+          [value]="canalFiltro()"
+          (change)="filtrarCanal($event)"
+        >
+          <option value="">Canal: todos</option>
+          @for (canal of canais(); track canal) {
+            <option [value]="canal">{{ canal }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (anunciosVisiveis().length === 0) {
+      <div class="estado" role="status">Nenhum anúncio corresponde aos filtros.</div>
+    } @else {
+      <div class="tabela-container">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Produto</th>
+              <th scope="col">Marketplace</th>
+              <th scope="col" class="numero">Preço</th>
+              <th scope="col">Situação</th>
+              <th scope="col"><span class="somente-leitor">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (anuncio of anunciosVisiveis(); track anuncio.id) {
+              <tr>
+                <td>
+                  <span class="produto">{{ anuncio.produto }}</span>
+                  <span class="titulo">{{ anuncio.titulo }}</span>
+                </td>
+                <td>{{ anuncio.marketplace }}</td>
+                <td class="numero">
+                  {{ anuncio.preco | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+                </td>
+                <td>
+                  <span [class]="'situacao ' + anuncio.situacao">
+                    {{ rotuloSituacao(anuncio.situacao) }}
+                  </span>
+                </td>
+                <td class="acoes">
+                  @if (editavel(anuncio)) {
+                    <button
+                      type="button"
+                      class="botao-link"
+                      [attr.aria-label]="
+                        'Editar anúncio de ' + anuncio.produto + ' no ' + anuncio.marketplace
+                      "
+                      (click)="anuncioEditando.set(anuncio.id)"
+                    >
+                      Editar
+                    </button>
+                  } @else {
+                    <span aria-hidden="true">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  @if (anuncioEditando() !== null) {
+    <app-editor-anuncio
+      [anuncioId]="anuncioEditando() || null"
+      [anuncios]="anuncios()"
+      (salvo)="recarregar()"
+      (fechado)="anuncioEditando.set(null)"
+    />
+  }
+</section>

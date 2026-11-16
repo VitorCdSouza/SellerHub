@@ -1,0 +1,41 @@
+.dialogo {
+  width: min(48rem, calc(100% - 2rem));
+}
+
+.resumo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2.5rem;
+  margin: 0 0 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--cor-divisoria);
+}
+
+.resumo dt {
+  color: var(--cor-texto-secundario);
+  font-size: 0.85rem;
+}
+
+.resumo dd {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+}
+
+.resumo .sku {
+  font-weight: 400;
+}
+
+.aviso {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+}
+
+.mensagem-erro {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}

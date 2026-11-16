@@ -1,0 +1,27 @@
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-entrada"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-entrada">Registrar entrada</h2>
+
+  <app-formulario
+    class="conteudo-dialogo"
+    identificador="formulario-entrada"
+    [campos]="campos()"
+    [enviando]="enviando()"
+    [erroEnvio]="erro()"
+    (salvar)="registrar($event)"
+  />
+
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    <button type="submit" form="formulario-entrada" class="botao-primario" [disabled]="enviando()">
+      {{ enviando() ? 'Registrando...' : 'Registrar entrada' }}
+    </button>
+  </div>
+</dialog>

@@ -25,10 +25,20 @@ export const routes: Routes = [
       {
         path: 'produtos',
         loadComponent: () =>
-          import('./produtos/produtos.component').then(
-            (m) => m.ProdutosComponent
-          ),
+          import('./produtos/produtos.component').then((m) => m.ProdutosComponent),
         title: 'Produtos | SellerHub',
+      },
+      {
+        path: 'anuncios',
+        loadComponent: () =>
+          import('./anuncios/anuncios.component').then((modulo) => modulo.AnunciosComponent),
+        title: 'Anúncios | SellerHub',
+      },
+      {
+        path: 'estoque',
+        loadComponent: () =>
+          import('./estoque/estoque.component').then((modulo) => modulo.EstoqueComponent),
+        title: 'Estoque | SellerHub',
       },
     ],
   },

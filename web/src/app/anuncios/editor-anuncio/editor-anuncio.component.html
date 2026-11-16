@@ -1,0 +1,78 @@
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-editor-anuncio"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-editor-anuncio">{{ edicao() ? 'Editar anúncio' : 'Novo anúncio' }}</h2>
+
+  @if (carregando()) {
+    <div class="conteudo-dialogo" role="status">Carregando...</div>
+  } @else if (erroLeitura()) {
+    <div class="conteudo-dialogo" role="alert">
+      <p class="mensagem-erro">{{ erroLeitura() }}</p>
+      <button type="button" class="botao-secundario" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else if (dados(); as dados) {
+    <div class="conteudo-dialogo">
+      @if (dados.detalhe; as detalhe) {
+        <dl class="resumo">
+          <div>
+            <dt>Produto</dt>
+            <dd>
+              {{ detalhe.produto }} <span class="sku">{{ detalhe.sku }}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>Canal</dt>
+            <dd>{{ detalhe.marketplace }}</dd>
+          </div>
+          <div>
+            <dt>Estoque</dt>
+            <dd>{{ detalhe.saldo }} un.</dd>
+          </div>
+        </dl>
+      }
+
+      @if (podeSalvar()) {
+        <app-formulario
+          identificador="formulario-anuncio"
+          [campos]="campos()"
+          [enviando]="enviando()"
+          [erroEnvio]="erro()"
+          (salvar)="salvar($event)"
+          (alterado)="aoAlterar($event)"
+        />
+      } @else {
+        <p class="aviso">Cadastre um produto antes de criar anúncios.</p>
+      }
+    </div>
+  }
+
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    @if (podeSalvar()) {
+      <button
+        type="submit"
+        form="formulario-anuncio"
+        class="botao-secundario"
+        [disabled]="enviando()"
+        (click)="pedirSituacao('rascunho')"
+      >
+        Salvar rascunho
+      </button>
+      <button
+        type="submit"
+        form="formulario-anuncio"
+        class="botao-primario"
+        [disabled]="enviando()"
+        (click)="pedirSituacao('aprovado')"
+      >
+        Aprovar
+      </button>
+    }
+  </div>
+</dialog>

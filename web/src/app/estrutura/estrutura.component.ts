@@ -44,6 +44,7 @@ export class EstruturaComponent {
     },
     {
       nome: 'Anúncios',
+      rota: '/anuncios',
       icone:
         'M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.42l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42zM8 7.5a.5.5 0 1 1-1 0a.5.5 0 1 1 1 0',
     },
@@ -54,6 +55,7 @@ export class EstruturaComponent {
     },
     {
       nome: 'Estoque',
+      rota: '/estoque',
       icone:
         'M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35M6 22V11h12v11M6 15h12M6 18.5h12',
     },

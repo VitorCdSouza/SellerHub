@@ -1,0 +1,70 @@
+<section aria-labelledby="titulo-estoque">
+  <header class="cabecalho-pagina">
+    <div>
+      <h1 id="titulo-estoque" appFocoPagina>Estoque</h1>
+      <p class="subtitulo">Um saldo por produto, compartilhado entre os canais.</p>
+    </div>
+    <button
+      type="button"
+      class="botao-primario"
+      [disabled]="itens().length === 0"
+      (click)="entradaAberta.set(true)"
+    >
+      Registrar entrada
+    </button>
+  </header>
+
+  @if (carregando()) {
+    <div class="estado" role="status">Carregando estoque...</div>
+  } @else if (erro()) {
+    <div class="estado erro" role="alert">
+      <p>{{ erro() }}</p>
+      <button type="button" class="botao-secundario" (click)="recarregar()">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (itens().length === 0) {
+    <div class="estado vazio">
+      <h2>Nenhum produto cadastrado</h2>
+      <p>O saldo aparece aqui depois que um produto for cadastrado.</p>
+    </div>
+  } @else {
+    <div class="tabela-container">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col">SKU</th>
+            <th scope="col" class="numero">Saldo</th>
+            <th scope="col">Anúncios</th>
+            <th scope="col">Atualizado em</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of itens(); track item.produtoId) {
+            <tr [class.sem-saldo]="item.saldo === 0">
+              <td>{{ item.nome }}</td>
+              <td class="sku">{{ item.sku }}</td>
+              <td class="numero saldo">
+                {{ item.saldo }}
+                @if (item.saldo === 0) {
+                  <span class="somente-leitor">(sem saldo)</span>
+                }
+              </td>
+              <td class="anuncios">{{ resumoAnuncios().get(item.produtoId) || '—' }}</td>
+              <td class="data">{{ item.atualizadoEm | date: 'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (entradaAberta()) {
+    <app-registrar-entrada
+      [itens]="itens()"
+      (registrada)="recarregar()"
+      (fechado)="entradaAberta.set(false)"
+    />
+  }
+</section>
