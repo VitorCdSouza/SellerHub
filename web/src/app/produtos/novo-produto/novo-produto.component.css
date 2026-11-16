@@ -4,7 +4,7 @@
   padding: 0;
   overflow-y: auto;
   border: 0;
-  border-radius: 14px;
+  border-radius: 4px;
   background: var(--cor-superficie);
   color: var(--cor-texto);
   box-shadow: 0 20px 48px rgb(20 43 73 / 24%);
