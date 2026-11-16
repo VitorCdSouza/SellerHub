@@ -4,7 +4,13 @@ FROM CAD_USUARIO
 WHERE email = $1;
 
 -- name: GetUserById :one
-SELECT id_usuario, email
+SELECT u.id_usuario, u.email, p.nome
+FROM CAD_USUARIO u
+INNER JOIN CAD_PESSOA p ON p.ID_pessoa = u.id_pessoa
+WHERE u.id_usuario = $1;
+
+-- name: GetSenhaHash :one
+SELECT senha_hash
 FROM CAD_USUARIO
 WHERE id_usuario = $1;
 
@@ -121,7 +127,7 @@ SELECT
     m.id_marketplace,
     m.nome_marketplace,
     m.taxa_comissao,
-    COUNT(p.id_produto) AS total_anuncios
+    COUNT(p.id_produto)::int AS total_anuncios
 FROM CAD_MARKETPLACE m
 LEFT JOIN CAD_ANUNCIO a ON a.id_marketplace = m.id_marketplace
 LEFT JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto AND p.id_usuario = $1
@@ -167,16 +173,16 @@ SELECT
     a.id_anuncio,
     a.titulo_anuncio,
     m.nome_marketplace,
-    a.status_campo,
-    COALESCE(SUM(h.visualizacoes), 0)::bigint AS total_visualizacoes,
-    COALESCE(SUM(h.conversoes), 0)::bigint AS total_conversoes
-FROM CAD_ANUNCIO a
+    COALESCE(SUM(h.visualizacoes), 0)::int AS total_visualizacoes,
+    COALESCE(SUM(h.conversoes), 0)::int AS total_conversoes
+FROM HIST_METRICA_ANUNCIO h
+INNER JOIN CAD_ANUNCIO a ON a.id_anuncio = h.id_anuncio
 INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
 INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
-LEFT JOIN HIST_METRICA_ANUNCIO h ON h.id_anuncio = a.id_anuncio
-WHERE p.id_usuario = $1
-GROUP BY a.id_anuncio, a.titulo_anuncio, m.nome_marketplace, a.status_campo
-ORDER BY total_conversoes DESC, total_visualizacoes DESC;
+WHERE p.id_usuario = sqlc.arg(id_usuario)
+  AND h.data_referencia BETWEEN sqlc.arg(inicio)::date AND sqlc.arg(fim)::date
+GROUP BY a.id_anuncio, a.titulo_anuncio, m.nome_marketplace
+ORDER BY total_visualizacoes DESC, a.id_anuncio;
 
 -- name: ListMetricasPorDia :many
 SELECT
@@ -238,10 +244,21 @@ INSERT INTO CAD_USUARIO (
     $1, $2, $3, $4
 ) RETURNING id_usuario;
 
--- name: UpdateUsuario :execrows
+-- name: UpdateConta :execrows
+WITH usuario AS (
+    UPDATE CAD_USUARIO
+    SET email = sqlc.arg(email)
+    WHERE id_usuario = sqlc.arg(id_usuario)
+    RETURNING id_pessoa
+)
+UPDATE CAD_PESSOA p
+SET nome = sqlc.arg(nome)
+FROM usuario
+WHERE p.ID_pessoa = usuario.id_pessoa;
+
+-- name: UpdateSenha :execrows
 UPDATE CAD_USUARIO
-SET login_campo = $2,
-    email = $3
+SET senha_hash = $2
 WHERE id_usuario = $1;
 
 -- name: ListAuditoria :many

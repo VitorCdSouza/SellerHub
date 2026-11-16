@@ -435,6 +435,19 @@ func (q *Queries) GetResumoMetricasUsuario(ctx context.Context, arg GetResumoMet
 	return i, err
 }
 
+const getSenhaHash = `-- name: GetSenhaHash :one
+SELECT senha_hash
+FROM CAD_USUARIO
+WHERE id_usuario = $1
+`
+
+func (q *Queries) GetSenhaHash(ctx context.Context, idUsuario int32) (string, error) {
+	row := q.db.QueryRow(ctx, getSenhaHash, idUsuario)
+	var senha_hash string
+	err := row.Scan(&senha_hash)
+	return senha_hash, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id_usuario, senha_hash
 FROM CAD_USUARIO
@@ -454,20 +467,22 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id_usuario, email
-FROM CAD_USUARIO
-WHERE id_usuario = $1
+SELECT u.id_usuario, u.email, p.nome
+FROM CAD_USUARIO u
+INNER JOIN CAD_PESSOA p ON p.ID_pessoa = u.id_pessoa
+WHERE u.id_usuario = $1
 `
 
 type GetUserByIdRow struct {
 	IDUsuario int32
 	Email     string
+	Nome      string
 }
 
 func (q *Queries) GetUserById(ctx context.Context, idUsuario int32) (GetUserByIdRow, error) {
 	row := q.db.QueryRow(ctx, getUserById, idUsuario)
 	var i GetUserByIdRow
-	err := row.Scan(&i.IDUsuario, &i.Email)
+	err := row.Scan(&i.IDUsuario, &i.Email, &i.Nome)
 	return i, err
 }
 
@@ -664,7 +679,7 @@ SELECT
     m.id_marketplace,
     m.nome_marketplace,
     m.taxa_comissao,
-    COUNT(p.id_produto) AS total_anuncios
+    COUNT(p.id_produto)::int AS total_anuncios
 FROM CAD_MARKETPLACE m
 LEFT JOIN CAD_ANUNCIO a ON a.id_marketplace = m.id_marketplace
 LEFT JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto AND p.id_usuario = $1
@@ -676,7 +691,7 @@ type ListMarketplacesComResumoRow struct {
 	IDMarketplace   int32
 	NomeMarketplace string
 	TaxaComissao    pgtype.Numeric
-	TotalAnuncios   int64
+	TotalAnuncios   int32
 }
 
 func (q *Queries) ListMarketplacesComResumo(ctx context.Context, idUsuario int32) ([]ListMarketplacesComResumoRow, error) {
@@ -709,29 +724,34 @@ SELECT
     a.id_anuncio,
     a.titulo_anuncio,
     m.nome_marketplace,
-    a.status_campo,
-    COALESCE(SUM(h.visualizacoes), 0)::bigint AS total_visualizacoes,
-    COALESCE(SUM(h.conversoes), 0)::bigint AS total_conversoes
-FROM CAD_ANUNCIO a
+    COALESCE(SUM(h.visualizacoes), 0)::int AS total_visualizacoes,
+    COALESCE(SUM(h.conversoes), 0)::int AS total_conversoes
+FROM HIST_METRICA_ANUNCIO h
+INNER JOIN CAD_ANUNCIO a ON a.id_anuncio = h.id_anuncio
 INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
 INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
-LEFT JOIN HIST_METRICA_ANUNCIO h ON h.id_anuncio = a.id_anuncio
 WHERE p.id_usuario = $1
-GROUP BY a.id_anuncio, a.titulo_anuncio, m.nome_marketplace, a.status_campo
-ORDER BY total_conversoes DESC, total_visualizacoes DESC
+  AND h.data_referencia BETWEEN $2::date AND $3::date
+GROUP BY a.id_anuncio, a.titulo_anuncio, m.nome_marketplace
+ORDER BY total_visualizacoes DESC, a.id_anuncio
 `
+
+type ListMetricasPorAnuncioParams struct {
+	IDUsuario int32
+	Inicio    pgtype.Date
+	Fim       pgtype.Date
+}
 
 type ListMetricasPorAnuncioRow struct {
 	IDAnuncio          int32
 	TituloAnuncio      string
 	NomeMarketplace    string
-	StatusCampo        string
-	TotalVisualizacoes int64
-	TotalConversoes    int64
+	TotalVisualizacoes int32
+	TotalConversoes    int32
 }
 
-func (q *Queries) ListMetricasPorAnuncio(ctx context.Context, idUsuario int32) ([]ListMetricasPorAnuncioRow, error) {
-	rows, err := q.db.Query(ctx, listMetricasPorAnuncio, idUsuario)
+func (q *Queries) ListMetricasPorAnuncio(ctx context.Context, arg ListMetricasPorAnuncioParams) ([]ListMetricasPorAnuncioRow, error) {
+	rows, err := q.db.Query(ctx, listMetricasPorAnuncio, arg.IDUsuario, arg.Inicio, arg.Fim)
 	if err != nil {
 		return nil, err
 	}
@@ -743,7 +763,6 @@ func (q *Queries) ListMetricasPorAnuncio(ctx context.Context, idUsuario int32) (
 			&i.IDAnuncio,
 			&i.TituloAnuncio,
 			&i.NomeMarketplace,
-			&i.StatusCampo,
 			&i.TotalVisualizacoes,
 			&i.TotalConversoes,
 		); err != nil {
@@ -938,6 +957,33 @@ func (q *Queries) UpdateAnuncio(ctx context.Context, arg UpdateAnuncioParams) er
 	return err
 }
 
+const updateConta = `-- name: UpdateConta :execrows
+WITH usuario AS (
+    UPDATE CAD_USUARIO
+    SET email = $2
+    WHERE id_usuario = $3
+    RETURNING id_pessoa
+)
+UPDATE CAD_PESSOA p
+SET nome = $1
+FROM usuario
+WHERE p.ID_pessoa = usuario.id_pessoa
+`
+
+type UpdateContaParams struct {
+	Nome      string
+	Email     string
+	IDUsuario int32
+}
+
+func (q *Queries) UpdateConta(ctx context.Context, arg UpdateContaParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateConta, arg.Nome, arg.Email, arg.IDUsuario)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const updateMarketplace = `-- name: UpdateMarketplace :execrows
 UPDATE CAD_MARKETPLACE
 SET nome_marketplace = $2,
@@ -989,21 +1035,19 @@ func (q *Queries) UpdateProduto(ctx context.Context, arg UpdateProdutoParams) (i
 	return result.RowsAffected(), nil
 }
 
-const updateUsuario = `-- name: UpdateUsuario :execrows
+const updateSenha = `-- name: UpdateSenha :execrows
 UPDATE CAD_USUARIO
-SET login_campo = $2,
-    email = $3
+SET senha_hash = $2
 WHERE id_usuario = $1
 `
 
-type UpdateUsuarioParams struct {
-	IDUsuario  int32
-	LoginCampo string
-	Email      string
+type UpdateSenhaParams struct {
+	IDUsuario int32
+	SenhaHash string
 }
 
-func (q *Queries) UpdateUsuario(ctx context.Context, arg UpdateUsuarioParams) (int64, error) {
-	result, err := q.db.Exec(ctx, updateUsuario, arg.IDUsuario, arg.LoginCampo, arg.Email)
+func (q *Queries) UpdateSenha(ctx context.Context, arg UpdateSenhaParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateSenha, arg.IDUsuario, arg.SenhaHash)
 	if err != nil {
 		return 0, err
 	}
