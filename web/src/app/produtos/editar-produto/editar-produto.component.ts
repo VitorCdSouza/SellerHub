@@ -21,7 +21,6 @@ import { ProdutoFormularioComponent } from '../produto-formulario/produto-formul
   selector: 'app-editar-produto',
   imports: [ProdutoFormularioComponent],
   templateUrl: './editar-produto.component.html',
-  styleUrl: './editar-produto.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditarProdutoComponent {

@@ -20,7 +20,6 @@ import { ProdutoFormularioComponent } from '../produto-formulario/produto-formul
   selector: 'app-novo-produto',
   imports: [ProdutoFormularioComponent],
   templateUrl: './novo-produto.component.html',
-  styleUrl: './novo-produto.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NovoProdutoComponent {
