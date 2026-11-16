@@ -17,6 +17,7 @@ type CadAnuncio struct {
 	PrecoVenda       pgtype.Numeric
 	IDExternoMp      pgtype.Text
 	StatusCampo      string
+	AtributosCanal   []byte
 }
 
 type CadAuditorium struct {
@@ -41,11 +42,13 @@ type CadPessoa struct {
 }
 
 type CadProduto struct {
-	IDProduto   int32
-	IDUsuario   int32
-	Sku         string
-	NomeProduto string
-	PrecoBase   pgtype.Numeric
+	IDProduto         int32
+	IDUsuario         int32
+	Sku               string
+	NomeProduto       string
+	PrecoBase         pgtype.Numeric
+	Saldo             int32
+	SaldoAtualizadoEm pgtype.Timestamptz
 }
 
 type CadUsuario struct {

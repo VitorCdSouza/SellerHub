@@ -38,6 +38,8 @@ CREATE TABLE CAD_PRODUTO (
     sku VARCHAR(100) NOT NULL,
     nome_produto VARCHAR(255) NOT NULL,
     preco_base DECIMAL(10,2) NOT NULL,
+    saldo INTEGER NOT NULL DEFAULT 0 CHECK (saldo >= 0),
+    saldo_atualizado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_produto_usuario FOREIGN KEY (id_usuario) REFERENCES CAD_USUARIO(id_usuario)
 );
 
@@ -50,7 +52,10 @@ CREATE TABLE CAD_ANUNCIO (
     descricao_anuncio TEXT,
     preco_venda DECIMAL(10,2) NOT NULL,
     id_externo_mp VARCHAR(100),
-    status_campo VARCHAR(50) NOT NULL,
+    status_campo VARCHAR(50) NOT NULL
+        CHECK (status_campo IN ('rascunho', 'aprovado', 'publicado', 'pausado', 'encerrado', 'erro')),
+    atributos_canal JSONB NOT NULL DEFAULT '{}',
+    CONSTRAINT uq_anuncio_produto_marketplace UNIQUE (id_produto, id_marketplace),
     CONSTRAINT fk_anuncio_marketplace FOREIGN KEY (id_marketplace) REFERENCES CAD_MARKETPLACE(id_marketplace),
     CONSTRAINT fk_anuncio_produto FOREIGN KEY (id_produto) REFERENCES CAD_PRODUTO(id_produto)
 );

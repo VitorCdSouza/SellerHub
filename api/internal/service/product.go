@@ -137,13 +137,18 @@ func validateProduct(input ProductInput) (ProductInput, error) {
 	if input.SKU == "" || utf8.RuneCountInString(input.SKU) > 100 {
 		return input, ErrInvalidInput
 	}
-	// o float so valida; o valor gravado continua exato
-	price, err := input.BasePrice.Float64Value()
-	if err != nil || !price.Valid || !(price.Float64 > 0 && price.Float64 < 1e8) {
-		return input, ErrInvalidInput
-	}
-	if math.Round(price.Float64*100)/100 != price.Float64 {
+	if !validPrice(input.BasePrice) {
 		return input, ErrInvalidInput
 	}
 	return input, nil
+}
+
+// cabe em DECIMAL(10,2): maior que zero, menor que 1e8 e ate 2 casas
+func validPrice(value pgtype.Numeric) bool {
+	// o float so valida; o valor gravado continua exato
+	price, err := value.Float64Value()
+	if err != nil || !price.Valid || !(price.Float64 > 0 && price.Float64 < 1e8) {
+		return false
+	}
+	return math.Round(price.Float64*100)/100 == price.Float64
 }

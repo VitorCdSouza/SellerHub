@@ -53,20 +53,12 @@ SELECT
     p.sku,
     a.titulo_anuncio,
     a.preco_venda,
-    a.id_externo_mp,
     a.status_campo
 FROM CAD_ANUNCIO a
 INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
 INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
 WHERE p.id_usuario = $1
-ORDER BY a.titulo_anuncio, a.id_anuncio
-LIMIT $2 OFFSET $3;
-
--- name: CountAnuncios :one
-SELECT COUNT(*)
-FROM CAD_ANUNCIO a
-INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
-WHERE p.id_usuario = $1;
+ORDER BY p.nome_produto, m.nome_marketplace;
 
 -- name: GetAnuncioById :one
 SELECT
@@ -75,11 +67,13 @@ SELECT
     m.nome_marketplace,
     a.id_produto,
     p.nome_produto,
+    p.sku,
+    p.saldo,
     a.titulo_anuncio,
     a.descricao_anuncio,
     a.preco_venda,
-    a.id_externo_mp,
-    a.status_campo
+    a.status_campo,
+    a.atributos_canal
 FROM CAD_ANUNCIO a
 INNER JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto
 INNER JOIN CAD_MARKETPLACE m ON m.id_marketplace = a.id_marketplace
@@ -92,24 +86,20 @@ INSERT INTO CAD_ANUNCIO (
     titulo_anuncio,
     descricao_anuncio,
     preco_venda,
-    id_externo_mp,
-    status_campo
+    status_campo,
+    atributos_canal
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id_anuncio;
 
--- name: UpdateAnuncio :execrows
-UPDATE CAD_ANUNCIO a
-SET id_marketplace = $3,
-    titulo_anuncio = $4,
-    descricao_anuncio = $5,
-    preco_venda = $6,
-    id_externo_mp = $7,
-    status_campo = $8
-FROM CAD_PRODUTO p
-WHERE a.id_produto = p.id_produto
-  AND a.id_anuncio = $1
-  AND p.id_usuario = $2;
+-- name: UpdateAnuncio :exec
+UPDATE CAD_ANUNCIO
+SET titulo_anuncio = $2,
+    descricao_anuncio = $3,
+    preco_venda = $4,
+    status_campo = $5,
+    atributos_canal = $6
+WHERE id_anuncio = $1;
 
 -- name: DeleteAnuncio :execrows
 DELETE FROM CAD_ANUNCIO a
@@ -118,7 +108,7 @@ WHERE a.id_produto = p.id_produto
   AND a.id_anuncio = $1
   AND p.id_usuario = $2;
 
-  -- name: ListMarketplaces :many
+-- name: ListMarketplaces :many
 SELECT
     id_marketplace,
     nome_marketplace,
@@ -131,7 +121,7 @@ SELECT
     m.id_marketplace,
     m.nome_marketplace,
     m.taxa_comissao,
-    COUNT(a.id_anuncio) AS total_anuncios
+    COUNT(p.id_produto) AS total_anuncios
 FROM CAD_MARKETPLACE m
 LEFT JOIN CAD_ANUNCIO a ON a.id_marketplace = m.id_marketplace
 LEFT JOIN CAD_PRODUTO p ON p.id_produto = a.id_produto AND p.id_usuario = $1
@@ -280,3 +270,16 @@ INSERT INTO CAD_AUDITORIA (
 ) VALUES (
     $1, $2, $3
 ) RETURNING id_auditoria;
+
+-- name: ListEstoque :many
+SELECT id_produto, nome_produto, sku, saldo, saldo_atualizado_em
+FROM CAD_PRODUTO
+WHERE id_usuario = $1
+ORDER BY saldo, nome_produto;
+
+-- name: AddSaldo :one
+UPDATE CAD_PRODUTO
+SET saldo = saldo + sqlc.arg(quantidade),
+    saldo_atualizado_em = CURRENT_TIMESTAMP
+WHERE id_produto = sqlc.arg(id_produto) AND id_usuario = sqlc.arg(id_usuario)
+RETURNING saldo;
