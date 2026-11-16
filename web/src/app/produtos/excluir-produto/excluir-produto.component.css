@@ -58,7 +58,7 @@ h2 {
   min-height: 2.75rem;
   padding: 0.65rem 1.15rem;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--cor-erro);
   color: #fff;
   font: inherit;

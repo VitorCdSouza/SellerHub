@@ -54,7 +54,7 @@ label {
   height: 2.375rem;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   background: none;
   color: var(--cor-texto-secundario);
   cursor: pointer;
@@ -77,7 +77,7 @@ label {
   min-height: 2.875rem;
   margin-top: 0.4rem;
   border: 0;
-  border-radius: 8px;
+  border-radius: 4px;
   background: #244bc1;
   color: #fff;
   font: inherit;

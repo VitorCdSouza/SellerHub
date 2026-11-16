@@ -10,7 +10,7 @@
 
 .tabela-container {
   overflow-x: auto;
-  border-radius: 14px;
+  border-radius: 4px;
   background: var(--cor-superficie);
   box-shadow: 0 1px 2px rgb(20 43 73 / 6%);
 }
@@ -23,11 +23,12 @@ table {
 
 th,
 td {
-  padding: 1.05rem 1.5rem;
+  padding: 0.6rem 1.5rem;
   border-bottom: 1px solid var(--cor-divisoria);
 }
 
 th {
+  padding-block: 0.85rem;
   color: var(--cor-texto-secundario);
   font-size: 0.85rem;
   font-weight: 500;
@@ -82,11 +83,11 @@ tbody tr:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: 4px;
   background: transparent;
   color: var(--cor-texto-secundario);
   cursor: pointer;
@@ -160,7 +161,7 @@ tbody tr:hover {
 
   th,
   td {
-    padding: 0.85rem 1rem;
+    padding: 0.5rem 1rem;
     white-space: nowrap;
   }
 }

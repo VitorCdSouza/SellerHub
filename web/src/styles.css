@@ -57,7 +57,7 @@ input[type='checkbox']:focus-visible,
   min-height: 2.875rem;
   padding: 0.7rem 0.9rem;
   border: 1px solid var(--cor-borda-campo);
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
@@ -180,7 +180,7 @@ input[type='checkbox']:focus-visible,
   min-height: 2.75rem;
   padding: 0.65rem 1.15rem;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 4px;
   font: inherit;
   font-weight: 600;
   text-decoration: none;
