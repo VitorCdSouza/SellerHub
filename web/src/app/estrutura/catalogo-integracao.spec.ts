@@ -88,9 +88,9 @@ describe('Integração da estrutura, sessão e catálogo', () => {
       .click();
     harness.detectChanges();
     expect(tela().querySelector('dialog')?.open).toBe(true);
-    preencher('nome', 'Produto novo');
-    preencher('sku', 'QA-NOVO');
-    preencher('precoBase', '35,50');
+    preencher('formulario-produto-nome', 'Produto novo');
+    preencher('formulario-produto-sku', 'QA-NOVO');
+    preencher('formulario-produto-precoBase', '35,50');
     enviar();
     const cadastro = http.expectOne('/api/produtos');
     expect(cadastro.request.method).toBe('POST');
@@ -112,9 +112,9 @@ describe('Integração da estrutura, sessão e catálogo', () => {
       .click();
     harness.detectChanges();
     expect(tela().querySelector('dialog')?.open).toBe(true);
-    expect(tela().querySelector<HTMLInputElement>('#nome')!.value).toBe('Produto novo');
-    preencher('nome', 'Produto editado');
-    preencher('precoBase', '42,01');
+    expect(tela().querySelector<HTMLInputElement>('#formulario-produto-nome')!.value).toBe('Produto novo');
+    preencher('formulario-produto-nome', 'Produto editado');
+    preencher('formulario-produto-precoBase', '42,01');
     enviar();
     const atualizacao = http.expectOne('/api/produtos/5');
     expect(atualizacao.request.method).toBe('PUT');

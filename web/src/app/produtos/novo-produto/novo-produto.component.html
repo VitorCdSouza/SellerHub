@@ -7,8 +7,10 @@
 >
   <h2 id="titulo-cadastro">Novo produto</h2>
 
-  <app-produto-formulario
+  <app-formulario
     class="conteudo-dialogo"
+    identificador="formulario-produto"
+    [campos]="campos"
     [enviando]="enviando()"
     [erroEnvio]="erro()"
     (salvar)="salvar($event)"

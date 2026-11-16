@@ -1,0 +1,73 @@
+<form [id]="identificador()" [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+  @for (campo of campos(); track campo.nome) {
+    @let id = identificador() + '-' + campo.nome;
+    @let invalido = erroVisivel(campo.nome);
+    @let descricao = invalido ? id + '-erro' : campo.ajuda ? id + '-ajuda' : null;
+
+    <div
+      class="campo"
+      [class.metade]="campo.largura === 'metade'"
+      [class.terco]="campo.largura === 'terco'"
+    >
+      <label [for]="id">{{ campo.rotulo }}</label>
+
+      @switch (campo.tipo) {
+        @case ('texto-longo') {
+          <textarea
+            [id]="id"
+            class="campo-texto"
+            rows="5"
+            [formControlName]="campo.nome"
+            [attr.placeholder]="campo.placeholder"
+            [attr.aria-invalid]="invalido"
+            [attr.aria-describedby]="descricao"
+          ></textarea>
+        }
+        @case ('selecao') {
+          <select
+            [id]="id"
+            class="campo-texto"
+            [formControlName]="campo.nome"
+            [attr.aria-invalid]="invalido"
+            [attr.aria-describedby]="descricao"
+          >
+            <option [ngValue]="null">Selecione</option>
+            @for (opcao of campo.opcoes ?? []; track opcao.valor) {
+              <option [ngValue]="opcao.valor" [disabled]="opcao.desabilitada ?? false">
+                {{ opcao.rotulo }}
+              </option>
+            }
+          </select>
+        }
+        @default {
+          <input
+            [id]="id"
+            type="text"
+            class="campo-texto"
+            autocomplete="off"
+            [formControlName]="campo.nome"
+            [attr.inputmode]="
+              campo.tipo === 'preco' ? 'decimal' : campo.tipo === 'inteiro' ? 'numeric' : null
+            "
+            [attr.placeholder]="campo.placeholder"
+            [attr.aria-invalid]="invalido"
+            [attr.aria-describedby]="descricao"
+          />
+        }
+      }
+
+      @if (campo.ajuda) {
+        <small [id]="id + '-ajuda'" class="ajuda">{{ campo.ajuda }}</small>
+      }
+      @if (invalido) {
+        <small [id]="id + '-erro'" class="mensagem-erro">
+          {{ formulario.controls[campo.nome].errors?.['mensagem'] }}
+        </small>
+      }
+    </div>
+  }
+
+  @if (erroEnvio()) {
+    <p class="mensagem-erro envio" role="alert">{{ erroEnvio() }}</p>
+  }
+</form>

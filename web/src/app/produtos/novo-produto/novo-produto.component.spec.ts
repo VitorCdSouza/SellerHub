@@ -3,14 +3,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of, Subject, throwError } from 'rxjs';
 import { NovoProdutoComponent } from './novo-produto.component';
-import { ProdutoFormularioComponent } from '../produto-formulario/produto-formulario.component';
+import { FormularioComponent } from '../../compartilhado/formulario/formulario.component';
 import { ProdutosService } from '../produtos.service';
 import { DadosProduto } from '../produto.model';
 
 describe('Modal de cadastro de produto', () => {
   let fixture: ComponentFixture<NovoProdutoComponent>;
   let service: { cadastrar: ReturnType<typeof vi.fn> };
-  let formulario: ProdutoFormularioComponent;
+  let formulario: FormularioComponent;
   let cadastrado: ReturnType<typeof vi.fn<() => void>>;
   let fechado: ReturnType<typeof vi.fn<() => void>>;
 
@@ -54,8 +54,8 @@ describe('Modal de cadastro de produto', () => {
     fixture.componentInstance.fechado.subscribe(fechado);
     fixture.detectChanges();
 
-    formulario = fixture.debugElement.query(By.directive(ProdutoFormularioComponent))
-      .componentInstance as ProdutoFormularioComponent;
+    formulario = fixture.debugElement.query(By.directive(FormularioComponent))
+      .componentInstance as FormularioComponent;
   });
 
   it('abre como modal rotulado pelo título', () => {

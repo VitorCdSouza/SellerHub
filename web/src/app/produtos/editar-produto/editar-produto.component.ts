@@ -4,6 +4,7 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
+  computed,
   inject,
   input,
   output,
@@ -15,11 +16,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { DadosProduto, Produto } from '../produto.model';
 import { ProdutosService } from '../produtos.service';
-import { ProdutoFormularioComponent } from '../produto-formulario/produto-formulario.component';
+import { FormularioComponent } from '../../compartilhado/formulario/formulario.component';
+import { ValoresFormulario } from '../../compartilhado/formulario/campo-formulario';
+import { camposProduto } from '../campos-produto';
 
 @Component({
   selector: 'app-editar-produto',
-  imports: [ProdutoFormularioComponent],
+  imports: [FormularioComponent],
   templateUrl: './editar-produto.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,12 +37,15 @@ export class EditarProdutoComponent {
 
   protected readonly enviando = signal(false);
   protected readonly erro = signal('');
+  protected readonly campos = computed(() => camposProduto(this.produto()));
 
   constructor() {
     afterNextRender(() => this.dialogo().nativeElement.showModal());
   }
 
-  protected salvar(dados: DadosProduto): void {
+  protected salvar(valores: ValoresFormulario): void {
+    const dados = valores as DadosProduto;
+
     if (this.enviando()) {
       return;
     }

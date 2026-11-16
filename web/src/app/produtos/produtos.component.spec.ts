@@ -150,7 +150,7 @@ describe('Listagem de produtos integrada ao serviço HTTP', () => {
       ['sku', produto.sku],
       ['precoBase', '35,50'],
     ]) {
-      const campo = tela.querySelector<HTMLInputElement>(`#${id}`)!;
+      const campo = tela.querySelector<HTMLInputElement>(`#formulario-produto-${id}`)!;
       campo.value = valor;
       campo.dispatchEvent(new Event('input'));
     }

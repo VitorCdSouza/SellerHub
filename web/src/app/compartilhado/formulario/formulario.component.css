@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1.5rem 1.25rem;
+}
+
+.campo {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.campo.metade {
+  grid-column: span 3;
+}
+
+.campo.terco {
+  grid-column: span 2;
+}
+
+.campo label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.ajuda {
+  color: var(--cor-texto-secundario);
+  font-size: 0.85rem;
+}
+
+.mensagem-erro {
+  color: var(--cor-erro);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.mensagem-erro.envio {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  background: var(--cor-erro-fundo);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+  .campo.metade,
+  .campo.terco {
+    grid-column: span 6;
+  }
+}
