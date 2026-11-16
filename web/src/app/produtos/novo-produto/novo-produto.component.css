@@ -1,5 +1,5 @@
 .dialogo {
-  width: min(640px, calc(100% - 2rem));
+  width: min(40rem, calc(100% - 2rem));
   max-height: calc(100dvh - 2rem);
   padding: 0;
   overflow-y: auto;

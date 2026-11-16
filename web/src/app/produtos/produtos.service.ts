@@ -43,14 +43,20 @@ export class ProdutosService {
   cadastrar(produto: DadosProduto) {
     return this.http
       .post<{ id: number }>('/api/produtos', corpoProduto(produto), {
-      observe: 'response',
-    })
+        observe: 'response',
+      })
       .pipe(timeout(10_000));
   }
 
   atualizar(id: number, produto: DadosProduto) {
     return this.http
       .put<{ success: boolean; message: string }>(`/api/produtos/${id}`, corpoProduto(produto))
+      .pipe(timeout(10_000));
+  }
+
+  excluir(id: number) {
+    return this.http
+      .delete<{ success: boolean; message: string }>(`/api/produtos/${id}`)
       .pipe(timeout(10_000));
   }
 }

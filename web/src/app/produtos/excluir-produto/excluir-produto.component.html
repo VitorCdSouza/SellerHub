@@ -1,0 +1,30 @@
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-exclusao"
+  aria-describedby="descricao-exclusao"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-exclusao">Excluir produto</h2>
+
+  <div class="conteudo">
+    <p id="descricao-exclusao">
+      Excluir <strong>{{ produto().nome }}</strong> (SKU <span class="sku">{{ produto().sku }}</span
+      >)? Essa ação não pode ser desfeita.
+    </p>
+
+    @if (erro()) {
+      <p class="mensagem-erro" role="alert">{{ erro() }}</p>
+    }
+  </div>
+
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    <button type="button" class="botao-perigo" [disabled]="enviando()" (click)="excluir()">
+      {{ enviando() ? 'Excluindo...' : 'Excluir produto' }}
+    </button>
+  </div>
+</dialog>

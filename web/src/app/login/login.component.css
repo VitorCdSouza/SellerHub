@@ -9,7 +9,7 @@
 }
 .cartao {
   width: 100%;
-  max-width: 440px;
+  max-width: 27.5rem;
   padding: 2.75rem;
   background: var(--cor-superficie);
   border-radius: 20px;
@@ -50,8 +50,8 @@ label {
   right: 0.35rem;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 2.375rem;
+  height: 2.375rem;
   padding: 0;
   border: 0;
   border-radius: 6px;
@@ -64,8 +64,8 @@ label {
   color: var(--cor-texto);
 }
 .mostrar-senha svg {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.75;
@@ -74,7 +74,7 @@ label {
 }
 .entrar {
   width: 100%;
-  min-height: 46px;
+  min-height: 2.875rem;
   margin-top: 0.4rem;
   border: 0;
   border-radius: 8px;

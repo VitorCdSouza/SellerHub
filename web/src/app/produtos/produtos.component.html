@@ -37,6 +37,7 @@
         <table>
           <thead>
             <tr>
+              <th scope="col" class="coluna-opcoes"><span class="somente-leitor">Opções</span></th>
               <th scope="col">Produto</th>
               <th scope="col">SKU</th>
               <th scope="col" class="numero">Preço base</th>
@@ -46,6 +47,35 @@
           <tbody>
             @for (produto of produtos(); track produto.id) {
               <tr>
+                <td class="coluna-opcoes">
+                  <button
+                    #botaoOpcoes
+                    type="button"
+                    class="botao-opcoes"
+                    [attr.popovertarget]="'opcoes-' + produto.id"
+                    [attr.aria-label]="'Opções de ' + produto.nome"
+                  >
+                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                      <path
+                        d="M4 7h16M4 12h16M4 17h16"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    class="menu-opcoes"
+                    popover
+                    [id]="'opcoes-' + produto.id"
+                    (beforetoggle)="posicionarMenu($event, botaoOpcoes)"
+                  >
+                    <a [routerLink]="['/produtos', produto.id, 'editar']">Editar</a>
+                    <button type="button" class="perigo" (click)="abrirExclusao(produto, $event)">
+                      Excluir
+                    </button>
+                  </div>
+                </td>
                 <td>
                   <a class="nome" [routerLink]="['/produtos', produto.id]">{{ produto.nome }}</a>
                 </td>
@@ -94,5 +124,13 @@
 
   @if (cadastroAberto()) {
     <app-novo-produto (cadastrado)="recarregar()" (fechado)="cadastroAberto.set(false)" />
+  }
+
+  @if (produtoExcluindo(); as produto) {
+    <app-excluir-produto
+      [produto]="produto"
+      (excluido)="aposExclusao()"
+      (fechado)="produtoExcluindo.set(null)"
+    />
   }
 </section>

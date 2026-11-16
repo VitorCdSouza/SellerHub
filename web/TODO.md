@@ -102,7 +102,7 @@ Nenhuma das três tarefas de catálogo é marcada integralmente concluída só p
 | Ambiente de desenvolvimento sem banco | Simulador HTTP isolado, comandos próprios, aviso permanente e cenários de catálogo/vazio/falhas/atraso/expiração; instruções em [README.md](README.md). | As páginas continuam com Leticia. O simulador apoia o desenvolvimento; não conclui integração ou homologação real. |
 | Verificação da base | Verificador completo aprovado; histórico e prova por impressão; Angular/HTTP real/Playwright/AXE sem falhas atuais. | Ampliar teclado/estados, expiração temporal e aceite do catálogo completo. Falhas de rede/500 na interface foram controladas pelo teste. |
 
-O serviço disponibiliza `listar(pagina, limite)`, `consultar(id)`, `cadastrar(dados)` e `atualizar(id, dados)`. O modelo interno usa `nome`, `sku` e `precoBase`; `listar` retorna `itens`/`total`. O serviço adapta o JSON da API (`name`, `basePrice`, `items`), sem cache de produtos, conversão para centavos ou fallback simulado. As páginas devem tratar erros e descartar seus dados ao serem destruídas/encerrar a sessão. Nenhum serviço foi inventado para anúncios/pedidos enquanto faltam esses contratos.
+O serviço disponibiliza `listar(pagina, limite)`, `consultar(id)`, `cadastrar(dados)`, `atualizar(id, dados)` e `excluir(id)`. O modelo interno usa `nome`, `sku` e `precoBase`; `listar` retorna `itens`/`total`. O serviço adapta o JSON da API (`name`, `basePrice`, `items`), sem cache de produtos, conversão para centavos ou fallback simulado. As páginas devem tratar erros e descartar seus dados ao serem destruídas/encerrar a sessão. Nenhum serviço foi inventado para anúncios/pedidos enquanto faltam esses contratos.
 
 ## Contrato disponível para o front-end
 
@@ -117,12 +117,13 @@ Contrato extraído das rotas, controllers e services atuais, posteriormente veri
 | Detalhar produto | `GET /api/produtos/{id}`, autenticado | `200`, objeto com `id`, `name`, `sku` e `basePrice`. |
 | Cadastrar produto | `POST /api/produtos`, autenticado, corpo `{ "name": "Produto", "sku": "SKU-1", "basePrice": 35.50 }` | `201`, `{ "id": 5 }`. Reconsultar detalhe/listagem se necessário. |
 | Editar produto | `PUT /api/produtos/{id}`, autenticado, mesmo corpo do cadastro | `200`, `{ "success": true, "message": "Produto atualizado" }`. Não usar PATCH. |
+| Excluir produto | `DELETE /api/produtos/{id}`, autenticado | `200`, `{ "success": true, "message": "Produto excluído" }`. `409` quando o produto possui anúncios. |
 
 - IDs são inteiros; `basePrice` é número JSON em valor monetário decimal, não centavos nem texto formatado em reais. Manter o nome inglês dos campos no DTO HTTP e adaptar os rótulos/nomes internos do Angular em português, sem renomear unilateralmente o contrato.
 - `pagina` começa em 1; `limite` padrão 20, entre 1 e 100. A API não devolve página/limite: o front os mantém e usa `total` para a navegação. A ordenação é nome e ID. Ainda não há busca ou filtros por texto/canal/saldo; não pesquisar só a página corrente como se fosse o catálogo inteiro.
 - Nome/SKU têm espaços das pontas removidos e limites de 255/100 caracteres; preço deve ser maior que zero, menor que 100.000.000 e ter até duas casas decimais. Corpo de login/produto tem limite de 4 KiB.
-- Erros usam `{ "success": false, "message": "..." }`: `400` para entrada/paginação inválida, `401` para cookie ausente/inválido/expirado, `404` para ID inválido/inexistente ou produto de outro usuário e `500` para falha interna. Não há erros por campo ou `409` de SKU/versão no código atual.
-- Produtos são filtrados pelo ID obtido do JWT. Não enviar `id_usuario` no formulário. Esse isolamento já está implementado; o eventual compartilhamento do catálogo da conta única continua em DEC-02. Não há exclusão de produto.
+- Erros usam `{ "success": false, "message": "..." }`: `400` para entrada/paginação inválida, `401` para cookie ausente/inválido/expirado, `404` para ID inválido/inexistente ou produto de outro usuário e `500` para falha interna. Não há erros por campo ou `409` de SKU/versão no código atual; o único `409` é o de exclusão de produto com anúncios.
+- Produtos são filtrados pelo ID obtido do JWT. Não enviar `id_usuario` no formulário. Esse isolamento já está implementado; o eventual compartilhamento do catálogo da conta única continua em DEC-02. A exclusão é física e bloqueada pela FK de `CAD_ANUNCIO` quando há anúncios.
 
 ## Quais telas podem ser feitas
 
@@ -248,7 +249,7 @@ FE-01 a FE-06 têm implementação entregue; as tarefas integrais continuam aber
 **Requisitos de desenvolvimento**
 
 - Construir a página de produtos consumindo os tipos e o serviço HTTP preparados por Caio, com `id`, `name`, `sku`, `basePrice` e resposta `items`/`total`. Leticia implementa tabela, paginação, ações e estados da tela.
-- Exibir nome, SKU e preço formatado em reais, acesso a novo produto e detalhe/edição. Não acrescentar exclusão, saldo, canais ou busca remota ainda ausentes.
+- Exibir nome, SKU e preço formatado em reais, acesso a novo produto, detalhe/edição e exclusão pelo menu de opções. Não acrescentar saldo, canais ou busca remota ainda ausentes.
 - Consumir `GET /api/produtos` com página inicial 1 e limite inicial 20; manter página/limite na tela e calcular a navegação a partir do total. Aceitar somente limites suportados, entre 1 e 100.
 - Prever carregamento, resultado vazio, erro e nova tentativa; impedir que uma resposta antiga substitua a página mais recente durante mudanças rápidas de paginação.
 

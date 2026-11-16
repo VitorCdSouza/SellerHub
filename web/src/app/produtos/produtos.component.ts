@@ -13,11 +13,18 @@ import { CurrencyPipe } from '@angular/common';
 import { EMPTY, Subject, catchError, finalize, startWith, switchMap } from 'rxjs';
 import { ProdutosService } from './produtos.service';
 import { NovoProdutoComponent } from './novo-produto/novo-produto.component';
+import { ExcluirProdutoComponent } from './excluir-produto/excluir-produto.component';
 import { Produto } from './produto.model';
 
 @Component({
   selector: 'app-produtos',
-  imports: [CurrencyPipe, RouterLink, FocoPaginaDirective, NovoProdutoComponent],
+  imports: [
+    CurrencyPipe,
+    RouterLink,
+    FocoPaginaDirective,
+    NovoProdutoComponent,
+    ExcluirProdutoComponent,
+  ],
   templateUrl: './produtos.component.html',
   styleUrl: './produtos.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +41,7 @@ export class ProdutosComponent {
   protected readonly carregando = signal(false);
   protected readonly erro = signal('');
   protected readonly cadastroAberto = signal(false);
+  protected readonly produtoExcluindo = signal<Produto | null>(null);
 
   protected readonly totalPaginas = computed(() =>
     Math.max(1, Math.ceil(this.total() / this.limite())),
@@ -87,5 +95,30 @@ export class ProdutosComponent {
 
   protected recarregar(): void {
     this.solicitacaoPagina.next(this.paginaAtual());
+  }
+
+  // o popover fica na top layer, fora do overflow da tabela; a posicao vem do botao
+  protected posicionarMenu(evento: Event, botao: HTMLElement): void {
+    if ((evento as ToggleEvent).newState !== 'open') {
+      return;
+    }
+    const menu = evento.target as HTMLElement;
+    const area = botao.getBoundingClientRect();
+    menu.style.top = `${area.bottom + window.scrollY + 4}px`;
+    menu.style.left = `${area.left + window.scrollX}px`;
+  }
+
+  protected abrirExclusao(produto: Produto, evento: Event): void {
+    (evento.target as HTMLElement).closest<HTMLElement>('[popover]')?.hidePopover();
+    this.produtoExcluindo.set(produto);
+  }
+
+  // excluir o ultimo item da pagina volta para a anterior
+  protected aposExclusao(): void {
+    if (this.produtos().length === 1 && this.podeVoltar()) {
+      this.solicitacaoPagina.next(this.paginaAtual() - 1);
+    } else {
+      this.recarregar();
+    }
   }
 }

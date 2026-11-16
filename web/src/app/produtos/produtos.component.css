@@ -64,6 +64,75 @@ tbody tr:hover {
   white-space: nowrap;
 }
 
+.coluna-opcoes {
+  width: 1%;
+  padding-right: 0;
+}
+
+.somente-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.botao-opcoes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+}
+
+.botao-opcoes:hover {
+  background: var(--cor-primaria-suave);
+  color: var(--cor-primaria);
+}
+
+.menu-opcoes {
+  position: absolute;
+  inset: auto;
+  min-width: 9rem;
+  margin: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--cor-divisoria);
+  border-radius: 10px;
+  background: var(--cor-superficie);
+  box-shadow: 0 12px 28px rgb(20 43 73 / 16%);
+}
+
+.menu-opcoes a,
+.menu-opcoes button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu-opcoes a:hover,
+.menu-opcoes button:hover {
+  background: var(--cor-fundo);
+}
+
+.menu-opcoes .perigo {
+  color: var(--cor-erro);
+}
+
 .vazio {
   text-align: center;
 }

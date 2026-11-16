@@ -1,4 +1,3 @@
-
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
@@ -60,9 +59,7 @@ describe('Tela de detalhe do produto', () => {
     fixture.detectChanges();
 
     expect(service.consultar).not.toHaveBeenCalled();
-    expect(fixture.nativeElement.textContent).toContain(
-      'O identificador do produto é inválido.',
-    );
+    expect(fixture.nativeElement.textContent).toContain('O identificador do produto é inválido.');
   });
 
   it('deve apresentar mensagem quando o produto não for encontrado', () => {
@@ -79,9 +76,7 @@ describe('Tela de detalhe do produto', () => {
     parametros.next(convertToParamMap({ id: '999' }));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain(
-      'Produto não encontrado.',
-    );
+    expect(fixture.nativeElement.textContent).toContain('Produto não encontrado.');
   });
 
   it('deve permitir tentar novamente após uma falha', () => {
@@ -100,9 +95,7 @@ describe('Tela de detalhe do produto', () => {
     parametros.next(convertToParamMap({ id: '6' }));
     fixture.detectChanges();
 
-    const botao = fixture.nativeElement.querySelector(
-      'button',
-    ) as HTMLButtonElement;
+    const botao = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
 
     botao.click();
     fixture.detectChanges();

@@ -33,12 +33,10 @@ describe('Contrato de produtos com a API', () => {
   });
 
   it('envia somente os campos públicos do cadastro e recebe o identificador', () => {
-    service
-      .cadastrar({ nome: 'Peça', sku: 'P-1', precoBase: 35.5 })
-      .subscribe((resposta) => {
-        expect(resposta.body?.id).toBe(5);
-        expect(resposta.status).toBe(201);
-      });
+    service.cadastrar({ nome: 'Peça', sku: 'P-1', precoBase: 35.5 }).subscribe((resposta) => {
+      expect(resposta.body?.id).toBe(5);
+      expect(resposta.status).toBe(201);
+    });
     const req = http.expectOne('/api/produtos');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ name: 'Peça', sku: 'P-1', basePrice: 35.5 });
@@ -70,5 +68,13 @@ describe('Contrato de produtos com a API', () => {
       }),
     );
     http.expectOne('/api/produtos/5').flush({ id: 5, name: 'Peça', sku: 'P-1', basePrice: 35.5 });
+  });
+
+  it('exclui pelo identificador sem enviar corpo', () => {
+    service.excluir(5).subscribe((resposta) => expect(resposta.success).toBe(true));
+    const req = http.expectOne('/api/produtos/5');
+    expect(req.request.method).toBe('DELETE');
+    expect(req.request.body).toBeNull();
+    req.flush({ success: true, message: 'Produto excluído' });
   });
 });
