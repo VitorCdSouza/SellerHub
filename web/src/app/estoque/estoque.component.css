@@ -11,20 +11,6 @@
   text-align: center;
 }
 
-.sem-saldo,
-.tabela-container tbody .sem-saldo:hover {
-  background: var(--cor-erro-fundo);
-}
-
-.sem-saldo .saldo {
+.zerado {
   color: var(--cor-erro);
-}
-
-.anuncios {
-  color: var(--cor-texto-secundario);
-}
-
-.data {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
 }

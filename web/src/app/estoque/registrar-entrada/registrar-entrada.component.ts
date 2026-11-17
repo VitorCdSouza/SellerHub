@@ -34,6 +34,7 @@ export class RegistrarEntradaComponent {
   private readonly dialogo = viewChild.required<ElementRef<HTMLDialogElement>>('dialogo');
 
   readonly itens = input.required<ItemEstoque[]>();
+  readonly produtoId = input<number | null>(null);
   readonly registrada = output();
   readonly fechado = output();
 
@@ -45,6 +46,7 @@ export class RegistrarEntradaComponent {
       nome: 'produtoId',
       rotulo: 'Produto',
       tipo: 'selecao',
+      valorInicial: this.produtoId(),
       obrigatorio: true,
       opcoes: this.itens().map((item) => ({
         valor: item.produtoId,

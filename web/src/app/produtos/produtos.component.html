@@ -33,59 +33,13 @@
         </button>
       </div>
     } @else {
-      <div class="tabela-container">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col" class="coluna-opcoes"><span class="somente-leitor">Opções</span></th>
-              <th scope="col">Produto</th>
-              <th scope="col">SKU</th>
-              <th scope="col" class="numero">Preço base</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            @for (produto of produtos(); track produto.id) {
-              <tr>
-                <td class="coluna-opcoes">
-                  <button
-                    #botaoOpcoes
-                    type="button"
-                    class="botao-opcoes"
-                    [attr.popovertarget]="'opcoes-' + produto.id"
-                    [attr.aria-label]="'Opções de ' + produto.nome"
-                  >
-                    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                      <path
-                        d="M4 7h16M4 12h16M4 17h16"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
-                  <div
-                    class="menu-opcoes"
-                    popover
-                    [id]="'opcoes-' + produto.id"
-                    (beforetoggle)="posicionarMenu($event, botaoOpcoes)"
-                  >
-                    <button type="button" (click)="abrirEdicao(produto, $event)">Editar</button>
-                    <button type="button" class="perigo" (click)="abrirExclusao(produto, $event)">
-                      Excluir
-                    </button>
-                  </div>
-                </td>
-                <td>{{ produto.nome }}</td>
-                <td class="sku">{{ produto.sku }}</td>
-                <td class="numero">
-                  {{ produto.precoBase | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <app-grade
+        identificador="produtos"
+        [colunas]="colunas"
+        [linhas]="produtos()"
+        [opcoes]="opcoes"
+        [rotuloLinha]="nomeProduto"
+      />
     }
 
     <nav class="paginacao" aria-label="Paginação de produtos">

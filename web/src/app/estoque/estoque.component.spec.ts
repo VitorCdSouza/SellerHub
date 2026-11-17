@@ -34,7 +34,8 @@ describe('Estoque', () => {
   ];
 
   beforeEach(() => {
-    // jsdom nao implementa showModal nem close
+    // jsdom nao implementa showModal, close nem hidePopover
+    HTMLElement.prototype.hidePopover = function () {};
     HTMLDialogElement.prototype.showModal = function () {
       this.open = true;
     };
@@ -79,7 +80,7 @@ describe('Estoque', () => {
   it('mostra saldo, resumo dos anúncios e destaca produto sem saldo', () => {
     carregar();
     const linhas = pagina().querySelectorAll('tbody tr');
-    expect(linhas[0].classList).toContain('sem-saldo');
+    expect(linhas[0].classList).toContain('alerta');
     expect(linhas[0].textContent).toContain('—');
     expect(linhas[1].textContent).toContain('2 publicados · 1 rascunho');
   });
@@ -107,5 +108,17 @@ describe('Estoque', () => {
     envio.flush({ stock: 12 });
     carregar();
     expect(pagina().querySelector('dialog')).toBeNull();
+  });
+
+  it('abre a entrada pelo menu da linha com o produto já selecionado', () => {
+    carregar();
+    pagina()
+      .querySelectorAll('tbody tr')[1]
+      .querySelector<HTMLButtonElement>('.menu-opcoes button')!
+      .click();
+    fixture.detectChanges();
+
+    const produto = pagina().querySelector<HTMLSelectElement>('#formulario-entrada-produtoId')!;
+    expect(produto.selectedOptions[0].textContent).toContain('Vela NGK');
   });
 });

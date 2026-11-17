@@ -7,16 +7,18 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CurrencyPipe } from '@angular/common';
 import { EMPTY, Subject, catchError, finalize, startWith, switchMap } from 'rxjs';
 import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
 import { AnunciosService } from './anuncios.service';
 import { Anuncio, SituacaoAnuncio, anuncioEditavel, situacoes } from './anuncio.model';
 import { EditorAnuncioComponent } from './editor-anuncio/editor-anuncio.component';
+import { GradeComponent } from '../compartilhado/grade/grade.component';
+import { CelulaGradeDirective } from '../compartilhado/grade/celula-grade.directive';
+import { ColunaGrade, OpcaoGrade } from '../compartilhado/grade/coluna-grade';
 
 @Component({
   selector: 'app-anuncios',
-  imports: [CurrencyPipe, FocoPaginaDirective, EditorAnuncioComponent],
+  imports: [FocoPaginaDirective, EditorAnuncioComponent, GradeComponent, CelulaGradeDirective],
   templateUrl: './anuncios.component.html',
   styleUrl: './anuncios.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +29,6 @@ export class AnunciosComponent {
   private readonly solicitacaoLeitura = new Subject<void>();
 
   protected readonly situacoes = situacoes;
-  protected readonly editavel = anuncioEditavel;
 
   protected readonly anuncios = signal<Anuncio[]>([]);
   protected readonly carregando = signal(false);
@@ -37,6 +38,25 @@ export class AnunciosComponent {
   protected readonly busca = signal('');
   // null fecha o editor, 0 abre o cadastro e um id abre a edicao
   protected readonly anuncioEditando = signal<number | null>(null);
+
+  protected readonly colunas: ColunaGrade<Anuncio>[] = [
+    { campo: 'produto', titulo: 'Produto' },
+    { campo: 'titulo', titulo: 'Título do anúncio' },
+    { campo: 'marketplace', titulo: 'Marketplace', largura: '11rem' },
+    { campo: 'preco', titulo: 'Preço', tipo: 'preco', largura: '10rem' },
+    { campo: 'situacao', titulo: 'Situação', largura: '10rem' },
+  ];
+
+  protected readonly opcoes: OpcaoGrade<Anuncio>[] = [
+    {
+      rotulo: 'Editar',
+      habilitada: anuncioEditavel,
+      acao: (anuncio) => this.anuncioEditando.set(anuncio.id),
+    },
+  ];
+
+  protected readonly nomeAnuncio = (anuncio: Anuncio) =>
+    `${anuncio.produto} no ${anuncio.marketplace}`;
 
   protected readonly canais = computed(() =>
     [...new Set(this.anuncios().map((anuncio) => anuncio.marketplace))].sort(),

@@ -37,7 +37,8 @@ describe('Anúncios', () => {
   ];
 
   beforeEach(() => {
-    // jsdom nao implementa showModal nem close
+    // jsdom nao implementa showModal, close nem hidePopover
+    HTMLElement.prototype.hidePopover = function () {};
     HTMLDialogElement.prototype.showModal = function () {
       this.open = true;
     };
@@ -98,8 +99,11 @@ describe('Anúncios', () => {
     fixture.detectChanges();
 
     const linhas = pagina().querySelectorAll('tbody tr');
-    expect(linhas[0].querySelector('button')).toBeNull();
-    expect(linhas[1].querySelector('button')?.textContent?.trim()).toBe('Editar');
+    const editar = (linha: Element) =>
+      linha.querySelector<HTMLButtonElement>('.menu-opcoes button')!;
+    expect(linhas[0].querySelector('.botao-opcoes')).not.toBeNull();
+    expect(editar(linhas[0]).disabled).toBe(true);
+    expect(editar(linhas[1]).disabled).toBe(false);
   });
 
   it('marca o canal já anunciado e exige descrição e condição para aprovar', async () => {
@@ -164,7 +168,10 @@ describe('Anúncios', () => {
     http.expectOne('/api/anuncios').flush(anuncios);
     fixture.detectChanges();
 
-    botao('Editar').click();
+    pagina()
+      .querySelectorAll('tbody tr')[1]
+      .querySelector<HTMLButtonElement>('.menu-opcoes button')!
+      .click();
     fixture.detectChanges();
     http.expectOne('/api/anuncios/2').flush({
       ...anuncios[1],

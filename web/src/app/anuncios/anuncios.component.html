@@ -77,54 +77,19 @@
     @if (anunciosVisiveis().length === 0) {
       <div class="estado" role="status">Nenhum anúncio corresponde aos filtros.</div>
     } @else {
-      <div class="tabela-container">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Produto</th>
-              <th scope="col">Marketplace</th>
-              <th scope="col" class="numero">Preço</th>
-              <th scope="col">Situação</th>
-              <th scope="col"><span class="somente-leitor">Ações</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (anuncio of anunciosVisiveis(); track anuncio.id) {
-              <tr>
-                <td>
-                  <span class="produto">{{ anuncio.produto }}</span>
-                  <span class="titulo">{{ anuncio.titulo }}</span>
-                </td>
-                <td>{{ anuncio.marketplace }}</td>
-                <td class="numero">
-                  {{ anuncio.preco | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-                </td>
-                <td>
-                  <span [class]="'situacao ' + anuncio.situacao">
-                    {{ rotuloSituacao(anuncio.situacao) }}
-                  </span>
-                </td>
-                <td class="acoes">
-                  @if (editavel(anuncio)) {
-                    <button
-                      type="button"
-                      class="botao-link"
-                      [attr.aria-label]="
-                        'Editar anúncio de ' + anuncio.produto + ' no ' + anuncio.marketplace
-                      "
-                      (click)="anuncioEditando.set(anuncio.id)"
-                    >
-                      Editar
-                    </button>
-                  } @else {
-                    <span aria-hidden="true">—</span>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <app-grade
+        identificador="anuncios"
+        [colunas]="colunas"
+        [linhas]="anunciosVisiveis()"
+        [opcoes]="opcoes"
+        [rotuloLinha]="nomeAnuncio"
+      >
+        <ng-template appCelula="situacao" let-anuncio>
+          <span [class]="'situacao ' + anuncio.situacao">
+            {{ rotuloSituacao(anuncio.situacao) }}
+          </span>
+        </ng-template>
+      </app-grade>
     }
   }
 

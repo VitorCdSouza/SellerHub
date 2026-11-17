@@ -61,16 +61,6 @@
   width: auto;
 }
 
-.produto {
-  display: block;
-}
-
-.titulo {
-  display: block;
-  color: var(--cor-texto-secundario);
-  font-size: 0.85rem;
-}
-
 .situacao {
   display: inline-flex;
   align-items: center;
@@ -114,26 +104,6 @@
 
 .erro {
   color: var(--cor-erro);
-}
-
-.acoes {
-  width: 1%;
-  text-align: right;
-}
-
-.botao-link {
-  padding: 0.35rem 0.5rem;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--cor-primaria);
-  font: inherit;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.botao-link:hover {
-  background: var(--cor-primaria-suave);
 }
 
 @media (max-width: 600px) {
