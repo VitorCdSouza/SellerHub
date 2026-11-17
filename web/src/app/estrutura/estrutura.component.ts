@@ -1,11 +1,13 @@
-import { NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -20,10 +22,11 @@ interface ModuloMenu {
 
 @Component({
   selector: 'app-estrutura',
-  imports: [NgOptimizedImage, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [NgOptimizedImage, NgTemplateOutlet, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './estrutura.component.html',
   styleUrl: './estrutura.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(window:resize)': 'ajustarMenu()' },
 })
 export class EstruturaComponent {
   protected readonly auth = inject(AuthService);
@@ -31,6 +34,10 @@ export class EstruturaComponent {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly saindo = signal(false);
   protected readonly erroSaida = signal('');
+  protected readonly menuAberto = signal(false);
+  private readonly painelMenu = viewChild<ElementRef<HTMLDialogElement>>('painelMenu');
+  private readonly botaoMenu = viewChild<ElementRef<HTMLButtonElement>>('botaoMenu');
+  private readonly conteudo = viewChild<ElementRef<HTMLElement>>('conteudo');
   // primeira letra do primeiro e do ultimo nome, ex.: "Vitor Souza" vira "VS"
   protected readonly iniciais = computed(() => {
     const usuario = this.auth.usuario();
@@ -71,6 +78,57 @@ export class EstruturaComponent {
     },
   ];
 
+  protected abrirMenu(): void {
+    this.painelMenu()?.nativeElement.showModal();
+    this.menuAberto.set(true);
+  }
+
+  protected fecharMenu(): void {
+    this.painelMenu()?.nativeElement.close();
+    this.menuAberto.set(false);
+  }
+
+  protected conterFocoMenu(evento: KeyboardEvent): void {
+    if (evento.key !== 'Tab') return;
+    const painel = this.painelMenu()?.nativeElement;
+    const alvos = Array.from(
+      painel?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]') ?? [],
+    ).filter((elemento) => elemento.getClientRects().length > 0);
+    const primeiro = alvos[0];
+    const ultimo = alvos.at(-1);
+    const atual = painel?.ownerDocument.activeElement;
+    if (evento.shiftKey && atual === primeiro) {
+      evento.preventDefault();
+      ultimo?.focus();
+    } else if (!evento.shiftKey && atual === ultimo) {
+      evento.preventDefault();
+      primeiro?.focus();
+    }
+  }
+
+  protected aoFecharMenu(): void {
+    this.menuAberto.set(false);
+    const botao = this.botaoMenu()?.nativeElement;
+    if (botao?.getClientRects().length) botao.focus();
+  }
+
+  protected navegar(): void {
+    if (!this.menuAberto()) return;
+    this.fecharMenu();
+    // A rota pode ser a atual; nesse caso também devolvemos o foco ao conteúdo.
+    requestAnimationFrame(() => {
+      const conteudo = this.conteudo()?.nativeElement;
+      (conteudo?.querySelector<HTMLElement>('h1') ?? conteudo)?.focus();
+    });
+  }
+
+  protected ajustarMenu(): void {
+    if (this.menuAberto() && window.innerWidth > 1024) {
+      this.fecharMenu();
+      requestAnimationFrame(() => this.conteudo()?.nativeElement.focus());
+    }
+  }
+
   protected sair(): void {
     if (this.saindo()) return;
     this.saindo.set(true);
@@ -83,6 +141,7 @@ export class EstruturaComponent {
       )
       .subscribe({
         next: () => {
+          if (this.menuAberto()) this.fecharMenu();
           void this.router.navigate(['/'], { replaceUrl: true });
         },
         error: () => this.erroSaida.set('Não foi possível sair. Tente novamente.'),

@@ -28,6 +28,7 @@
 }
 
 .situacoes button {
+  min-height: 44px;
   padding: 0.5rem 0;
   border: 0;
   border-bottom: 2px solid transparent;
@@ -66,7 +67,8 @@
   align-items: center;
   gap: 0.45rem;
   font-weight: 500;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .situacao::before {
@@ -75,6 +77,7 @@
   height: 0.5rem;
   border-radius: 50%;
   background: currentColor;
+  flex-shrink: 0;
 }
 
 .rascunho {
@@ -107,6 +110,14 @@
 }
 
 @media (max-width: 600px) {
+  .cabecalho-pagina {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cabecalho-pagina > button {
+    min-height: 44px;
+  }
   .busca-canal {
     width: 100%;
     flex-direction: column;

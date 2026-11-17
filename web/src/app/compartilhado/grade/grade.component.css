@@ -1,35 +1,35 @@
 :host {
   display: block;
+  min-width: 0;
+  container-type: inline-size;
   --largura-opcoes: 3.75rem;
   --largura-coluna-texto: 14rem;
 }
-
-/* As colunas mantêm suas larguras ao filtrar; o mínimo reserva espaço para texto. */
+.tabela-container {
+  display: none;
+}
 table {
   table-layout: fixed;
 }
-
 .tabela-container td {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-
 .tabela-container td.numero,
 .tabela-container td.data {
   white-space: nowrap;
 }
-
 .coluna-opcoes {
   width: var(--largura-opcoes);
   padding-right: 0;
 }
-
 .botao-opcoes {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: 4px;
@@ -37,16 +37,17 @@ table {
   color: var(--cor-texto-secundario);
   cursor: pointer;
 }
-
 .botao-opcoes:hover {
   background: var(--cor-primaria-suave);
   color: var(--cor-primaria);
 }
-
 .menu-opcoes {
-  position: absolute;
+  position: fixed;
   inset: auto;
   min-width: 9rem;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
   margin: 0;
   padding: 0.35rem;
   border: 1px solid var(--cor-divisoria);
@@ -54,10 +55,10 @@ table {
   background: var(--cor-superficie);
   box-shadow: 0 12px 28px rgb(20 43 73 / 16%);
 }
-
 .menu-opcoes button {
   display: block;
   width: 100%;
+  min-height: 44px;
   padding: 0.6rem 0.85rem;
   border: 0;
   border-radius: 6px;
@@ -67,26 +68,92 @@ table {
   text-align: left;
   cursor: pointer;
 }
-
 .menu-opcoes button:hover:not(:disabled) {
   background: var(--cor-fundo);
 }
-
 .menu-opcoes button:disabled {
   color: var(--cor-texto-secundario);
   cursor: not-allowed;
 }
-
 .menu-opcoes .perigo {
   color: var(--cor-erro);
 }
-
 .data {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-
 .alerta,
 .tabela-container tbody .alerta:hover {
   background: var(--cor-erro-fundo);
+}
+.lista-registros {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 6px;
+  background: var(--cor-superficie);
+  box-shadow: 0 1px 2px rgb(20 43 73 / 6%);
+}
+.registro {
+  min-width: 0;
+  padding: 1rem;
+  border-bottom: 1px solid var(--cor-divisoria);
+}
+.registro:first-child {
+  border-radius: 6px 6px 0 0;
+}
+.registro:last-child {
+  border-bottom: 0;
+  border-radius: 0 0 6px 6px;
+}
+.cabecalho-registro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.identidade-registro {
+  min-width: 0;
+}
+.rotulo-campo,
+dt {
+  color: var(--cor-texto-secundario);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+h2 {
+  margin: 0.2rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.45;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.8rem 1.5rem;
+  margin: 0.9rem 0 0;
+}
+.campo-registro {
+  min-width: 0;
+}
+dd {
+  margin: 0.15rem 0 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+/* A largura útil, incluindo a lateral quando existe, define a apresentação. */
+@container (min-width: 36rem) {
+  dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 64rem) {
+  .tabela-container {
+    display: block;
+  }
+  .lista-registros {
+    display: none;
+  }
 }

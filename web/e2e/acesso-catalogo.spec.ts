@@ -1,4 +1,4 @@
-import { test, expect, conta, entrar, capturar, abrirEdicao } from './apoio';
+import { test, expect, conta, entrar, capturar, abrirEdicao, abrirConta, gradeVisivel, registrosVisiveis } from './apoio';
 
 test('login inválido, entrada por teclado, recarga e saída reais', async ({ page }, info) => {
   await page.goto('/');
@@ -13,8 +13,10 @@ test('login inválido, entrada por teclado, recarga e saída reais', async ({ pa
   await expect(page).toHaveURL('/produtos');
   await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
   await page.reload();
-  await expect(page.getByText(conta.email, { exact: true })).toBeVisible();
+  await expect(gradeVisivel(page)).toBeVisible();
   await capturar(page, info, 'produtos-autenticado');
+  await abrirConta(page);
+  await expect(page.locator('.conta:visible').getByText(conta.email, { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Sair', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Entre na sua conta' })).toBeVisible();
   await page.goto('/produtos');
@@ -34,7 +36,7 @@ test('acesso anônimo preserva a URL após o login', async ({ page }) => {
 test('navega pelo catálogo real e cancela sem gravar', async ({ page, produtoId }) => {
   expect(produtoId).toBeGreaterThan(0);
   await page.goto('/produtos');
-  await expect(page.getByRole('table')).toBeVisible();
+  await expect(gradeVisivel(page)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Anterior', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
   const modal = page.getByRole('dialog', { name: 'Novo produto' });
@@ -67,7 +69,7 @@ test('perda do cookie durante uso exige login e recupera o destino', async ({
   produtoId,
 }) => {
   await page.goto('/produtos');
-  await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
+  await expect(gradeVisivel(page)).toBeVisible();
   const edicao = await abrirEdicao(page);
   await context.clearCookies();
   await edicao.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
@@ -75,7 +77,7 @@ test('perda do cookie durante uso exige login e recupera o destino', async ({
   await expect(page.getByRole('table')).toHaveCount(0);
   await entrar(page);
   await expect(page).toHaveURL('/produtos');
-  await expect(page.getByRole('row').nth(1)).toBeVisible();
+  await expect(registrosVisiveis(page).first()).toBeVisible();
   expect(produtoId).toBeGreaterThan(0);
 });
 
@@ -89,7 +91,7 @@ test('falha controlada de rede na sessão permite recuperação', async ({ page,
   await page.unroute('**/api/sessao');
   await page.getByRole('button', { name: 'Tentar novamente', exact: true }).click();
   await expect(page).toHaveURL('/produtos');
-  await expect(page.getByRole('table')).toBeVisible();
+  await expect(gradeVisivel(page)).toBeVisible();
   expect(produtoId).toBeGreaterThan(0);
 });
 
@@ -107,7 +109,7 @@ test('500 controlado na lista permite tentar novamente na API real', async ({
   await expect(page.getByRole('alert').filter({ hasText: 'Não foi possível' })).toBeVisible();
   await page.unroute('**/api/produtos?*');
   await page.getByRole('button', { name: 'Tentar novamente', exact: true }).click();
-  await expect(page.getByRole('table')).toBeVisible();
+  await expect(gradeVisivel(page)).toBeVisible();
   expect(produtoId).toBeGreaterThan(0);
 });
 

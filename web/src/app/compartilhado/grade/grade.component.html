@@ -10,58 +10,24 @@
         }
       </tr>
     </thead>
-
     <tbody>
       @for (linha of linhas(); track linha; let indice = $index) {
-        @let menu = identificador() + '-opcoes-' + indice;
-
         <tr [class.alerta]="linhaEmAlerta()(linha)">
           <td class="coluna-opcoes">
-            <button
-              #botaoOpcoes
-              type="button"
-              class="botao-opcoes"
-              [attr.popovertarget]="menu"
-              [attr.aria-label]="'Opções de ' + rotuloLinha()(linha)"
-            >
-              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                <path
-                  d="M4 7h16M4 12h16M4 17h16"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-            <div
-              class="menu-opcoes"
-              popover
-              [id]="menu"
-              (beforetoggle)="posicionarMenu($event, botaoOpcoes)"
-            >
-              @for (opcao of opcoes(); track opcao.rotulo) {
-                <button
-                  type="button"
-                  [class.perigo]="opcao.perigo"
-                  [disabled]="!habilitada(opcao, linha)"
-                  (click)="executar(opcao, linha, $event)"
-                >
-                  {{ opcao.rotulo }}
-                </button>
-              }
-            </div>
+            <ng-container
+              [ngTemplateOutlet]="acoes"
+              [ngTemplateOutletContext]="{
+                $implicit: linha,
+                menu: identificador() + '-opcoes-' + indice,
+              }"
+            />
           </td>
-
           @for (coluna of colunas(); track coluna.campo) {
             <td [class.numero]="numerica(coluna)" [class.data]="coluna.tipo === 'data'">
-              @if (template(coluna); as celula) {
-                <ng-container
-                  [ngTemplateOutlet]="celula"
-                  [ngTemplateOutletContext]="{ $implicit: linha }"
-                />
-              } @else {
-                {{ formatar(linha, coluna) }}
-              }
+              <ng-container
+                [ngTemplateOutlet]="valor"
+                [ngTemplateOutletContext]="{ $implicit: linha, coluna: coluna }"
+              />
             </td>
           }
         </tr>
@@ -69,3 +35,80 @@
     </tbody>
   </table>
 </div>
+<ul class="lista-registros" [attr.aria-label]="'Lista de ' + identificador()">
+  @for (linha of linhas(); track linha; let indice = $index) {
+    <li class="registro" [class.alerta]="linhaEmAlerta()(linha)">
+      <header class="cabecalho-registro">
+        @if (colunas()[0]; as primeira) {
+          <div class="identidade-registro">
+            <span class="rotulo-campo">{{ primeira.titulo }}</span>
+            <h2>
+              <ng-container
+                [ngTemplateOutlet]="valor"
+                [ngTemplateOutletContext]="{ $implicit: linha, coluna: primeira }"
+              />
+            </h2>
+          </div>
+        }
+        <ng-container
+          [ngTemplateOutlet]="acoes"
+          [ngTemplateOutletContext]="{
+            $implicit: linha,
+            menu: identificador() + '-mobile-opcoes-' + indice,
+          }"
+        />
+      </header>
+      <dl>
+        @for (coluna of colunas(); track coluna.campo; let primeira = $first) {
+          @if (!primeira) {
+            <div class="campo-registro">
+              <dt>{{ coluna.titulo }}</dt>
+              <dd>
+                <ng-container
+                  [ngTemplateOutlet]="valor"
+                  [ngTemplateOutletContext]="{ $implicit: linha, coluna: coluna }"
+                />
+              </dd>
+            </div>
+          }
+        }
+      </dl>
+    </li>
+  }
+</ul>
+
+<ng-template #valor let-linha let-coluna="coluna">
+  @if (template(coluna); as celula) {
+    <ng-container [ngTemplateOutlet]="celula" [ngTemplateOutletContext]="{ $implicit: linha }" />
+  } @else {
+    {{ formatar(linha, coluna) }}
+  }
+</ng-template>
+
+<ng-template #acoes let-linha let-menu="menu">
+  <button
+    #botaoOpcoes
+    type="button"
+    class="botao-opcoes"
+    [attr.popovertarget]="menu"
+    [attr.aria-label]="'Opções de ' + rotuloLinha()(linha)"
+  >
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  </button>
+  <div class="menu-opcoes" popover [id]="menu" (toggle)="posicionarMenu($event, botaoOpcoes)">
+    @for (opcao of opcoes(); track opcao.rotulo) {
+      <button
+        type="button"
+        [class.perigo]="opcao.perigo"
+        [disabled]="!habilitada(opcao, linha)"
+        (click)="executar(opcao, linha, $event)"
+      >
+        {{ opcao.rotulo }}
+      </button>
+    }
+  </div>
+</ng-template>

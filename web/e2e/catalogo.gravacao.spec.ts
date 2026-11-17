@@ -1,4 +1,4 @@
-import { test, expect, entrar, capturar, abrirEdicao } from './apoio';
+import { test, expect, entrar, capturar, abrirEdicao, abrirConta, gradeVisivel, registrosVisiveis } from './apoio';
 
 test('cadastra ou retoma um produto QA e edita pela interface real', async ({ page }, info) => {
   let sku = `QA-E2E-${Date.now()}`;
@@ -42,8 +42,8 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     contentType: 'application/json',
   });
   await expect(page).toHaveURL('/produtos');
-  await expect(page.getByRole('table')).toBeVisible();
-  const linha = page.getByRole('row').filter({ hasText: sku });
+  await expect(gradeVisivel(page)).toBeVisible();
+  const linha = registrosVisiveis(page).filter({ hasText: sku });
   // A ordenação/paginação real pode colocar o QA fora da primeira página.
   while (
     !(await linha.count()) &&
@@ -54,7 +54,7 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
     );
     await page.getByRole('button', { name: 'Próxima', exact: true }).click();
     expect((await leitura).status()).toBe(200);
-    await expect(page.getByRole('table')).toBeVisible();
+    await expect(gradeVisivel(page)).toBeVisible();
   }
   await expect(linha).toContainText(precoInicial.toFixed(2).replace('.', ','));
   const edicao = await abrirEdicao(page, linha);
@@ -71,9 +71,11 @@ test('cadastra ou retoma um produto QA e edita pela interface real', async ({ pa
   const consulta = await page.request.get(`/api/produtos/${id}`);
   expect(await consulta.json()).toEqual({ id, name: `${nome} editado`, sku, basePrice: 42.01 });
   await capturar(page, info, 'produto-gravado');
+  await abrirConta(page);
   await page.getByRole('button', { name: 'Sair', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Entre na sua conta' })).toBeVisible();
   await entrar(page, 'samuel@sellerhub.com');
   expect((await page.request.get(`/api/produtos/${id}`)).status()).toBe(404);
+  await abrirConta(page);
   await page.getByRole('button', { name: 'Sair', exact: true }).click();
 });

@@ -1,8 +1,8 @@
 import { type Locator } from '@playwright/test';
-import { conta, test, expect, capturar } from './apoio';
+import { conta, test, expect, capturar, auditar, gradeVisivel, registrosVisiveis } from './apoio';
 
 // 640 px CSS também representa uma janela de 1280 px com zoom de 200%.
-const larguras = [390, 640, 768, 1024, 1280, 1440, 1920];
+const larguras = [320, 390, 640, 768, 1024, 1280, 1440, 1920];
 const cenarios = [
   { nome: 'produtos', rota: '/produtos', email: conta.email },
   { nome: 'anuncios', rota: '/anuncios', email: 'samuel@sellerhub.com' },
@@ -42,8 +42,10 @@ async function medirGrade(tabela: Locator) {
       }
     }
 
-    const nomes = Array.from(elemento.querySelectorAll('tbody tr')).map((linha, indice) => {
-      const celula = linha.querySelectorAll('td')[1];
+    const lista = elemento.tagName === 'UL';
+    const linhas = lista ? Array.from(elemento.children) : Array.from(elemento.querySelectorAll('tbody tr'));
+    const nomes = linhas.map((linha, indice) => {
+      const celula = lista ? linha.querySelector('h2')! : linha.querySelectorAll('td')[1];
       const texto = celula.textContent?.trim() ?? '';
       const maiorPalavra = Math.max(...texto.split(/\s+/).map((palavra) => Array.from(palavra).length));
       const caracteresPorLinha = new Map<number, number>();
@@ -78,6 +80,11 @@ async function medirGrade(tabela: Locator) {
     const deslocamentoInterno = container.scrollLeft;
     container.scrollLeft = 0;
     return {
+      lista,
+      campos: lista ? linhas.map((linha) => ({
+        rotulos: Array.from(linha.querySelectorAll('dt')).map((rotulo) => rotulo.textContent?.trim()),
+        valores: Array.from(linha.querySelectorAll('dd')).map((valor) => ({ texto: valor.textContent?.trim(), largura: valor.getBoundingClientRect().width, larguraConteudo: valor.scrollWidth })),
+      })) : [],
       larguraJanela: window.innerWidth,
       larguraDocumento: document.documentElement.scrollWidth,
       larguraContainer: container.clientWidth,
@@ -96,15 +103,14 @@ for (const cenario of cenarios) {
     });
     expect(login.status()).toBe(200);
     await page.goto(cenario.rota);
-    const tabela = page.getByRole('table');
-    await expect(tabela).toBeVisible();
-    await expect(tabela.locator('tbody tr')).not.toHaveCount(0);
+    await expect(gradeVisivel(page)).toBeVisible();
+    await expect(registrosVisiveis(page)).not.toHaveCount(0);
 
     for (const largura of larguras) {
       await test.step(`${largura} px CSS`, async () => {
         await page.setViewportSize({ width: largura, height: 900 });
         await page.evaluate(() => document.fonts.ready);
-        const medidas = await medirGrade(tabela);
+        const medidas = await medirGrade(gradeVisivel(page));
         await info.attach(`${cenario.nome}-${largura}-geometria`, {
           body: JSON.stringify(medidas, null, 2),
           contentType: 'application/json',
@@ -114,9 +120,45 @@ for (const cenario of cenarios) {
         for (const nome of medidas.nomes) {
           expect.soft(nome.maiorLinha, `Nome da linha ${nome.linha} deve ter leitura em palavras, sem quebra letra a letra.`).toBeGreaterThanOrEqual(nome.minimoLegivel);
         }
-        if (medidas.larguraConteudo > medidas.larguraContainer + 1) {
-          expect.soft(medidas.deslocamentoInterno, 'O conteúdo excedente deve ser alcançável pela rolagem interna da tabela.').toBeGreaterThan(0);
+        expect.soft(medidas.larguraConteudo, 'A consulta deve caber sem rolagem horizontal interna.').toBeLessThanOrEqual(medidas.larguraContainer + 1);
+        if (largura <= 768) expect.soft(medidas.lista, 'Mobile e tablet estreito usam lista empilhada.').toBe(true);
+        if (largura >= 1280) expect.soft(medidas.lista, 'Desktop mantém comparação em tabela.').toBe(false);
+        if (medidas.lista) {
+          const rotulos = cenario.nome === 'produtos'
+            ? ['SKU', 'Preço base', 'Saldo', 'Saldo atualizado em']
+            : ['Título do anúncio', 'Marketplace', 'Preço', 'Situação'];
+          for (const campo of medidas.campos) {
+            expect.soft(campo.rotulos).toEqual(rotulos);
+            expect.soft(campo.valores).toHaveLength(4);
+            for (const valor of campo.valores) {
+              expect.soft(valor.texto).not.toBe('');
+              expect.soft(valor.larguraConteudo).toBeLessThanOrEqual(valor.largura + 1);
+            }
+          }
+          await expect(page.getByRole('table')).toHaveCount(0);
+        } else {
+          await expect(page.getByRole('table')).toBeVisible();
+          await expect(page.getByRole('columnheader')).toHaveCount(6);
         }
+        if ([320, 390, 1440].includes(largura)) {
+          const opcoes = registrosVisiveis(page).first().getByRole('button', { name: /^Opções de / });
+          await opcoes.click();
+          const painel = page.locator('.menu-opcoes:popover-open');
+          await expect(painel).toBeVisible();
+          const area = (await painel.boundingBox())!;
+          expect.soft(area.x).toBeGreaterThanOrEqual(0);
+          expect.soft(area.x + area.width).toBeLessThanOrEqual(largura + 1);
+          expect.soft(area.y).toBeGreaterThanOrEqual(0);
+          expect.soft(area.y + area.height).toBeLessThanOrEqual(900 + 1);
+          await expect(painel.getByRole('button', { name: 'Editar', exact: true })).toBeVisible();
+          await expect(painel.getByRole('button', { name: 'Excluir', exact: true })).toBeVisible();
+          if (cenario.nome === 'produtos') {
+            await expect(painel.getByRole('button', { name: 'Registrar entrada', exact: true })).toBeVisible();
+          }
+          await page.keyboard.press('Escape');
+          await expect(painel).not.toBeVisible();
+        }
+        if ([390, 1440].includes(largura)) await auditar(page, info, `${cenario.nome}-${largura}`);
         if ([390, 768, 1280, 1920].includes(largura)) {
           await capturar(page, info, `grade-${cenario.nome}-${largura}`);
         }

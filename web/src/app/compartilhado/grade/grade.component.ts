@@ -73,14 +73,22 @@ export class GradeComponent<T> {
     opcao.acao(linha);
   }
 
-  // o popover fica na top layer, fora do overflow da tabela; a posicao vem do botao
+  // O popover acompanha o botão sem ultrapassar as bordas da janela.
   protected posicionarMenu(evento: Event, botao: HTMLElement): void {
     if ((evento as ToggleEvent).newState !== 'open') {
       return;
     }
     const menu = evento.target as HTMLElement;
     const area = botao.getBoundingClientRect();
-    menu.style.top = `${area.bottom + window.scrollY + 4}px`;
-    menu.style.left = `${area.left + window.scrollX}px`;
+    const margem = 8;
+    const largura = menu.offsetWidth;
+    const altura = menu.offsetHeight;
+    const esquerda = Math.max(margem, Math.min(area.left, window.innerWidth - largura - margem));
+    const topo =
+      area.bottom + altura + margem <= window.innerHeight
+        ? area.bottom + 4
+        : Math.max(margem, area.top - altura - 4);
+    menu.style.top = `${topo}px`;
+    menu.style.left = `${esquerda}px`;
   }
 }

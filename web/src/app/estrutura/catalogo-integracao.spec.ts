@@ -87,7 +87,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
       .find((botao) => botao.textContent?.includes('Novo produto'))!
       .click();
     harness.detectChanges();
-    expect(tela().querySelector('dialog')?.open).toBe(true);
+    expect(tela().querySelector<HTMLDialogElement>('dialog[open]')?.open).toBe(true);
     preencher('formulario-produto-nome', 'Produto novo');
     preencher('formulario-produto-sku', 'QA-NOVO');
     preencher('formulario-produto-precoBase', '35,50');
@@ -104,14 +104,14 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     const criado = { ...produto, name: 'Produto novo', sku: 'QA-NOVO' };
     responderLista([criado]);
     expect(router.url).toBe('/produtos');
-    expect(tela().querySelector('dialog')).toBeNull();
+    expect(tela().querySelector<HTMLDialogElement>('dialog[open]')).toBeNull();
     expect(tela().textContent).toContain('Produto novo');
 
     Array.from(tela().querySelectorAll<HTMLButtonElement>('.menu-opcoes button'))
       .find((botao) => botao.textContent?.includes('Editar'))!
       .click();
     harness.detectChanges();
-    expect(tela().querySelector('dialog')?.open).toBe(true);
+    expect(tela().querySelector<HTMLDialogElement>('dialog[open]')?.open).toBe(true);
     expect(tela().querySelector<HTMLInputElement>('#formulario-produto-nome')!.value).toBe('Produto novo');
     preencher('formulario-produto-nome', 'Produto editado');
     preencher('formulario-produto-precoBase', '42,01');
@@ -128,7 +128,7 @@ describe('Integração da estrutura, sessão e catálogo', () => {
     const editado = { ...criado, name: 'Produto editado', basePrice: 42.01 };
     responderLista([editado]);
     expect(router.url).toBe('/produtos');
-    expect(tela().querySelector('dialog')).toBeNull();
+    expect(tela().querySelector<HTMLDialogElement>('dialog[open]')).toBeNull();
     expect(tela().textContent).toContain('Produto editado');
     expect(tela().textContent).toContain('42,01');
   });

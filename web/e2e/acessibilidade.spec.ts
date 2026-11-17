@@ -1,4 +1,4 @@
-import { test, expect, auditar, abrirEdicao } from './apoio';
+import { test, expect, auditar, abrirEdicao, gradeVisivel } from './apoio';
 
 test('AXE e captura do login', async ({ page }, info) => {
   await page.goto('/');
@@ -10,8 +10,7 @@ for (const tela of ['lista', 'cadastro', 'edicao'] as const) {
   test(`AXE, foco e largura da página: ${tela}`, async ({ page, produtoId }, info) => {
     expect(produtoId).toBeGreaterThan(0);
     await page.goto('/produtos');
-    await expect(page.getByRole('button', { name: 'Sair', exact: true })).toBeVisible();
-    await expect(page.getByRole('table')).toBeVisible();
+    await expect(gradeVisivel(page)).toBeVisible();
     if (tela === 'cadastro') {
       await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
       const modal = page.getByRole('dialog', { name: 'Novo produto' });

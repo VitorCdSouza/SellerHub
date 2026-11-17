@@ -1,8 +1,8 @@
 # Verificação técnica do front-end
 
-Estado: **APROVADO**. Finalizado em 2026-11-17T15:55:51.031Z.
+Estado: **APROVADO**. Finalizado em 2026-11-17T16:41:38.560Z.
 
-Código verificado: `b33aa94f4139379f12b20bdcc34862c8cc4c17bd85a74fbc78c0591156e4c774`. HEAD de referência: `170af0054eebf0f393941ede3ab59fd7bb72415a`. Plano 1.
+Código verificado: `5afe0fb7e39257af2b98bddb9a7e32a201d7d57023f4af6337b31ba8c0ee0f1e`. HEAD de referência: `dd1960fbb443a4b1e56cb80babaefe260e0cd881`. Plano 1.
 
 Ambiente: Node v24.11.1; win32/x64.
 
@@ -14,7 +14,7 @@ Ambiente: Node v24.11.1; win32/x64.
 | tipos-e2e | APROVADO | 0 |
 | build | APROVADO | 0 |
 | api-real | APROVADO | 0; {"aprovados":19} |
-| e2e | APROVADO | 0; {"aprovados":26,"falhas":0,"ignorados":0,"instaveis":0} |
+| e2e | APROVADO | 0; {"aprovados":32,"falhas":0,"ignorados":0,"instaveis":0} |
 
 Este resultado vale para o conteúdo identificado acima e os checks executados. Não conclui o MVP nem substitui os critérios de aceite.
 

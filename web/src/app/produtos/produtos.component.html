@@ -44,7 +44,7 @@
         <ng-template appCelula="saldo" let-produto>
           <span [class.zerado]="produto.saldo === 0">{{ produto.saldo }}</span>
           @if (produto.saldo === 0) {
-            <span class="somente-leitor">(sem saldo)</span>
+            <span class="somente-leitor aviso-sem-saldo">(sem saldo)</span>
           }
         </ng-template>
       </app-grade>

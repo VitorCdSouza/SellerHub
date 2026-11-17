@@ -32,8 +32,29 @@
 }
 
 @media (max-width: 600px) {
+  .cabecalho-pagina {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .cabecalho-pagina > button,
+  .acoes-paginacao button {
+    min-height: 44px;
+  }
   .paginacao {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@container (max-width: 63.999rem) {
+  .aviso-sem-saldo {
+    margin-inline-start: 0.25rem;
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    color: var(--cor-erro);
   }
 }
