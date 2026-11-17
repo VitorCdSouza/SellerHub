@@ -2,9 +2,64 @@
   display: block;
 }
 
-.subtitulo {
-  margin: 0.4rem 0 0;
+.titulo-com-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.info {
+  position: relative;
+  display: inline-flex;
+}
+
+.botao-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 1.5px solid var(--cor-texto-secundario);
+  border-radius: 50%;
+  background: transparent;
   color: var(--cor-texto-secundario);
+  font:
+    italic 700 0.75rem/1 Georgia,
+    serif;
+  cursor: help;
+}
+
+.botao-info:hover,
+.botao-info:focus-visible {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.dica {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  z-index: 10;
+  width: max-content;
+  max-width: 16rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: var(--cor-texto);
+  color: var(--cor-superficie);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.info:hover .dica,
+.info:focus-within .dica {
+  visibility: visible;
+  opacity: 1;
 }
 
 .filtro {

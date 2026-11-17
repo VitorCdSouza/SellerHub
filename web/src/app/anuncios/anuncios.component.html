@@ -66,7 +66,7 @@
           [value]="canalFiltro()"
           (change)="filtrarCanal($event)"
         >
-          <option value="">Canal: todos</option>
+          <option value="">Todos</option>
           @for (canal of canais(); track canal) {
             <option [value]="canal">{{ canal }}</option>
           }
