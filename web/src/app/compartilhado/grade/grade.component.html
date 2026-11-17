@@ -53,11 +53,7 @@
           </td>
 
           @for (coluna of colunas(); track coluna.campo) {
-            <td
-              [class.numero]="numerica(coluna)"
-              [class.sku]="coluna.tipo === 'codigo'"
-              [class.data]="coluna.tipo === 'data'"
-            >
+            <td [class.numero]="numerica(coluna)" [class.data]="coluna.tipo === 'data'">
               @if (template(coluna); as celula) {
                 <ng-container
                   [ngTemplateOutlet]="celula"

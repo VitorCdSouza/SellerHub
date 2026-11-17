@@ -39,7 +39,7 @@ const excluir = vi.fn<(item: Item) => void>();
 class HospedeiroComponent {
   readonly colunas: ColunaGrade<Item>[] = [
     { campo: 'nome', titulo: 'Nome' },
-    { campo: 'codigo', titulo: 'Código', tipo: 'codigo' },
+    { campo: 'codigo', titulo: 'Código' },
     { campo: 'preco', titulo: 'Preço', tipo: 'preco' },
     { campo: 'observacao', titulo: 'Observação' },
   ];
@@ -89,7 +89,7 @@ describe('Grade genérica', () => {
 
   it('formata os valores pelo tipo e mostra traço no valor vazio', () => {
     expect(celulas(linhas()[0])).toEqual(['Vela', 'V-1', 'R$\u00a035,50', '—']);
-    expect(linhas()[0].querySelectorAll('td')[2].classList).toContain('sku');
+    expect(linhas()[0].querySelectorAll('td')[2].classList).not.toContain('sku');
     expect(linhas()[0].querySelectorAll('td')[3].classList).toContain('numero');
   });
 

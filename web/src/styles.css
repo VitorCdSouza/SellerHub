@@ -10,7 +10,6 @@
   --cor-primaria-suave: #edf2ff;
   --cor-erro: #a01e2d;
   --cor-erro-fundo: #fff0f1;
-  --fonte-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
 }
 
 /* altura reservada para o aviso fixo do ambiente simulado */
@@ -374,12 +373,6 @@ select.campo-texto:has(.opcao-vazia:checked) {
 
 .tabela-container tbody tr:hover {
   background: #f9fafc;
-}
-
-.sku {
-  color: #3a4659;
-  font-family: var(--fonte-mono);
-  font-size: 0.9rem;
 }
 
 .numero {

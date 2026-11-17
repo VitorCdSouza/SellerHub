@@ -10,8 +10,7 @@
 
   <div class="conteudo-dialogo">
     <p id="descricao-exclusao">
-      Excluir <strong>{{ produto().nome }}</strong> (SKU <span class="sku">{{ produto().sku }}</span
-      >)? Essa ação não pode ser desfeita.
+      Excluir {{ produto().nome }} (SKU {{ produto().sku }})? Essa ação não pode ser desfeita.
     </p>
 
     @if (erro()) {
