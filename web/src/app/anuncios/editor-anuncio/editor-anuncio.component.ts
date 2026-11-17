@@ -142,7 +142,6 @@ export class EditorAnuncioComponent implements OnInit {
         valorInicial: detalhe?.descricao,
         obrigatorio: paraAprovar,
         maximo: 50_000,
-        ajuda: 'Obrigatória para aprovar.',
       },
       {
         nome: 'preco',
@@ -160,7 +159,6 @@ export class EditorAnuncioComponent implements OnInit {
         valorInicial: detalhe?.condicao || null,
         obrigatorio: paraAprovar,
         largura: 'terco',
-        ajuda: 'Obrigatória para aprovar.',
         opcoes: [
           { valor: 'novo', rotulo: 'Novo' },
           { valor: 'usado', rotulo: 'Usado' },

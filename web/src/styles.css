@@ -91,6 +91,83 @@ input[type='checkbox']:focus-visible,
   color: #6b7586;
 }
 
+select.campo-texto {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23526075' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.9rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  cursor: pointer;
+}
+
+select.campo-texto:disabled {
+  cursor: default;
+}
+
+select.campo-texto:has(.opcao-vazia:checked) {
+  color: #6b7586;
+}
+
+/* navegadores com select customizavel desenham a lista com o estilo do sistema; os demais usam a nativa */
+@supports (appearance: base-select) {
+  select.campo-texto,
+  select.campo-texto::picker(select) {
+    appearance: base-select;
+  }
+
+  select.campo-texto::picker-icon {
+    display: none;
+  }
+
+  select.campo-texto::picker(select) {
+    margin-block: 0.25rem;
+    padding: 0.3rem;
+    max-block-size: 18rem;
+    border: 1px solid var(--cor-borda-campo);
+    border-radius: 6px;
+    background: var(--cor-superficie);
+    box-shadow: 0 10px 28px rgb(24 35 53 / 14%);
+  }
+
+  select.campo-texto option {
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 4px;
+    color: var(--cor-texto);
+    cursor: pointer;
+  }
+
+  select.campo-texto option:not(:disabled):is(:hover, :focus-visible) {
+    background: var(--cor-primaria-suave);
+    outline: none;
+  }
+
+  select.campo-texto option:checked {
+    color: var(--cor-primaria);
+    font-weight: 600;
+  }
+
+  select.campo-texto option::checkmark {
+    order: 1;
+    margin-left: auto;
+  }
+
+  select.campo-texto option.opcao-vazia {
+    color: var(--cor-texto-secundario);
+    font-weight: 400;
+  }
+
+  select.campo-texto option.opcao-vazia::checkmark {
+    visibility: hidden;
+  }
+
+  select.campo-texto option:disabled {
+    color: #8c96a5;
+    cursor: default;
+  }
+}
+
 /* titulos recebem foco por script so para leitores de tela */
 [tabindex='-1']:focus {
   outline: none;

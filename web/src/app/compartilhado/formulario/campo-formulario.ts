@@ -16,6 +16,7 @@ export interface CampoFormulario {
   valorInicial?: ValorCampo;
   placeholder?: string;
   // funcao quando a obrigatoriedade depende do estado da tela no momento do envio
+  // o asterisco aparece nos dois casos
   obrigatorio?: boolean | (() => boolean);
   // caracteres em texto, valor em inteiro
   maximo?: number;

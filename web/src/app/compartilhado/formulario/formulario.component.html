@@ -2,6 +2,7 @@
   @for (campo of campos(); track campo.nome) {
     @let id = identificador() + '-' + campo.nome;
     @let invalido = erroVisivel(campo.nome);
+    @let obrigatorio = !!campo.obrigatorio;
     @let descricao = invalido ? id + '-erro' : campo.ajuda ? id + '-ajuda' : null;
 
     <div
@@ -9,7 +10,12 @@
       [class.metade]="campo.largura === 'metade'"
       [class.terco]="campo.largura === 'terco'"
     >
-      <label [for]="id">{{ campo.rotulo }}</label>
+      <label [for]="id">
+        {{ campo.rotulo }}
+        @if (obrigatorio) {
+          <span class="obrigatorio" aria-hidden="true">*</span>
+        }
+      </label>
 
       @switch (campo.tipo) {
         @case ('texto-longo') {
@@ -19,6 +25,7 @@
             rows="5"
             [formControlName]="campo.nome"
             [attr.placeholder]="campo.placeholder"
+            [attr.aria-required]="obrigatorio"
             [attr.aria-invalid]="invalido"
             [attr.aria-describedby]="descricao"
           ></textarea>
@@ -28,10 +35,11 @@
             [id]="id"
             class="campo-texto"
             [formControlName]="campo.nome"
+            [attr.aria-required]="obrigatorio"
             [attr.aria-invalid]="invalido"
             [attr.aria-describedby]="descricao"
           >
-            <option [ngValue]="null">Selecione</option>
+            <option class="opcao-vazia" [ngValue]="null">Selecione</option>
             @for (opcao of campo.opcoes ?? []; track opcao.valor) {
               <option [ngValue]="opcao.valor" [disabled]="opcao.desabilitada ?? false">
                 {{ opcao.rotulo }}
@@ -50,6 +58,7 @@
               campo.tipo === 'preco' ? 'decimal' : campo.tipo === 'inteiro' ? 'numeric' : null
             "
             [attr.placeholder]="campo.placeholder"
+            [attr.aria-required]="obrigatorio"
             [attr.aria-invalid]="invalido"
             [attr.aria-describedby]="descricao"
           />

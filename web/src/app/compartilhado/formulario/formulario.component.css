@@ -29,6 +29,10 @@ form {
   font-weight: 600;
 }
 
+.obrigatorio {
+  color: var(--cor-erro);
+}
+
 textarea {
   resize: vertical;
 }

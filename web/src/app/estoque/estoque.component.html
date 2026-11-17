@@ -1,8 +1,20 @@
 <section aria-labelledby="titulo-estoque">
   <header class="cabecalho-pagina">
-    <div>
+    <div class="titulo-com-info">
       <h1 id="titulo-estoque" appFocoPagina>Estoque</h1>
-      <p class="subtitulo">Um saldo por produto, compartilhado entre os canais.</p>
+      <span class="info">
+        <button
+          type="button"
+          class="botao-info"
+          aria-label="Sobre o estoque"
+          aria-describedby="dica-estoque"
+        >
+          i
+        </button>
+        <span id="dica-estoque" role="tooltip" class="dica">
+          Um saldo por produto, compartilhado entre os canais.
+        </span>
+      </span>
     </div>
     <button
       type="button"
