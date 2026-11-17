@@ -823,7 +823,7 @@ func (q *Queries) ListMetricasPorDia(ctx context.Context, arg ListMetricasPorDia
 }
 
 const listProdutos = `-- name: ListProdutos :many
-SELECT id_produto, nome_produto, sku, preco_base 
+SELECT id_produto, nome_produto, sku, preco_base, saldo, saldo_atualizado_em
 FROM CAD_PRODUTO 
 WHERE id_usuario = $1 
 ORDER BY nome_produto, id_produto
@@ -837,10 +837,12 @@ type ListProdutosParams struct {
 }
 
 type ListProdutosRow struct {
-	IDProduto   int32
-	NomeProduto string
-	Sku         string
-	PrecoBase   pgtype.Numeric
+	IDProduto         int32
+	NomeProduto       string
+	Sku               string
+	PrecoBase         pgtype.Numeric
+	Saldo             int32
+	SaldoAtualizadoEm pgtype.Timestamptz
 }
 
 func (q *Queries) ListProdutos(ctx context.Context, arg ListProdutosParams) ([]ListProdutosRow, error) {
@@ -857,6 +859,8 @@ func (q *Queries) ListProdutos(ctx context.Context, arg ListProdutosParams) ([]L
 			&i.NomeProduto,
 			&i.Sku,
 			&i.PrecoBase,
+			&i.Saldo,
+			&i.SaldoAtualizadoEm,
 		); err != nil {
 			return nil, err
 		}

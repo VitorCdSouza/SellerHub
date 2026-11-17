@@ -12,10 +12,18 @@ registerLocaleData(pt);
 describe('Listagem de produtos integrada ao serviço HTTP', () => {
   let fixture: ComponentFixture<ProdutosComponent>;
   let http: HttpTestingController;
-  const produto = { id: 5, name: 'Peça de teste', sku: 'PECA-5', basePrice: 35.5 };
+  const produto = {
+    id: 5,
+    name: 'Peça de teste',
+    sku: 'PECA-5',
+    basePrice: 35.5,
+    stock: 4,
+    stockUpdatedAt: '2026-10-31T08:30:00-03:00',
+  };
 
   beforeEach(() => {
-    // jsdom nao implementa showModal nem close
+    // jsdom nao implementa showModal, close nem hidePopover
+    HTMLElement.prototype.hidePopover = function () {};
     HTMLDialogElement.prototype.showModal = function () {
       this.open = true;
     };
@@ -177,6 +185,49 @@ describe('Listagem de produtos integrada ao serviço HTTP', () => {
 
     expect(tela.querySelector('dialog')).toBeNull();
     http.expectNone('/api/produtos');
+  });
+
+  it('mostra o saldo e destaca produto sem saldo', () => {
+    const tela = fixture.nativeElement as HTMLElement;
+    leitura(1).flush({ items: [{ ...produto, id: 6, stock: 0 }, produto], total: 2 });
+    fixture.detectChanges();
+
+    const linhas = tela.querySelectorAll('tbody tr');
+    expect(linhas[0].classList).toContain('alerta');
+    expect(linhas[0].textContent).toContain('(sem saldo)');
+    expect(linhas[1].classList).not.toContain('alerta');
+    expect(linhas[1].textContent).toContain('31/10/2026');
+  });
+
+  it('registra entrada pelo menu da linha e recarrega a página atual', () => {
+    const tela = fixture.nativeElement as HTMLElement;
+    leitura(1).flush({ items: [produto], total: 1 });
+    fixture.detectChanges();
+
+    Array.from(tela.querySelectorAll<HTMLButtonElement>('tbody .menu-opcoes button'))
+      .find((item) => item.textContent?.trim() === 'Registrar entrada')!
+      .click();
+    fixture.detectChanges();
+    expect(tela.querySelector('dialog')?.textContent).toContain('Saldo atual: 4 un.');
+
+    const quantidade = tela.querySelector<HTMLInputElement>('#formulario-entrada-quantidade')!;
+    quantidade.value = '0';
+    quantidade.dispatchEvent(new Event('input'));
+    tela.querySelector<HTMLButtonElement>('dialog button[type="submit"]')!.click();
+    fixture.detectChanges();
+    expect(tela.textContent).toContain('Informe um número inteiro entre 1 e 100.000.');
+
+    quantidade.value = '12';
+    quantidade.dispatchEvent(new Event('input'));
+    tela.querySelector<HTMLButtonElement>('dialog button[type="submit"]')!.click();
+    const envio = http.expectOne({ method: 'POST', url: '/api/estoque/5/entradas' });
+    expect(envio.request.body).toEqual({ quantity: 12 });
+    envio.flush({ stock: 16 });
+    leitura(1).flush({ items: [{ ...produto, stock: 16 }], total: 1 });
+    fixture.detectChanges();
+
+    expect(tela.querySelector('dialog')).toBeNull();
+    expect(tela.querySelector('tbody tr')?.textContent).toContain('16');
   });
 
   it('cancela a consulta ao destruir a página', () => {

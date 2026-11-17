@@ -4,7 +4,6 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
-  computed,
   inject,
   input,
   output,
@@ -19,7 +18,8 @@ import {
   CampoFormulario,
   ValoresFormulario,
 } from '../../compartilhado/formulario/campo-formulario';
-import { EstoqueService, ItemEstoque } from '../estoque.service';
+import { EstoqueService } from '../../estoque/estoque.service';
+import { Produto } from '../produto.model';
 
 @Component({
   selector: 'app-registrar-entrada',
@@ -33,28 +33,22 @@ export class RegistrarEntradaComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialogo = viewChild.required<ElementRef<HTMLDialogElement>>('dialogo');
 
-  readonly itens = input.required<ItemEstoque[]>();
-  readonly produtoId = input<number | null>(null);
+  readonly produto = input.required<Produto>();
   readonly registrada = output();
   readonly fechado = output();
 
   protected readonly enviando = signal(false);
   protected readonly erro = signal('');
 
-  protected readonly campos = computed<CampoFormulario[]>(() => [
+  protected readonly campos: CampoFormulario[] = [
     {
-      nome: 'produtoId',
-      rotulo: 'Produto',
-      tipo: 'selecao',
-      valorInicial: this.produtoId(),
+      nome: 'quantidade',
+      rotulo: 'Quantidade',
+      tipo: 'inteiro',
       obrigatorio: true,
-      opcoes: this.itens().map((item) => ({
-        valor: item.produtoId,
-        rotulo: `${item.nome} — ${item.sku} (${item.saldo} un.)`,
-      })),
+      maximo: 100_000,
     },
-    { nome: 'quantidade', rotulo: 'Quantidade', tipo: 'inteiro', obrigatorio: true, maximo: 100_000 },
-  ]);
+  ];
 
   constructor() {
     afterNextRender(() => this.dialogo().nativeElement.showModal());
@@ -70,7 +64,7 @@ export class RegistrarEntradaComponent {
     this.erro.set('');
 
     this.service
-      .registrarEntrada(valores['produtoId'] as number, valores['quantidade'] as number)
+      .registrarEntrada(this.produto().id, valores['quantidade'] as number)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.enviando.set(false)),

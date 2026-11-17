@@ -60,12 +60,6 @@ export class EstruturaComponent {
         'M2 2h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L22 7H5.12M9 21a1 1 0 1 1-2 0a1 1 0 1 1 2 0M20 21a1 1 0 1 1-2 0a1 1 0 1 1 2 0',
     },
     {
-      nome: 'Estoque',
-      rota: '/estoque',
-      icone:
-        'M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35M6 22V11h12v11M6 15h12M6 18.5h12',
-    },
-    {
       nome: 'Indicadores',
       rota: '/indicadores',
       icone: 'M3 3v16a2 2 0 0 0 2 2h16M8 17v-3M13 17V9M18 17V5',

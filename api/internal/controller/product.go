@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -26,8 +27,14 @@ type productResponse struct {
 	BasePrice pgtype.Numeric `json:"basePrice"`
 }
 
+type productListItem struct {
+	productResponse
+	Stock          int32     `json:"stock"`
+	StockUpdatedAt time.Time `json:"stockUpdatedAt"`
+}
+
 type productPage struct {
-	Items []productResponse `json:"items"`
+	Items []productListItem `json:"items"`
 	Total int64             `json:"total"`
 }
 
@@ -52,13 +59,17 @@ func (productController *ProductController) List(writer http.ResponseWriter, req
 	products, total, err := productController.Service.List(request.Context(), sessionUserID(request), page, pageSize)
 	switch {
 	case err == nil:
-		items := make([]productResponse, 0, len(products))
+		items := make([]productListItem, 0, len(products))
 		for _, product := range products {
-			items = append(items, productResponse{
-				ID:        product.IDProduto,
-				Name:      product.NomeProduto,
-				SKU:       product.Sku,
-				BasePrice: product.PrecoBase,
+			items = append(items, productListItem{
+				productResponse: productResponse{
+					ID:        product.IDProduto,
+					Name:      product.NomeProduto,
+					SKU:       product.Sku,
+					BasePrice: product.PrecoBase,
+				},
+				Stock:          product.Saldo,
+				StockUpdatedAt: product.SaldoAtualizadoEm.Time,
 			})
 		}
 		writeJSON(writer, http.StatusOK, productPage{Items: items, Total: total})

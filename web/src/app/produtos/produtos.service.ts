@@ -8,6 +8,8 @@ interface ProdutoResposta {
   name: string;
   sku: string;
   basePrice: number;
+  stock: number;
+  stockUpdatedAt: string;
 }
 
 interface PaginaResposta {
@@ -16,7 +18,14 @@ interface PaginaResposta {
 }
 
 function mapearProduto(produto: ProdutoResposta): Produto {
-  return { id: produto.id, nome: produto.name, sku: produto.sku, precoBase: produto.basePrice };
+  return {
+    id: produto.id,
+    nome: produto.name,
+    sku: produto.sku,
+    precoBase: produto.basePrice,
+    saldo: produto.stock,
+    saldoAtualizadoEm: produto.stockUpdatedAt,
+  };
 }
 
 function corpoProduto(produto: DadosProduto) {

@@ -15,7 +15,7 @@ FROM CAD_USUARIO
 WHERE id_usuario = $1;
 
 -- name: ListProdutos :many
-SELECT id_produto, nome_produto, sku, preco_base 
+SELECT id_produto, nome_produto, sku, preco_base, saldo, saldo_atualizado_em
 FROM CAD_PRODUTO 
 WHERE id_usuario = $1 
 ORDER BY nome_produto, id_produto

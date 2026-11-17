@@ -35,12 +35,6 @@ export const routes: Routes = [
         title: 'Anúncios | SellerHub',
       },
       {
-        path: 'estoque',
-        loadComponent: () =>
-          import('./estoque/estoque.component').then((modulo) => modulo.EstoqueComponent),
-        title: 'Estoque | SellerHub',
-      },
-      {
         path: 'indicadores',
         loadComponent: () =>
           import('./indicadores/indicadores.component').then(

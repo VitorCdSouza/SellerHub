@@ -18,13 +18,34 @@ describe('Contrato de produtos com a API', () => {
   it('preserva paginação/total e adapta nomes sem converter preço para centavos', () => {
     service.listar(2, 10).subscribe((pagina) => {
       expect(pagina).toEqual({
-        itens: [{ id: 3, nome: 'Peça', sku: 'P-1', precoBase: 35.5 }],
+        itens: [
+          {
+            id: 3,
+            nome: 'Peça',
+            sku: 'P-1',
+            precoBase: 35.5,
+            saldo: 4,
+            saldoAtualizadoEm: '2026-10-31T08:30:00-03:00',
+          },
+        ],
         total: 24,
       });
     });
     const req = http.expectOne('/api/produtos?pagina=2&limite=10');
     expect(req.request.method).toBe('GET');
-    req.flush({ items: [{ id: 3, name: 'Peça', sku: 'P-1', basePrice: 35.5 }], total: 24 });
+    req.flush({
+      items: [
+        {
+          id: 3,
+          name: 'Peça',
+          sku: 'P-1',
+          basePrice: 35.5,
+          stock: 4,
+          stockUpdatedAt: '2026-10-31T08:30:00-03:00',
+        },
+      ],
+      total: 24,
+    });
   });
 
   it('mantém uma resposta vazia como lista vazia', () => {

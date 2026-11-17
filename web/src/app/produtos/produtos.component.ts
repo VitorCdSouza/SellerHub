@@ -13,8 +13,10 @@ import { ProdutosService } from './produtos.service';
 import { NovoProdutoComponent } from './novo-produto/novo-produto.component';
 import { EditarProdutoComponent } from './editar-produto/editar-produto.component';
 import { ExcluirProdutoComponent } from './excluir-produto/excluir-produto.component';
+import { RegistrarEntradaComponent } from './registrar-entrada/registrar-entrada.component';
 import { Produto } from './produto.model';
 import { GradeComponent } from '../compartilhado/grade/grade.component';
+import { CelulaGradeDirective } from '../compartilhado/grade/celula-grade.directive';
 import { ColunaGrade, OpcaoGrade } from '../compartilhado/grade/coluna-grade';
 
 @Component({
@@ -22,9 +24,11 @@ import { ColunaGrade, OpcaoGrade } from '../compartilhado/grade/coluna-grade';
   imports: [
     FocoPaginaDirective,
     GradeComponent,
+    CelulaGradeDirective,
     NovoProdutoComponent,
     EditarProdutoComponent,
     ExcluirProdutoComponent,
+    RegistrarEntradaComponent,
   ],
   templateUrl: './produtos.component.html',
   styleUrl: './produtos.component.css',
@@ -44,19 +48,24 @@ export class ProdutosComponent {
   protected readonly cadastroAberto = signal(false);
   protected readonly produtoEditando = signal<Produto | null>(null);
   protected readonly produtoExcluindo = signal<Produto | null>(null);
+  protected readonly produtoEntrada = signal<Produto | null>(null);
 
   protected readonly colunas: ColunaGrade<Produto>[] = [
     { campo: 'nome', titulo: 'Produto' },
-    { campo: 'sku', titulo: 'SKU', tipo: 'codigo', largura: '14rem' },
+    { campo: 'sku', titulo: 'SKU', largura: '14rem' },
     { campo: 'precoBase', titulo: 'Preço base', tipo: 'preco', largura: '10rem' },
+    { campo: 'saldo', titulo: 'Saldo', tipo: 'inteiro', largura: '7rem' },
+    { campo: 'saldoAtualizadoEm', titulo: 'Saldo atualizado em', tipo: 'data', largura: '12rem' },
   ];
 
   protected readonly opcoes: OpcaoGrade<Produto>[] = [
     { rotulo: 'Editar', acao: (produto) => this.produtoEditando.set(produto) },
+    { rotulo: 'Registrar entrada', acao: (produto) => this.produtoEntrada.set(produto) },
     { rotulo: 'Excluir', perigo: true, acao: (produto) => this.produtoExcluindo.set(produto) },
   ];
 
   protected readonly nomeProduto = (produto: Produto) => produto.nome;
+  protected readonly semSaldo = (produto: Produto) => produto.saldo === 0;
 
   protected readonly totalPaginas = computed(() =>
     Math.max(1, Math.ceil(this.total() / this.limite())),

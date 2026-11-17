@@ -2,15 +2,20 @@
   #dialogo
   class="dialogo"
   aria-labelledby="titulo-entrada"
+  aria-describedby="descricao-entrada"
   (cancel)="impedirFechamentoDuranteEnvio($event)"
   (close)="fechado.emit()"
 >
   <h2 id="titulo-entrada">Registrar entrada</h2>
 
+  <p id="descricao-entrada" class="produto-entrada">
+    {{ produto().nome }} (SKU {{ produto().sku }}). Saldo atual: {{ produto().saldo }} un.
+  </p>
+
   <app-formulario
     class="conteudo-dialogo"
     identificador="formulario-entrada"
-    [campos]="campos()"
+    [campos]="campos"
     [enviando]="enviando()"
     [erroEnvio]="erro()"
     (salvar)="registrar($event)"

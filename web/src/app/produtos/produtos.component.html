@@ -39,7 +39,15 @@
         [linhas]="produtos()"
         [opcoes]="opcoes"
         [rotuloLinha]="nomeProduto"
-      />
+        [linhaEmAlerta]="semSaldo"
+      >
+        <ng-template appCelula="saldo" let-produto>
+          <span [class.zerado]="produto.saldo === 0">{{ produto.saldo }}</span>
+          @if (produto.saldo === 0) {
+            <span class="somente-leitor">(sem saldo)</span>
+          }
+        </ng-template>
+      </app-grade>
     }
 
     <nav class="paginacao" aria-label="Paginação de produtos">
@@ -83,6 +91,14 @@
       [produto]="produto"
       (atualizado)="recarregar()"
       (fechado)="produtoEditando.set(null)"
+    />
+  }
+
+  @if (produtoEntrada(); as produto) {
+    <app-registrar-entrada
+      [produto]="produto"
+      (registrada)="recarregar()"
+      (fechado)="produtoEntrada.set(null)"
     />
   }
 

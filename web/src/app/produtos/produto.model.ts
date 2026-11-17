@@ -3,9 +3,11 @@ export interface Produto {
   nome: string;
   sku: string;
   precoBase: number;
+  saldo: number;
+  saldoAtualizadoEm: string;
 }
 
-export type DadosProduto = Omit<Produto, 'id'>;
+export type DadosProduto = Pick<Produto, 'nome' | 'sku' | 'precoBase'>;
 
 export interface PaginaProdutos {
   itens: Produto[];
