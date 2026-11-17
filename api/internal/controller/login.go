@@ -17,6 +17,7 @@ type loginRequest struct {
 type userResponse struct {
 	ID    int32  `json:"id"`
 	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
 type LoginController struct {
@@ -62,7 +63,7 @@ func (loginController *LoginController) CurrentUser(writer http.ResponseWriter, 
 	user, err := loginController.Service.User(request.Context(), sessionUserID(request))
 	switch {
 	case err == nil:
-		writeJSON(writer, http.StatusOK, userResponse{ID: user.IDUsuario, Email: user.Email})
+		writeJSON(writer, http.StatusOK, userResponse{ID: user.IDUsuario, Email: user.Email, Name: user.Nome})
 	case errors.Is(err, service.ErrNotFound):
 		respond(writer, http.StatusUnauthorized, false, "Sessão inválida ou expirada")
 	default:

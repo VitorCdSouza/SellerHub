@@ -47,8 +47,10 @@ type listingDetail struct {
 }
 
 type marketplaceResponse struct {
-	ID   int32  `json:"id"`
-	Name string `json:"name"`
+	ID         int32          `json:"id"`
+	Name       string         `json:"name"`
+	Commission pgtype.Numeric `json:"commission"`
+	Listings   int32          `json:"listings"`
 }
 
 const invalidListingMessage = "Informe título (até 255 caracteres) e preço maior que zero com até 2 casas decimais. Para publicar, informe também descrição e condição. EAN, se informado, deve ter 8, 12, 13 ou 14 dígitos"
@@ -169,7 +171,7 @@ func (listingController *ListingController) Update(writer http.ResponseWriter, r
 }
 
 func (listingController *ListingController) Marketplaces(writer http.ResponseWriter, request *http.Request) {
-	marketplaces, err := listingController.Service.Marketplaces(request.Context())
+	marketplaces, err := listingController.Service.Marketplaces(request.Context(), sessionUserID(request))
 	if err != nil {
 		log.Printf("listar marketplaces: %v", err)
 		respond(writer, http.StatusInternalServerError, false, "Não foi possível listar os marketplaces")
@@ -177,7 +179,12 @@ func (listingController *ListingController) Marketplaces(writer http.ResponseWri
 	}
 	items := make([]marketplaceResponse, 0, len(marketplaces))
 	for _, marketplace := range marketplaces {
-		items = append(items, marketplaceResponse{ID: marketplace.IDMarketplace, Name: marketplace.NomeMarketplace})
+		items = append(items, marketplaceResponse{
+			ID:         marketplace.IDMarketplace,
+			Name:       marketplace.NomeMarketplace,
+			Commission: marketplace.TaxaComissao,
+			Listings:   marketplace.TotalAnuncios,
+		})
 	}
 	writeJSON(writer, http.StatusOK, items)
 }

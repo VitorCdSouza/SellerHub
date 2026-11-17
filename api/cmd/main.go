@@ -44,6 +44,12 @@ func main() {
 	stockController := &controller.StockController{
 		Service: &service.StockService{Queries: queries},
 	}
+	accountController := &controller.AccountController{
+		Service: &service.AccountService{Queries: queries},
+	}
+	metricsController := &controller.MetricsController{
+		Service: &service.MetricsService{Queries: queries},
+	}
 	protected := func(handler http.HandlerFunc) http.HandlerFunc {
 		return controller.RequireSession(sessionService, handler)
 	}
@@ -64,6 +70,9 @@ func main() {
 	mux.HandleFunc("PUT /api/anuncios/{id}", protected(listingController.Update))
 	mux.HandleFunc("GET /api/estoque", protected(stockController.List))
 	mux.HandleFunc("POST /api/estoque/{id}/entradas", protected(stockController.AddEntry))
+	mux.HandleFunc("PUT /api/conta", protected(accountController.Update))
+	mux.HandleFunc("PUT /api/conta/senha", protected(accountController.ChangePassword))
+	mux.HandleFunc("GET /api/indicadores", protected(metricsController.List))
 
 	log.Print("API em http://localhost:8080")
 	log.Fatal(http.ListenAndServe("localhost:8080", mux))

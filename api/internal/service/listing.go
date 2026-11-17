@@ -138,8 +138,8 @@ func (listingService *ListingService) Update(ctx context.Context, userID, listin
 	return nil
 }
 
-func (listingService *ListingService) Marketplaces(ctx context.Context) ([]db.CadMarketplace, error) {
-	marketplaces, err := listingService.Queries.ListMarketplaces(ctx)
+func (listingService *ListingService) Marketplaces(ctx context.Context, userID int32) ([]db.ListMarketplacesComResumoRow, error) {
+	marketplaces, err := listingService.Queries.ListMarketplacesComResumo(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("listar marketplaces: %w", err)
 	}
