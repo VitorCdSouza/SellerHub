@@ -101,4 +101,12 @@
       (fechado)="anuncioEditando.set(null)"
     />
   }
+
+  @if (anuncioExcluindo(); as anuncio) {
+    <app-excluir-anuncio
+      [anuncio]="anuncio"
+      (excluido)="recarregar()"
+      (fechado)="anuncioExcluindo.set(null)"
+    />
+  }
 </section>

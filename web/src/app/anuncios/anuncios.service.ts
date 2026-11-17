@@ -91,6 +91,12 @@ export class AnunciosService {
       .pipe(timeout(10_000));
   }
 
+  excluir(id: number) {
+    return this.http
+      .delete<{ success: boolean; message: string }>(`/api/anuncios/${id}`)
+      .pipe(timeout(10_000));
+  }
+
   marketplaces(): Observable<Marketplace[]> {
     return this.http.get<{ id: number; name: string }[]>('/api/marketplaces').pipe(
       timeout(10_000),

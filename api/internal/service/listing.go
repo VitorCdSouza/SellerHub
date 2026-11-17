@@ -23,9 +23,13 @@ const (
 )
 
 var (
-	ErrListingExists = errors.New("produto ja anunciado no marketplace")
-	ErrListingLocked = errors.New("anuncio nao editavel")
+	ErrListingExists     = errors.New("produto ja anunciado no marketplace")
+	ErrListingLocked     = errors.New("anuncio nao editavel")
+	ErrListingHasMetrics = errors.New("anuncio possui metricas")
 )
+
+// publicado, pausado e encerrado ja estao no marketplace
+var editableStatuses = []string{"rascunho", "aprovado", "erro"}
 
 var eanPattern = regexp.MustCompile(`^(\d{8}|\d{12,14})$`)
 
@@ -120,8 +124,7 @@ func (listingService *ListingService) Update(ctx context.Context, userID, listin
 	if err != nil {
 		return err
 	}
-	// publicado, pausado e encerrado ja estao no marketplace
-	if !slices.Contains([]string{"rascunho", "aprovado", "erro"}, current.StatusCampo) {
+	if !slices.Contains(editableStatuses, current.StatusCampo) {
 		return ErrListingLocked
 	}
 	err = listingService.Queries.UpdateAnuncio(ctx, db.UpdateAnuncioParams{
@@ -134,6 +137,32 @@ func (listingService *ListingService) Update(ctx context.Context, userID, listin
 	})
 	if err != nil {
 		return fmt.Errorf("atualizar anuncio: %w", err)
+	}
+	return nil
+}
+
+func (listingService *ListingService) Delete(ctx context.Context, userID, listingID int32) error {
+	current, err := listingService.Get(ctx, userID, listingID)
+	if err != nil {
+		return err
+	}
+	if !slices.Contains(editableStatuses, current.StatusCampo) {
+		return ErrListingLocked
+	}
+	deleted, err := listingService.Queries.DeleteAnuncio(ctx, db.DeleteAnuncioParams{
+		IDAnuncio: listingID,
+		IDUsuario: userID,
+	})
+	// 23503 e a fk de HIST_METRICA_ANUNCIO barrando a exclusao
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+		return ErrListingHasMetrics
+	}
+	if err != nil {
+		return fmt.Errorf("excluir anuncio: %w", err)
+	}
+	if deleted == 0 {
+		return ErrNotFound
 	}
 	return nil
 }

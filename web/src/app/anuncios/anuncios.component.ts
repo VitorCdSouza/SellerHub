@@ -12,13 +12,20 @@ import { FocoPaginaDirective } from '../compartilhado/foco-pagina.directive';
 import { AnunciosService } from './anuncios.service';
 import { Anuncio, SituacaoAnuncio, anuncioEditavel, situacoes } from './anuncio.model';
 import { EditorAnuncioComponent } from './editor-anuncio/editor-anuncio.component';
+import { ExcluirAnuncioComponent } from './excluir-anuncio/excluir-anuncio.component';
 import { GradeComponent } from '../compartilhado/grade/grade.component';
 import { CelulaGradeDirective } from '../compartilhado/grade/celula-grade.directive';
 import { ColunaGrade, OpcaoGrade } from '../compartilhado/grade/coluna-grade';
 
 @Component({
   selector: 'app-anuncios',
-  imports: [FocoPaginaDirective, EditorAnuncioComponent, GradeComponent, CelulaGradeDirective],
+  imports: [
+    FocoPaginaDirective,
+    EditorAnuncioComponent,
+    ExcluirAnuncioComponent,
+    GradeComponent,
+    CelulaGradeDirective,
+  ],
   templateUrl: './anuncios.component.html',
   styleUrl: './anuncios.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +45,7 @@ export class AnunciosComponent {
   protected readonly busca = signal('');
   // null fecha o editor, 0 abre o cadastro e um id abre a edicao
   protected readonly anuncioEditando = signal<number | null>(null);
+  protected readonly anuncioExcluindo = signal<Anuncio | null>(null);
 
   protected readonly colunas: ColunaGrade<Anuncio>[] = [
     { campo: 'produto', titulo: 'Produto' },
@@ -52,6 +60,12 @@ export class AnunciosComponent {
       rotulo: 'Editar',
       habilitada: anuncioEditavel,
       acao: (anuncio) => this.anuncioEditando.set(anuncio.id),
+    },
+    {
+      rotulo: 'Excluir',
+      perigo: true,
+      habilitada: anuncioEditavel,
+      acao: (anuncio) => this.anuncioExcluindo.set(anuncio),
     },
   ];
 

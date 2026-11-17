@@ -170,6 +170,29 @@ func (listingController *ListingController) Update(writer http.ResponseWriter, r
 	}
 }
 
+func (listingController *ListingController) Delete(writer http.ResponseWriter, request *http.Request) {
+	listingID, ok := pathID(request)
+	if !ok {
+		respond(writer, http.StatusNotFound, false, "Anúncio não encontrado")
+		return
+	}
+
+	err := listingController.Service.Delete(request.Context(), sessionUserID(request), listingID)
+	switch {
+	case err == nil:
+		respond(writer, http.StatusOK, true, "Anúncio excluído")
+	case errors.Is(err, service.ErrNotFound):
+		respond(writer, http.StatusNotFound, false, "Anúncio não encontrado")
+	case errors.Is(err, service.ErrListingLocked):
+		respond(writer, http.StatusConflict, false, "Anúncio publicado, pausado ou encerrado não pode ser excluído")
+	case errors.Is(err, service.ErrListingHasMetrics):
+		respond(writer, http.StatusConflict, false, "O anúncio possui métricas registradas e não pode ser excluído")
+	default:
+		log.Printf("excluir anuncio: %v", err)
+		respond(writer, http.StatusInternalServerError, false, "Não foi possível excluir o anúncio")
+	}
+}
+
 func (listingController *ListingController) Marketplaces(writer http.ResponseWriter, request *http.Request) {
 	marketplaces, err := listingController.Service.Marketplaces(request.Context(), sessionUserID(request))
 	if err != nil {

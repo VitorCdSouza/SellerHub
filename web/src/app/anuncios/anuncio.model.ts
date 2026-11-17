@@ -49,7 +49,7 @@ export const situacoes: { valor: SituacaoAnuncio; rotulo: string; plural: string
   { valor: 'erro', rotulo: 'Erro', plural: 'Erros' },
 ];
 
-// publicado, pausado e encerrado ja estao no marketplace e a api recusa a edicao
+// publicado, pausado e encerrado ja estao no marketplace e a api recusa edicao e exclusao
 export function anuncioEditavel(anuncio: Anuncio): boolean {
   return ['rascunho', 'aprovado', 'erro'].includes(anuncio.situacao);
 }

@@ -68,6 +68,7 @@ func main() {
 	mux.HandleFunc("GET /api/anuncios/{id}", protected(listingController.Get))
 	mux.HandleFunc("POST /api/anuncios", protected(listingController.Create))
 	mux.HandleFunc("PUT /api/anuncios/{id}", protected(listingController.Update))
+	mux.HandleFunc("DELETE /api/anuncios/{id}", protected(listingController.Delete))
 	mux.HandleFunc("GET /api/estoque", protected(stockController.List))
 	mux.HandleFunc("POST /api/estoque/{id}/entradas", protected(stockController.AddEntry))
 	mux.HandleFunc("PUT /api/conta", protected(accountController.Update))

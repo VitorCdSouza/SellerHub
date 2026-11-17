@@ -106,6 +106,33 @@ describe('Anúncios', () => {
     expect(editar(linhas[1]).disabled).toBe(false);
   });
 
+  it('exclui anúncio fora do marketplace depois de confirmar e recarrega a lista', () => {
+    http.expectOne('/api/anuncios').flush(anuncios);
+    fixture.detectChanges();
+
+    const opcao = (linha: Element, rotulo: string) =>
+      Array.from(linha.querySelectorAll<HTMLButtonElement>('.menu-opcoes button')).find(
+        (item) => item.textContent?.trim() === rotulo,
+      )!;
+    const linhas = pagina().querySelectorAll('tbody tr');
+    expect(opcao(linhas[0], 'Excluir').disabled).toBe(true);
+    opcao(linhas[1], 'Excluir').click();
+    fixture.detectChanges();
+    expect(pagina().querySelector('dialog')?.textContent).toContain(
+      'Excluir o anúncio de Kit Relação CG 160 no Shopee?',
+    );
+
+    botao('Excluir anúncio').click();
+    http
+      .expectOne({ method: 'DELETE', url: '/api/anuncios/2' })
+      .flush({ success: true, message: 'Anúncio excluído' });
+    http.expectOne('/api/anuncios').flush([anuncios[0]]);
+    fixture.detectChanges();
+
+    expect(pagina().querySelector('dialog')).toBeNull();
+    expect(pagina().querySelectorAll('tbody tr').length).toBe(1);
+  });
+
   it('marca o canal já anunciado e exige descrição e condição para aprovar', async () => {
     http.expectOne('/api/anuncios').flush(anuncios);
     fixture.detectChanges();

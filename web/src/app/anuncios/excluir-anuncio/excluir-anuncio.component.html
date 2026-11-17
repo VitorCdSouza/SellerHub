@@ -1,0 +1,30 @@
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-exclusao-anuncio"
+  aria-describedby="descricao-exclusao-anuncio"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-exclusao-anuncio">Excluir anúncio</h2>
+
+  <div class="conteudo-dialogo">
+    <p id="descricao-exclusao-anuncio">
+      Excluir o anúncio de {{ anuncio().produto }} no {{ anuncio().marketplace }}? Essa ação não
+      pode ser desfeita.
+    </p>
+
+    @if (erro()) {
+      <p class="mensagem-erro" role="alert">{{ erro() }}</p>
+    }
+  </div>
+
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    <button type="button" class="botao-perigo" [disabled]="enviando()" (click)="excluir()">
+      {{ enviando() ? 'Excluindo...' : 'Excluir anúncio' }}
+    </button>
+  </div>
+</dialog>

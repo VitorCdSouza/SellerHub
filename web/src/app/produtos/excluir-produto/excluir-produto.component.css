@@ -19,28 +19,3 @@
   background: var(--cor-erro-fundo);
   color: var(--cor-erro);
 }
-
-.botao-perigo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.65rem 1.15rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background: var(--cor-erro);
-  color: #fff;
-  font: inherit;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.botao-perigo:hover:not(:disabled) {
-  background: #821826;
-}
-
-.botao-perigo:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
