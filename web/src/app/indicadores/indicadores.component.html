@@ -1,0 +1,111 @@
+<section aria-labelledby="titulo-indicadores">
+  <header class="cabecalho-pagina">
+    <div>
+      <h1 id="titulo-indicadores" appFocoPagina>Indicadores</h1>
+      <p class="subtitulo">Acessos e conversões registrados para os seus anúncios.</p>
+    </div>
+    <div class="filtro">
+      <label for="filtro-mes">Mês</label>
+      <select
+        #seletor
+        id="filtro-mes"
+        class="campo-texto"
+        [value]="mes().valor"
+        (change)="selecionarMes(seletor.value)"
+      >
+        @for (opcao of meses; track opcao.valor) {
+          <option [value]="opcao.valor">{{ opcao.rotulo }}</option>
+        }
+      </select>
+    </div>
+  </header>
+
+  @if (carregando()) {
+    <div class="estado" role="status">Carregando indicadores...</div>
+  } @else if (erro()) {
+    <div class="estado erro" role="alert">
+      <p>{{ erro() }}</p>
+      <button type="button" class="botao-secundario" (click)="recarregar()">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (metricas().length === 0) {
+    <div class="estado vazio">
+      <h2>Nenhum acesso registrado em {{ mes().rotulo }}</h2>
+      <p>Os números aparecem aqui quando houver métricas dos anúncios no período.</p>
+    </div>
+  } @else {
+    <dl class="cartao resumo">
+      <div>
+        <dt>Acessos</dt>
+        <dd>{{ totais().acessos | number }}</dd>
+      </div>
+      <div>
+        <dt>Conversões</dt>
+        <dd>{{ totais().conversoes | number }}</dd>
+      </div>
+      <div>
+        <dt>Taxa de conversão</dt>
+        <dd>{{ (taxa(totais().conversoes, totais().acessos) | percent: '1.2-2') ?? '—' }}</dd>
+      </div>
+    </dl>
+
+    <div class="paineis">
+      <section class="cartao" aria-labelledby="titulo-por-anuncio">
+        <h2 id="titulo-por-anuncio">Acessos por anúncio</h2>
+        <ol class="barras">
+          @for (metrica of metricas(); track metrica.anuncioId) {
+            <li>
+              <span class="rotulo">
+                <span class="titulo">{{ metrica.titulo }}</span>
+                <span class="canal">{{ metrica.marketplace }}</span>
+              </span>
+              <span class="trilho" aria-hidden="true">
+                <span class="barra" [style.width.%]="(metrica.acessos / maiorAcesso()) * 100"></span>
+              </span>
+              <span class="numero">{{ metrica.acessos | number }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+
+      <section class="cartao" aria-labelledby="titulo-por-canal">
+        <h2 id="titulo-por-canal">Por canal</h2>
+        <div class="tabela-container">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Canal</th>
+                <th scope="col" class="numero">Acessos</th>
+                <th scope="col" class="numero">Conversões</th>
+                <th scope="col" class="numero">Taxa</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (canal of porCanal(); track canal.nome) {
+                <tr>
+                  <th scope="row">{{ canal.nome }}</th>
+                  <td class="numero">{{ canal.acessos | number }}</td>
+                  <td class="numero">{{ canal.conversoes | number }}</td>
+                  <td class="numero">
+                    {{ (taxa(canal.conversoes, canal.acessos) | percent: '1.2-2') ?? '—' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row">Total</th>
+                <td class="numero">{{ totais().acessos | number }}</td>
+                <td class="numero">{{ totais().conversoes | number }}</td>
+                <td class="numero">
+                  {{ (taxa(totais().conversoes, totais().acessos) | percent: '1.2-2') ?? '—' }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </div>
+  }
+</section>

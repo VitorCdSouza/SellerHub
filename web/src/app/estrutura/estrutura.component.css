@@ -80,7 +80,7 @@ nav > a.ativo {
   padding: 1rem 0.85rem 0;
 }
 .avatar {
-  grid-row: span 2;
+  grid-row: span 3;
   display: grid;
   place-items: center;
   width: 2.25rem;
@@ -91,12 +91,18 @@ nav > a.ativo {
   font-size: 0.85rem;
   font-weight: 700;
 }
+.nome,
 .email {
   overflow: hidden;
   font-size: 0.9rem;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.nome + .email {
+  color: var(--cor-texto-secundario);
+  font-size: 0.85rem;
+  font-weight: 400;
 }
 .botao-saida {
   justify-self: start;

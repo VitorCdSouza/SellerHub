@@ -1,0 +1,27 @@
+<dialog
+  #dialogo
+  class="dialogo"
+  aria-labelledby="titulo-senha"
+  (cancel)="impedirFechamentoDuranteEnvio($event)"
+  (close)="fechado.emit()"
+>
+  <h2 id="titulo-senha">Alterar senha</h2>
+
+  <app-formulario
+    class="conteudo-dialogo"
+    identificador="formulario-senha"
+    [campos]="campos"
+    [enviando]="enviando()"
+    [erroEnvio]="erro()"
+    (salvar)="salvar($event)"
+  />
+
+  <div class="acoes-dialogo">
+    <button type="button" class="botao-secundario" [disabled]="enviando()" (click)="fechar()">
+      Cancelar
+    </button>
+    <button type="submit" form="formulario-senha" class="botao-primario" [disabled]="enviando()">
+      {{ enviando() ? 'Salvando...' : 'Alterar senha' }}
+    </button>
+  </div>
+</dialog>

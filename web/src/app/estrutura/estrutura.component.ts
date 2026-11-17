@@ -31,9 +31,15 @@ export class EstruturaComponent {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly saindo = signal(false);
   protected readonly erroSaida = signal('');
-  protected readonly iniciais = computed(() =>
-    (this.auth.usuario()?.email ?? '').slice(0, 2).toUpperCase(),
-  );
+  // primeira letra do primeiro e do ultimo nome, ex.: "Vitor Souza" vira "VS"
+  protected readonly iniciais = computed(() => {
+    const usuario = this.auth.usuario();
+    const nomes = (usuario?.nome ?? '').trim().split(/\s+/).filter(Boolean);
+    if (nomes.length === 0) return (usuario?.email ?? '').slice(0, 2).toUpperCase();
+    const primeira = nomes[0][0];
+    const ultima = nomes.length > 1 ? nomes[nomes.length - 1][0] : '';
+    return (primeira + ultima).toUpperCase();
+  });
   // icones desenhados com tracos em grade 24x24
   protected readonly modulos: ModuloMenu[] = [
     {
@@ -61,10 +67,12 @@ export class EstruturaComponent {
     },
     {
       nome: 'Indicadores',
+      rota: '/indicadores',
       icone: 'M3 3v16a2 2 0 0 0 2 2h16M8 17v-3M13 17V9M18 17V5',
     },
     {
       nome: 'Administração',
+      rota: '/administracao',
       icone: 'M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4',
     },
   ];

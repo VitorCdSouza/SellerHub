@@ -42,7 +42,7 @@
         @default {
           <input
             [id]="id"
-            type="text"
+            [type]="campo.tipo === 'senha' ? 'password' : 'text'"
             class="campo-texto"
             autocomplete="off"
             [formControlName]="campo.nome"

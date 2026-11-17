@@ -1,0 +1,70 @@
+<section aria-labelledby="titulo-administracao">
+  <header class="cabecalho-pagina">
+    <h1 id="titulo-administracao" appFocoPagina>Administração</h1>
+  </header>
+
+  <div class="aviso" role="status">
+    @if (aviso()) {
+      <p>{{ aviso() }}</p>
+    }
+  </div>
+
+  <div class="grade">
+    <section class="cartao" aria-labelledby="titulo-conta">
+      <h2 id="titulo-conta">Conta</h2>
+      <app-formulario
+        identificador="formulario-conta"
+        [campos]="campos"
+        [enviando]="salvando()"
+        [erroEnvio]="erroConta()"
+        (salvar)="salvarConta($event)"
+        (alterado)="aviso.set('')"
+      />
+      <div class="acoes-cartao">
+        <button type="button" class="botao-secundario" (click)="senhaAberta.set(true)">
+          Alterar senha
+        </button>
+        <button
+          type="submit"
+          form="formulario-conta"
+          class="botao-primario"
+          [disabled]="salvando()"
+        >
+          {{ salvando() ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="cartao" aria-labelledby="titulo-canais">
+      <h2 id="titulo-canais">Canais</h2>
+      <p class="nota">A conexão com as contas dos marketplaces ainda não está disponível.</p>
+
+      @if (carregandoCanais()) {
+        <p role="status">Carregando canais...</p>
+      } @else if (erroCanais()) {
+        <div class="erro" role="alert">
+          <p>{{ erroCanais() }}</p>
+          <button type="button" class="botao-secundario" (click)="recarregarCanais()">
+            Tentar novamente
+          </button>
+        </div>
+      } @else {
+        <ul class="canais">
+          @for (canal of canais(); track canal.id) {
+            <li>
+              <span class="nome-canal">{{ canal.nome }}</span>
+              <span class="detalhe">
+                {{ canal.anuncios }} {{ canal.anuncios === 1 ? 'anúncio' : 'anúncios' }}
+              </span>
+              <span class="detalhe">Comissão {{ canal.comissao | number: '1.0-2' }}%</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+
+  @if (senhaAberta()) {
+    <app-alterar-senha (alterada)="senhaAlterada()" (fechado)="senhaAberta.set(false)" />
+  }
+</section>

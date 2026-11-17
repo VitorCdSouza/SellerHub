@@ -10,6 +10,7 @@ export interface RespostaLogin {
 export interface UsuarioSessao {
   id: number;
   email: string;
+  nome: string;
 }
 
 export type EstadoSessao =

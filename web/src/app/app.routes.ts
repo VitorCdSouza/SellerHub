@@ -40,6 +40,22 @@ export const routes: Routes = [
           import('./estoque/estoque.component').then((modulo) => modulo.EstoqueComponent),
         title: 'Estoque | SellerHub',
       },
+      {
+        path: 'indicadores',
+        loadComponent: () =>
+          import('./indicadores/indicadores.component').then(
+            (modulo) => modulo.IndicadoresComponent,
+          ),
+        title: 'Indicadores | SellerHub',
+      },
+      {
+        path: 'administracao',
+        loadComponent: () =>
+          import('./administracao/administracao.component').then(
+            (modulo) => modulo.AdministracaoComponent,
+          ),
+        title: 'Administração | SellerHub',
+      },
     ],
   },
   {

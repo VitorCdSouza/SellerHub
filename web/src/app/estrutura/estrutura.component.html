@@ -35,6 +35,9 @@
     </nav>
     <div class="conta">
       <span class="avatar" aria-hidden="true">{{ iniciais() }}</span>
+      @if (auth.usuario()?.nome) {
+        <span class="nome">{{ auth.usuario()?.nome }}</span>
+      }
       <span class="email">{{ auth.usuario()?.email }}</span>
       <button type="button" class="botao-saida" (click)="sair()" [disabled]="saindo()">
         {{ saindo() ? 'Saindo...' : 'Sair' }}
