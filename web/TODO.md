@@ -1,16 +1,16 @@
 # SellerHub — tarefas para concluir a entrega
 
-Revisão em **17/11/2026**, com cruzamento dos 22 commits entre `336af955` e `776b91fc`, correção do banco local e revalidação. Apresentação prevista para **17/11/2026**. Fila única para front-end, dependências de back-end e decisões; os IDs FE/BE/DEC anteriores continuam rastreáveis.
+Revisão em **17/11/2026**, com cruzamento dos 22 commits entre `336af955` e `776b91fc`, correção do banco local e da grade responsiva sobre `170af005`. Apresentação prevista para **17/11/2026**. Fila única para front-end, dependências de back-end e decisões; os IDs FE/BE/DEC anteriores continuam rastreáveis.
 
-**Estado de qualidade em 17/11: APROVADO**, conforme [QUALIDADE.md](QUALIDADE.md): 94 Angular, 8 do executor, 5 do simulador, tipos/build, 19 HTTP reais e 22 E2E; zero skips/flaky e oito laudos AXE sem violações. Rodada `20261117153254124-ff1484a5`, impressão `72d0a504d25443ef6b296a14bb3625e3d3206f325be4154b3209291c63f1dae5`, confirmada por `:conferir`. O resultado aprova os checks exercitados; não conclui todos os critérios do MVP ou a avaliação visual móvel. Caixas marcadas identificam subentregas, não aceite integral.
+**Estado de qualidade em 17/11: APROVADO**, conforme [QUALIDADE.md](QUALIDADE.md): 94 Angular, 8 do executor, 5 do simulador, tipos/build, 19 HTTP reais e 26 E2E; zero skips/flaky e oito laudos AXE da suíte sem violações. Rodada `20261117155518103-34ad6bdb`, impressão `b33aa94f4139379f12b20bdcc34862c8cc4c17bd85a74fbc78c0591156e4c774`. Inclui regressão da grade em Produtos/Anúncios nas sete larguras descritas abaixo. O resultado não conclui todos os critérios do MVP. Caixas marcadas identificam subentregas, não aceite integral.
 
-Base atual revisada: **`776b91fc`**. Os commits de 15–17/11 acrescentam APIs e telas de anúncios, saldo/entrada de produtos, conta/senha e indicadores. Vitor contribuiu em 13 commits que tocaram `web/`; Leticia entregou modais, administração e indicadores, e Samuel ampliou SQL/sqlc. As referências de autoria e os aceites históricos abaixo foram preservados.
+Base da correção atual: **`170af005`**. O cruzamento anterior cobriu `336af955..776b91fc`: APIs e telas de anúncios, saldo/entrada, conta/senha e indicadores. Nesse corte, Vitor contribuiu em 13 commits que tocaram `web/`; Leticia entregou modais, administração e indicadores, e Samuel ampliou SQL/sqlc. Referências de autoria e aceites históricos foram preservados.
 
 **Bloqueio de BE-02 resolvido neste ambiente:** a [migration SQL](../db/migrations/20261117_01_compatibiliza_saldo_atributos.sql) acrescentou `saldo`, `saldo_atualizado_em` e `atributos_canal`, com CHECK de saldo não negativo. Atualização aplicada somente ao banco local, com backup e comparação de integridade; demais dados, IDs e situações preservados. Produtos/estoque e detalhe de anúncio voltaram a responder 200. Os defaults novos são zero/data da atualização/objeto vazio, sem representar contagem física ou atributos conferidos. Não houve mudança de código Go ou Angular de produção, seed/reset, normalização de situações ou aplicação de UNIQUE.
 
 **Testes de catálogo ajustados:** seletores agora usam o nome acessível do campo, preservando foco/valores/erro; a validação confere a descrição acessível e `aria-invalid`. O teste aguarda a abertura do modal antes de Escape. Dois arquivos E2E alterados, sem remoção de AXE/interceptações/assertivas e sem gravação de produtos. As rodadas anteriores com falhas de banco e seletores permanecem como histórico.
 
-**Pendência visual — QA-20261117-003-VIS-01:** em 390 px, o nome do produto na grade fica excessivamente comprimido, com quebras quase letra por linha. Sustentação deve corrigir o comportamento da tabela e devolver a QA para captura/revalidação móvel. AXE sem violações não comprova legibilidade visual. Essa correção de CSS não foi incluída na intervenção do banco.
+**Defeito visual corrigido — QA-20261117-003-VIS-01:** o mínimo da grade agora soma as larguras declaradas e reserva espaço útil para cada coluna textual. A tabela mantém rolagem interna quando não cabe; nomes não são comprimidos letra por letra e cabeçalhos não se sobrepõem. Regressão independente falhou antes e passou depois em Produtos/Anúncios nas larguras CSS 390, 640, 768, 1024, 1280, 1440 e 1920; 640 representa também a largura CSS equivalente a uma janela de 1280 com zoom de 200%, sem afirmar teste de zoom nativo. Não houve mudança de dados, API ou páginas fora da grade compartilhada.
 
 ## Cruzamento das entregas recentes com a fila
 
@@ -23,7 +23,7 @@ Base atual revisada: **`776b91fc`**. Os commits de 15–17/11 acrescentam APIs e
 | **FE-13; BE-13** | Nome/e-mail, senha atual/nova/confirmação, atualização da sessão e resumo de canais. `364ab327`, `121b844f`. | Homologar persistência/erros. Preferências e conexão/reconexão externas não entregues. Trocar senha autenticado não conclui FE-14/BE-14. |
 | **ENT-01/06; BE-08** | Listagem local de marketplaces e vínculo do anúncio ao canal. | Destino de testes e envio/recebimento/resposta não implementados no recorte. Nome de canal/status no banco não comprova publicação. |
 | **FE-07/10/14; BE-06/09/10/14** | Nenhuma entrega dos respectivos fluxos encontrada nos commits revisados. | Fotos, IA, pedidos e recuperação de senha continuam pendentes. Vendas segue “Em breve”. |
-| **ENT-07/08; FE-15/BE-15** | Banco local compatibilizado e suíte atual aprovada; catálogo/login exercitados em desktop/390 px. Roteiro preparado separadamente. | Corrigir a legibilidade da grade móvel e concluir os cenários adicionais, novos módulos, persistência/gravação, fluxo externo e ensaio. |
+| **ENT-07/08; FE-15/BE-15** | Banco local compatibilizado, grade responsiva corrigida e suíte atual aprovada; catálogo/login e geometria da grade exercitados. Roteiro preparado separadamente. | Concluir cenários adicionais, novos módulos, persistência/gravação, fluxo externo e ensaio. |
 
 **Documentação ainda pendente:** o guia técnico mantém a referência incorreta a login em `/inicio`. A incompatibilidade de seletor/mensagem obrigatória do E2E foi reproduzida e corrigida nos testes, sem mudar a validação do produto. A visibilidade do erro associado também foi confirmada em sondagem independente; a aprovação não elimina as demais lacunas de cobertura de ENT-02.
 
@@ -77,7 +77,8 @@ Esta seção reúne **entregas delimitadas já realizadas**, com sua evidência.
 | --- | --- |
 | **BE-02 — Corrigir compatibilidade do banco local** | Migration de saldo/data/atributos aplicada com backup e integridade preservada; consultas antes afetadas respondem 200. Situações antigas e UNIQUE não modificadas; demais ambientes e acentuação permanecem pendentes. |
 | **ENT-02 — Atualizar testes do catálogo em modais** | Seletores por nome acessível, validação associada ao campo e espera de abertura antes de Escape; testes focados e 22 E2E aprovados. Sem alterar componentes de produção ou gravar produtos. |
-| **ENT-07 — Revalidar os checks atuais** | Todos os sete checks aprovados na rodada indicada no início; oito laudos AXE sem violações. Grade móvel, cenários adicionais e módulos externos continuam com aceite aberto. |
+| **ENT-07 — Revalidar os checks atuais** | Todos os sete checks aprovados na rodada indicada no início; oito laudos AXE sem violações. Cenários adicionais e módulos externos continuam com aceite aberto. |
+| **FE-04/08 — Corrigir legibilidade da grade responsiva** | QA-20261117-003-VIS-01 corrigido na grade compartilhada; regressão geométrica e capturas em sete larguras para Produtos/Anúncios, com rolagem interna e sem sobreposição de cabeçalhos. Suíte final com 26 E2E aprovados; não conclui os demais marcos do produto. |
 
 ### Evidência histórica de qualidade e limite da revisão de 14/11
 
@@ -159,7 +160,7 @@ São **oito tarefas com aceite ainda aberto**, algumas com implementação parci
 
 ### ENT-07 — Homologação e qualidade (FE-15/BE-15)
 
-**Prova atual de 17/11: APROVADO**, após correção local do banco e dos testes desatualizados, com execução e limites descritos no início da fila. A aprovação de 14/11 permanece histórica. A grade móvel tem pendência visual separada; os critérios adicionais abaixo não são encerrados pela suíte verde.
+**Prova atual de 17/11: APROVADO**, após correção local do banco, testes desatualizados e grade responsiva, com execução e limites descritos no início da fila. A aprovação de 14/11 permanece histórica. QA-20261117-003-VIS-01 foi encerrado no recorte reproduzido; os critérios adicionais abaixo não são encerrados pela suíte verde.
 
 - [ ] Repetir o catálogo atual: login inválido/válido → `/produtos` → cadastrar em modal → lista → editar em modal → F5 → sair → bloquear retorno → entrar com outra conta e confirmar isolamento. Testar `404` do produto alheio diretamente na API; não exigir página de detalhe removida.
 - [ ] Confirmar persistência após reinício da API. Gravação QA é explícita e limitada; reutilizar registros adequados, sem criar massa só para paginação. A suíte padrão não grava produtos.

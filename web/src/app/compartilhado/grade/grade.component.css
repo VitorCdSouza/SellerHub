@@ -1,10 +1,11 @@
 :host {
   display: block;
+  --largura-opcoes: 3.75rem;
+  --largura-coluna-texto: 14rem;
 }
 
-/* fixed: a largura vem do cabecalho, nao do conteudo, e nao muda ao filtrar */
+/* As colunas mantêm suas larguras ao filtrar; o mínimo reserva espaço para texto. */
 table {
-  min-width: 48rem;
   table-layout: fixed;
 }
 
@@ -19,7 +20,7 @@ table {
 }
 
 .coluna-opcoes {
-  width: 3.75rem;
+  width: var(--largura-opcoes);
   padding-right: 0;
 }
 

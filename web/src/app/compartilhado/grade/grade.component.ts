@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   LOCALE_ID,
+  computed,
   contentChildren,
   inject,
   input,
@@ -28,6 +29,14 @@ export class GradeComponent<T> {
   // nome da linha lido pelo leitor de tela no botao de opcoes
   readonly rotuloLinha = input.required<(linha: T) => string>();
   readonly linhaEmAlerta = input<(linha: T) => boolean>(() => false);
+
+  protected readonly larguraMinima = computed(() => {
+    const larguras = [
+      'var(--largura-opcoes)',
+      ...this.colunas().map((coluna) => coluna.largura ?? 'var(--largura-coluna-texto)'),
+    ];
+    return `calc(${larguras.join(' + ')})`;
+  });
 
   private readonly celulas = contentChildren(CelulaGradeDirective);
 
