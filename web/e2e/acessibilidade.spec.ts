@@ -16,11 +16,11 @@ for (const tela of ['lista', 'cadastro', 'edicao'] as const) {
       await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
       const modal = page.getByRole('dialog', { name: 'Novo produto' });
       await expect(modal).toBeVisible();
-      await expect.soft(modal.getByLabel('Nome', { exact: true })).toBeFocused({ timeout: 2_000 });
+      await expect.soft(modal.getByRole('textbox', { name: 'Nome', exact: true })).toBeFocused({ timeout: 2_000 });
     } else if (tela === 'edicao') {
       const modal = await abrirEdicao(page);
-      await expect(modal.getByLabel('Nome', { exact: true })).not.toHaveValue('');
-      await expect.soft(modal.getByLabel('Nome', { exact: true })).toBeFocused({ timeout: 2_000 });
+      await expect(modal.getByRole('textbox', { name: 'Nome', exact: true })).not.toHaveValue('');
+      await expect.soft(modal.getByRole('textbox', { name: 'Nome', exact: true })).toBeFocused({ timeout: 2_000 });
     } else {
       await expect.soft(page.getByRole('heading', { level: 1 })).toBeFocused({ timeout: 2_000 });
     }

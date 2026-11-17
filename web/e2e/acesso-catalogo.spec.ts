@@ -39,19 +39,23 @@ test('navega pelo catálogo real e cancela sem gravar', async ({ page, produtoId
   await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
   const modal = page.getByRole('dialog', { name: 'Novo produto' });
   await expect(modal).toBeVisible();
-  await expect(modal.getByLabel('Nome', { exact: true })).toBeFocused();
+  const campoNome = modal.getByRole('textbox', { name: 'Nome', exact: true });
+  await expect(campoNome).toBeFocused();
   await modal.getByRole('button', { name: 'Salvar produto', exact: true }).click();
-  await expect(modal.getByText('Informe o nome do produto.')).toBeVisible();
+  await expect(campoNome).toHaveAccessibleDescription('Preencha este campo.');
+  await expect(campoNome).toHaveAttribute('aria-invalid', 'true');
+  await expect(campoNome).toBeFocused();
   await expect(page).toHaveURL('/produtos');
-  await modal.getByLabel('Nome', { exact: true }).fill('Rascunho local não salvo');
+  await campoNome.fill('Rascunho local não salvo');
   await modal.getByRole('button', { name: 'Cancelar', exact: true }).click();
   await expect(modal).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Novo produto', exact: true })).toBeFocused();
   await page.getByRole('button', { name: 'Novo produto', exact: true }).click();
+  await expect(modal).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(modal).toHaveCount(0);
   const edicao = await abrirEdicao(page);
-  await expect(edicao.getByLabel('Nome', { exact: true })).not.toHaveValue('');
+  await expect(edicao.getByRole('textbox', { name: 'Nome', exact: true })).not.toHaveValue('');
   await edicao.getByRole('button', { name: 'Cancelar', exact: true }).click();
   await expect(edicao).toHaveCount(0);
   await expect(page).toHaveURL('/produtos');
@@ -122,15 +126,15 @@ test('500 controlado no PUT preserva os valores digitados sem alterar o banco', 
   });
   await page.goto('/produtos');
   const edicao = await abrirEdicao(page);
-  await expect(edicao.getByLabel('Nome', { exact: true })).not.toHaveValue('');
-  await edicao.getByLabel('Nome', { exact: true }).fill('Edição local preservada');
-  await edicao.getByLabel('Preço base (R$)').fill('42,01');
+  await expect(edicao.getByRole('textbox', { name: 'Nome', exact: true })).not.toHaveValue('');
+  await edicao.getByRole('textbox', { name: 'Nome', exact: true }).fill('Edição local preservada');
+  await edicao.getByRole('textbox', { name: 'Preço base (R$)', exact: true }).fill('42,01');
   await edicao.getByRole('button', { name: 'Salvar alterações', exact: true }).click();
   await expect(
     edicao.getByRole('alert').filter({ hasText: 'Não foi possível salvar' }),
   ).toBeVisible();
-  await expect(edicao.getByLabel('Nome', { exact: true })).toHaveValue('Edição local preservada');
-  await expect(edicao.getByLabel('Preço base (R$)')).toHaveValue('42,01');
+  await expect(edicao.getByRole('textbox', { name: 'Nome', exact: true })).toHaveValue('Edição local preservada');
+  await expect(edicao.getByRole('textbox', { name: 'Preço base (R$)', exact: true })).toHaveValue('42,01');
   expect(envios).toBe(1);
   await capturar(page, info, 'falha-gravacao-controlada');
 });
